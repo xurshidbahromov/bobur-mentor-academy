@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTranslation } from '../../hooks/useTranslation'
+import { useTelegram } from '../../context/TelegramProvider'
 import { Coins } from 'lucide-react'
 import { useStreak } from '../../hooks/useStreak'
 import Button from '../ui/Button'
@@ -25,9 +26,10 @@ const IcoProfile = ({ active }) => active ? (
 )
 
 export default function Navbar() {
-  const { user, signOut, loading } = useAuth()
-  const { profile } = useStreak()
+  const { user, profile, loading, signOut } = useAuth()
+  const { streakData } = useStreak()
   const { t } = useTranslation()
+  const { isTelegram } = useTelegram()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -61,8 +63,9 @@ export default function Navbar() {
 
   return (
     <>
-      <header style={{
-        position: 'sticky',
+      {!isTelegram && (
+        <header style={{
+          position: 'sticky',
         top: 0,
         zIndex: 100,
         height: '72px',
@@ -168,9 +171,10 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
+      )}
 
       {/* Mobile Bottom Navigation (Mini App Style) */}
-      <nav className="mobile-bottom-nav">
+      <nav className={`mobile-bottom-nav ${isTelegram ? 'tma-mode' : ''}`}>
         <NavLink to="/" end style={mobileLinkStyle}>
           {({ isActive }) => (
             <>
@@ -224,7 +228,7 @@ export default function Navbar() {
         {`
           @media (min-width: 768px) {
             .desktop-only { display: flex !important; }
-            .mobile-bottom-nav { display: none !important; }
+            .mobile-bottom-nav:not(.tma-mode) { display: none !important; }
           }
           @media (max-width: 767px) {
             .desktop-only { display: none !important; }
@@ -245,6 +249,23 @@ export default function Navbar() {
               border-radius: 36px 36px 0 0;
             }
             body { padding-bottom: 100px; } /* Ensure bottom nav doesn't cover content */
+          }
+          .tma-mode {
+            display: flex !important;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #0f172a);
+            border-top: 1px solid var(--border-soft);
+            padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 24px));
+            justify-content: space-around;
+            z-index: 200;
+            box-shadow: 0 -4px 32px rgba(0,0,0,0.04);
+            /* native app tab bar usually does not have big top radius, keep it subtle */
+            border-radius: 20px 20px 0 0;
+          }
+          :root:has(.tma-mode) body {
+            padding-bottom: calc(100px + env(safe-area-inset-bottom, 24px));
           }
         `}
       </style>
