@@ -19,8 +19,32 @@ function TelegramAutoLogin() {
 
   useEffect(() => {
     if (!isTelegram || loading || user || !tgUser) return
-    signInWithTelegram(tgUser)
+
+    signInWithTelegram(tgUser).then(({ error }) => {
+      if (error) {
+        // Show visible error inside Telegram WebView
+        alert(`TMA Login xatosi:\n${error?.message || JSON.stringify(error)}`)
+      }
+    })
   }, [isTelegram, tgUser, user, loading])
+
+  // DEBUG overlay — remove after fixing
+  if (isTelegram && !user && !loading) {
+    return (
+      <div style={{
+        position: 'fixed', top: 10, left: 10, right: 10, zIndex: 9999,
+        background: '#1e293b', color: '#f1f5f9', borderRadius: 12,
+        padding: '12px 16px', fontSize: 13, fontFamily: 'monospace',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+      }}>
+        <div style={{ color: '#94a3b8', marginBottom: 4 }}>🔍 TMA Debug</div>
+        <div>isTelegram: <b style={{ color: '#10b981' }}>{String(isTelegram)}</b></div>
+        <div>tgUser: <b style={{ color: tgUser ? '#10b981' : '#ef4444' }}>{tgUser ? `id=${tgUser.id}` : 'null'}</b></div>
+        <div>auth loading: <b>{String(loading)}</b></div>
+        <div>user: <b style={{ color: user ? '#10b981' : '#ef4444' }}>{user ? user.email : 'null'}</b></div>
+      </div>
+    )
+  }
 
   return null
 }

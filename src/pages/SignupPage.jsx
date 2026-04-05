@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTelegram } from '../context/TelegramProvider'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 
@@ -13,6 +14,61 @@ const IconArrow   = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="
 const IconTelegram = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.08 9.8c-.156.7-.566.87-1.146.54l-3.163-2.33-1.527 1.47c-.17.17-.313.313-.64.313l.228-3.238 5.9-5.328c.257-.228-.056-.356-.397-.127L7.1 14.47l-3.11-.97c-.676-.21-.69-.676.142-.998l12.155-4.686c.562-.204 1.053.137.875.432z"/></svg>
 const IconGoogle  = () => <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
 const IconCheckCircle = () => <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+
+// ─── Telegram Button ──────────────────────────────────────────
+function TelegramBtn({ label }) {
+  const { tgUser, isTelegram } = useTelegram()
+  const { signInWithTelegram } = useAuth()
+  const navigate = useNavigate()
+  const [state, setState] = useState('idle') // idle | loading | error
+
+  const handleClick = async () => {
+    if (!isTelegram || !tgUser) {
+      // Open bot in Telegram
+      window.open('https://t.me/' + (import.meta.env.VITE_TG_BOT_USERNAME || ''), '_blank')
+      return
+    }
+    setState('loading')
+    const { error } = await signInWithTelegram(tgUser)
+    if (error) {
+      setState('error')
+      setTimeout(() => setState('idle'), 3000)
+    } else {
+      navigate('/courses')
+    }
+  }
+
+  return (
+    <motion.button
+      type="button"
+      onClick={handleClick}
+      disabled={state === 'loading'}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+      style={{
+        width: '100%', padding: '14px 20px', borderRadius: 16, border: 'none',
+        background: state === 'error'
+          ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+          : 'linear-gradient(135deg, #229ED9 0%, #1880B8 100%)',
+        color: 'white', fontWeight: 700, fontSize: '0.9375rem',
+        fontFamily: 'inherit', cursor: state === 'loading' ? 'not-allowed' : 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+        boxShadow: '0 4px 18px rgba(34,158,217,0.32)',
+        opacity: state === 'loading' ? 0.8 : 1,
+      }}
+    >
+      {state === 'loading' ? (
+        <><div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Yuklanmoqda...</>
+      ) : state === 'error' ? (
+        <><IconTelegram /> Xatolik yuz berdi</>
+      ) : (
+        <><IconTelegram /> {label}</>
+      )}
+    </motion.button>
+  )
+}
+
 
 const Logo = ({ size = 36 }) => (
   <img src="/favicon.svg" alt="Bobur Mentor logo" width={size} height={size} style={{ objectFit: 'contain' }} />
@@ -283,21 +339,7 @@ export default function SignupPage() {
                   </motion.button>
 
                   {/* Telegram */}
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-                    style={{
-                      width: '100%', padding: '14px 20px', borderRadius: 16, border: 'none',
-                      background: 'linear-gradient(135deg, #229ED9 0%, #1880B8 100%)',
-                      color: 'white', fontWeight: 700, fontSize: '0.9375rem',
-                      fontFamily: 'inherit', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                      boxShadow: '0 4px 18px rgba(34,158,217,0.32)',
-                    }}
-                  >
-                    <IconTelegram /> Telegram orqali ro'yxatdan o'tish
-                  </motion.button>
+                  <TelegramBtn label="Telegram orqali ro'yxatdan o'tish" />
 
                   {/* Divider */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>

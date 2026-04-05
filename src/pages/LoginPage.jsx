@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTelegram } from '../context/TelegramProvider'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // ─── Icons ────────────────────────────────────────────────────
@@ -108,25 +109,58 @@ function BrandPanel() {
 
 // ─── Telegram Button ──────────────────────────────────────────
 function TelegramBtn({ label }) {
+  const { tgUser, isTelegram } = useTelegram()
+  const { signInWithTelegram } = useAuth()
+  const navigate = useNavigate()
+  const [state, setState] = useState('idle') // idle | loading | error
+
+  const handleClick = async () => {
+    if (!isTelegram || !tgUser) {
+      // Open bot in Telegram
+      window.open('https://t.me/' + (import.meta.env.VITE_TG_BOT_USERNAME || ''), '_blank')
+      return
+    }
+    setState('loading')
+    const { error } = await signInWithTelegram(tgUser)
+    if (error) {
+      setState('error')
+      setTimeout(() => setState('idle'), 3000)
+    } else {
+      navigate('/courses')
+    }
+  }
+
   return (
     <motion.button
       type="button"
+      onClick={handleClick}
+      disabled={state === 'loading'}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: 'spring', stiffness: 380, damping: 22 }}
       style={{
         width: '100%', padding: '14px 20px', borderRadius: 16, border: 'none',
-        background: 'linear-gradient(135deg, #229ED9 0%, #1880B8 100%)',
+        background: state === 'error'
+          ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+          : 'linear-gradient(135deg, #229ED9 0%, #1880B8 100%)',
         color: 'white', fontWeight: 700, fontSize: '0.9375rem',
-        fontFamily: 'inherit', cursor: 'pointer',
+        fontFamily: 'inherit', cursor: state === 'loading' ? 'not-allowed' : 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
         boxShadow: '0 4px 18px rgba(34,158,217,0.32)',
+        opacity: state === 'loading' ? 0.8 : 1,
       }}
     >
-      <IconTelegram /> {label}
+      {state === 'loading' ? (
+        <><div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Kirilmoqda...</>
+      ) : state === 'error' ? (
+        <><IconTelegram /> Xatolik yuz berdi</>
+      ) : (
+        <><IconTelegram /> {label}</>
+      )}
     </motion.button>
   )
 }
+
 
 // ─── Divider ──────────────────────────────────────────────────
 function Divider() {
