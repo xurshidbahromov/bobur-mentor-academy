@@ -56,45 +56,57 @@ export function AuthProvider({ children }) {
   }
 
   // ── Telegram Mini App auto-login ───────────────────────────────
-  // Uses synthetic email pattern: tg_{id}@tg.local
-  // User never sees a login form inside Telegram.
+  // Strategy: try signIn → if fails (new user) → signUp
+  // Email format: tg_{telegram_id}@tgapp.io
+  // Password: tg_{telegram_id}_tma (deterministic, never shown to user)
   const signInWithTelegram = async (tgUser) => {
     if (!tgUser?.id) return { error: 'No Telegram user' }
 
-    const email    = `tg_${tgUser.id}@tg.local`
-    const password = `tg_${tgUser.id}_secure`
-    const fullName = [tgUser.firstName, tgUser.lastName].filter(Boolean).join(' ')
+    const email    = `tg_${tgUser.id}@tgapp.io`
+    const password = `tg_${tgUser.id}_tma_secret`
+    const fullName = [tgUser.firstName, tgUser.lastName].filter(Boolean).join(' ') || tgUser.username || 'Telegram User'
 
-    // Try sign in first
+    // 1. Try to sign in (existing user — no email confirmation needed)
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email, password,
     })
 
-    if (!signInError) {
-      // Already registered — update profile name if missing
-      if (fullName) {
-        await supabase.from('profiles').update({
-          full_name:  fullName,
-          avatar_url: tgUser.photoUrl || null,
-          updated_at: new Date().toISOString(),
-        }).eq('id', signInData.user.id).is('full_name', null)
-      }
+    if (!signInError && signInData?.user) {
+      // Update profile with latest Telegram data
+      await supabase.from('profiles').upsert({
+        id:         signInData.user.id,
+        full_name:  fullName,
+        avatar_url: tgUser.photoUrl || null,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' })
       return { data: signInData, error: null }
     }
 
-    // First time — sign up
+    // 2. New user — sign up
+    // Note: Supabase email confirmation must be DISABLED for this to work.
+    // Go to: Supabase → Authentication → Settings → disable "Enable email confirmations"
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email, password,
+      email,
+      password,
       options: {
+        emailRedirectTo: null,
         data: {
-          full_name:  fullName,
-          avatar_url: tgUser.photoUrl || null,
-          telegram_id: tgUser.id,
+          full_name:   fullName,
+          avatar_url:  tgUser.photoUrl  || null,
+          telegram_id: String(tgUser.id),
+          username:    tgUser.username  || '',
         },
       },
     })
 
-    return { data: signUpData, error: signUpError }
+    if (signUpError) return { data: null, error: signUpError }
+
+    // After signup, sign in immediately (bypass email confirmation)
+    const { data: finalData, error: finalError } = await supabase.auth.signInWithPassword({
+      email, password,
+    })
+
+    return { data: finalData, error: finalError }
   }
 
   const value = {
