@@ -82,6 +82,8 @@ function AppShell() {
   )
 }
 
+import { Toaster } from 'sonner'
+
 // ── Root ───────────────────────────────────────────────────────
 export default function App() {
   return (
@@ -90,6 +92,7 @@ export default function App() {
         <AuthProvider>
           <TelegramAutoLogin />
           <TMARedirect />
+          <Toaster position="top-center" richColors />
           <AppShell />
         </AuthProvider>
       </TelegramProvider>

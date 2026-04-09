@@ -6,6 +6,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import confetti from 'canvas-confetti'
+import { toast } from 'sonner'
 
 export function useStreak() {
   const { user, profile, setProfile } = useAuth()
@@ -74,7 +76,25 @@ export function useStreak() {
       setProfile(data)   // <-- updates AuthContext.profile → Navbar coin re-renders instantly
       setCanClaim(false)
       setJustClaimed(true)
+
+      // 🎉 Gamification!
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#F59E0B', '#10B981', '#3461FF']
+      })
+      
+      toast.success("Muborak bo'lsin!", {
+        description: "+1 Coin balansingizga qo'shildi! ✨",
+        duration: 4000
+      })
+
       setTimeout(() => setJustClaimed(false), 3000)
+    } else {
+      toast.error("Xatolik yuz berdi", {
+        description: "Coinni olishda muammo paydo bo'ldi. Qaytadan urinib ko'ring."
+      })
     }
     setClaiming(false)
   }

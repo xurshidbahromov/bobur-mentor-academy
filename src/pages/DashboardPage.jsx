@@ -170,9 +170,50 @@ export default function DashboardPage() {
         </section>
 
         {/* ── Stats & Rewards Section ── */}
-        <section style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+        <section style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
           <CoinCard coins={profile.coins} canClaim={canClaim} claiming={claiming} justClaimed={justClaimed} onClaim={claimDailyReward} />
           <StreakCard streak={profile.streak_count} longest={profile.longest_streak} />
+        </section>
+
+        {/* ── Referral Section ── */}
+        <section style={{ marginBottom: '32px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #1E1E2F, #09090E)',
+            borderRadius: 20, padding: '22px', color: 'white',
+            border: '1px solid rgba(255,255,255,0.1)',
+            position: 'relative', overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, position: 'relative', zIndex: 1 }}>
+              <div>
+                <h3 style={{ margin: '0 0 4px', fontSize: '1.0625rem', fontWeight: 800 }}>Do'stlarni taklif qiling</h3>
+                <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94A3B8', maxWidth: '200px' }}>
+                  Har bir do'stingiz uchun <strong style={{ color: '#F59E0B' }}>+15 Coin</strong> sovga oling!
+                </p>
+              </div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Coins size={22} color="#F59E0B" />
+              </div>
+            </div>
+
+            <button 
+              onClick={() => {
+                const botUsername = import.meta.env.VITE_TG_BOT_USERNAME || 'boburmentor_bot'
+                const refLink = `https://t.me/${botUsername}?startapp=ref_${profile.id}`
+                navigator.clipboard.writeText(refLink)
+                alert("Nusxa olindi! Do'stlaringizga yuboring.")
+              }}
+              style={{
+                width: '100%', padding: '12px', borderRadius: 12, border: 'none',
+                background: 'rgba(255,255,255,0.1)', color: 'white', fontWeight: 700,
+                fontSize: '0.9375rem', cursor: 'pointer', fontFamily: 'inherit',
+                borderTop: '1px solid rgba(255,255,255,0.1)'
+              }}
+            >
+              Havolani nusxalash
+            </button>
+          </div>
         </section>
 
         {/* ── Continue Learning ── */}

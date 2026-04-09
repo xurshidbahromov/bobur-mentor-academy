@@ -96,6 +96,15 @@ export default function ProfilePage() {
             <ArrowRight size={18} color="#94A3B8" />
           </div>
 
+          {/* Leaderboard */}
+          <Link to="/leaderboard" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer', textDecoration: 'none' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <strong style={{ color: '#F59E0B', fontSize: '18px' }}>🏆</strong>
+            </div>
+            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#334155' }}>Kuchlilar doskasi (Top 100)</p>
+            <ArrowRight size={18} color="#94A3B8" />
+          </Link>
+
           {/* About */}
           <Link to="/about" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer', textDecoration: 'none' }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(52,97,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

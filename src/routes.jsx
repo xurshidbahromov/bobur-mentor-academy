@@ -5,18 +5,22 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 
-// Pages
-import LandingPage from './pages/LandingPage'
-import CoursesPage from './pages/CoursesPage'
-import CourseDetailPage from './pages/CourseDetailPage'
-import LessonDetailPage from './pages/LessonDetailPage'
-import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
-import NotFoundPage from './pages/NotFoundPage'
-import AboutPage from './pages/AboutPage'
-import ProfilePage from './pages/ProfilePage'
-import DashboardPage from './pages/DashboardPage'
-import ShopPage from './pages/ShopPage'
+import { Suspense, lazy } from 'react'
+import PageSkeleton from './components/ui/PageSkeleton'
+
+// Lazy loaded pages
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const CoursesPage = lazy(() => import('./pages/CoursesPage'))
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
+const LessonDetailPage = lazy(() => import('./pages/LessonDetailPage'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const SignupPage = lazy(() => import('./pages/SignupPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const ShopPage = lazy(() => import('./pages/ShopPage'))
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 
 const pageVariants = {
   initial: { opacity: 0, y: 15, scale: 0.98 },
@@ -41,19 +45,22 @@ export default function AppRoutes() {
   
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/"                     element={<PageWrapper><LandingPage /></PageWrapper>} />
-        <Route path="/dashboard"            element={<PageWrapper><DashboardPage /></PageWrapper>} />
-        <Route path="/courses"              element={<PageWrapper><CoursesPage /></PageWrapper>} />
-        <Route path="/courses/:courseId"    element={<PageWrapper><CourseDetailPage /></PageWrapper>} />
-        <Route path="/lessons/:lessonId"    element={<PageWrapper><LessonDetailPage /></PageWrapper>} />
-        <Route path="/about"                element={<PageWrapper><AboutPage /></PageWrapper>} />
-        <Route path="/profile"              element={<PageWrapper><ProfilePage /></PageWrapper>} />
-        <Route path="/shop"                 element={<PageWrapper><ShopPage /></PageWrapper>} />
-        <Route path="/login"                element={<PageWrapper><LoginPage /></PageWrapper>} />
-        <Route path="/signup"               element={<PageWrapper><SignupPage /></PageWrapper>} />
-        <Route path="*"                     element={<PageWrapper><NotFoundPage /></PageWrapper>} />
-      </Routes>
+      <Suspense fallback={<PageSkeleton />}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/"                     element={<PageWrapper><LandingPage /></PageWrapper>} />
+          <Route path="/dashboard"            element={<PageWrapper><DashboardPage /></PageWrapper>} />
+          <Route path="/courses"              element={<PageWrapper><CoursesPage /></PageWrapper>} />
+          <Route path="/courses/:courseId"    element={<PageWrapper><CourseDetailPage /></PageWrapper>} />
+          <Route path="/lessons/:lessonId"    element={<PageWrapper><LessonDetailPage /></PageWrapper>} />
+          <Route path="/about"                element={<PageWrapper><AboutPage /></PageWrapper>} />
+          <Route path="/profile"              element={<PageWrapper><ProfilePage /></PageWrapper>} />
+          <Route path="/shop"                 element={<PageWrapper><ShopPage /></PageWrapper>} />
+          <Route path="/leaderboard"          element={<PageWrapper><LeaderboardPage /></PageWrapper>} />
+          <Route path="/login"                element={<PageWrapper><LoginPage /></PageWrapper>} />
+          <Route path="/signup"               element={<PageWrapper><SignupPage /></PageWrapper>} />
+          <Route path="*"                     element={<PageWrapper><NotFoundPage /></PageWrapper>} />
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   )
 }

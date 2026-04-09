@@ -51,6 +51,10 @@ export function AuthProvider({ children }) {
   // ── Standard auth ──────────────────────────────────────────────
   const signUp = async ({ email, password }) => {
     const { data, error } = await supabase.auth.signUp({ email, password })
+    if (data?.user) {
+      // Need a bit of delay since trigger handles profile creation
+      setTimeout(() => processReferral(), 2000)
+    }
     return { data, error }
   }
 
@@ -122,7 +126,32 @@ export function AuthProvider({ children }) {
       email, password,
     })
 
+    if (finalData?.user) {
+      await processReferral()
+    }
+
     return { data: finalData, error: finalError }
+  }
+
+  // Helper to process referral code
+  const processReferral = async () => {
+    try {
+      let refCode = new URLSearchParams(window.location.search).get('ref')
+      if (!refCode) {
+        const tgParam = window?.Telegram?.WebApp?.initDataUnsafe?.start_param
+        if (tgParam && tgParam.startsWith('ref_')) {
+          refCode = tgParam.replace('ref_', '')
+        }
+      }
+      
+      // Basic UUID validation before calling RPC
+      if (refCode && refCode.length === 36) {
+        const { error } = await supabase.rpc('handle_referral', { p_referred_by_id: refCode })
+        if (error) console.error("Referral error:", error)
+      }
+    } catch (err) {
+      console.error("Referral processing error:", err)
+    }
   }
 
   const value = {

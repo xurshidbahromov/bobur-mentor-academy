@@ -3,6 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, XCircle, Coins, ArrowRight, RefreshCw, Trophy } from 'lucide-react'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
+import confetti from 'canvas-confetti'
+import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../context/AuthContext'
+import { toast } from 'sonner'
 
 export default function QuizBlock({ quizzes = [] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -11,6 +15,7 @@ export default function QuizBlock({ quizzes = [] }) {
   const [score, setScore] = useState(0)
   const [showResult, setShowResult] = useState(false)
   const [shake, setShake] = useState(false)
+  const { user, profile, setProfile } = useAuth()
 
   if (!quizzes.length) return null
 
@@ -42,13 +47,39 @@ export default function QuizBlock({ quizzes = [] }) {
     }
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < quizzes.length - 1) {
       setCurrentIndex(i => i + 1)
       setSelectedOption(null)
       setIsRevealed(false)
     } else {
       setShowResult(true)
+      
+      // 🎉 Reward Logic & Celebration
+      const earnedCoins = score * 10
+      if (earnedCoins > 0 && user) {
+        // Optimistic update
+        if (setProfile && profile) {
+          setProfile(prev => ({ ...prev, coins: (prev.coins || 0) + earnedCoins }))
+        }
+
+        // Persist to DB
+        const { error } = await supabase
+          .from('profiles')
+          .update({ coins: (profile?.coins || 0) + earnedCoins })
+          .eq('id', user.id)
+
+        if (!error) {
+          confetti({
+            particleCount: 200,
+            spread: 100,
+            origin: { y: 0.7 }
+          })
+          toast.success("Barakalla!", {
+            description: `Siz ${earnedCoins} ta coin yutib oldingiz! ✨`
+          })
+        }
+      }
     }
   }
 

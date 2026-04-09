@@ -16,6 +16,7 @@ export function TelegramProvider({ children }) {
   const [isTelegram, setIsTelegram] = useState(false)
   const [isReady,    setIsReady]    = useState(false)
   const [tgWebApp,   setTgWebApp]   = useState(null)
+  const [startParam, setStartParam] = useState(null)
 
   useEffect(() => {
     const tg = window?.Telegram?.WebApp
@@ -37,6 +38,9 @@ export function TelegramProvider({ children }) {
 
     // 3. Extract user from initDataUnsafe (always available)
     const u = tg.initDataUnsafe?.user
+    const param = tg.initDataUnsafe?.start_param
+    if (param) setStartParam(param)
+
     if (u) {
       setTgUser({
         id:           u.id,
@@ -55,7 +59,7 @@ export function TelegramProvider({ children }) {
   }, [])
 
   return (
-    <TelegramContext.Provider value={{ tgUser, isTelegram, isReady, tgWebApp }}>
+    <TelegramContext.Provider value={{ tgUser, isTelegram, isReady, tgWebApp, startParam }}>
       {children}
     </TelegramContext.Provider>
   )

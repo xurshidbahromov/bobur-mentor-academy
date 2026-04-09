@@ -113,7 +113,7 @@ export default function LessonDetailPage() {
           {/* Video / Lock Area */}
           <div style={{ marginBottom: '24px', boxShadow: 'var(--shadow-elevated)', borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
             {canWatch ? (
-              <VideoPlayer videoId={lesson.youtube_video_id} />
+              <VideoPlayer videoId={lesson.youtube_video_id} lessonId={lesson.id} />
             ) : (
               <LockOverlay 
                 lesson={lesson} 
