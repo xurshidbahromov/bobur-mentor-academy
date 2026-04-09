@@ -16,6 +16,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import AboutPage from './pages/AboutPage'
 import ProfilePage from './pages/ProfilePage'
 import DashboardPage from './pages/DashboardPage'
+import ShopPage from './pages/ShopPage'
 
 const pageVariants = {
   initial: { opacity: 0, y: 15, scale: 0.98 },
@@ -48,6 +49,7 @@ export default function AppRoutes() {
         <Route path="/lessons/:lessonId"    element={<PageWrapper><LessonDetailPage /></PageWrapper>} />
         <Route path="/about"                element={<PageWrapper><AboutPage /></PageWrapper>} />
         <Route path="/profile"              element={<PageWrapper><ProfilePage /></PageWrapper>} />
+        <Route path="/shop"                 element={<PageWrapper><ShopPage /></PageWrapper>} />
         <Route path="/login"                element={<PageWrapper><LoginPage /></PageWrapper>} />
         <Route path="/signup"               element={<PageWrapper><SignupPage /></PageWrapper>} />
         <Route path="*"                     element={<PageWrapper><NotFoundPage /></PageWrapper>} />

@@ -24,6 +24,12 @@ const IcoProfile = ({ active }) => active ? (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 )
 
+const IcoShop = ({ active }) => active ? (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm0 10c-2.76 0-5-2.24-5-5h2c0 1.66 1.34 3 3 3s3-1.34 3-3h2c0 2.76-2.24 5-5 5z"/></svg>
+) : (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h4v16H4V4h4m4 0v16m-4-8h10"/></svg>
+)
+
 export default function Navbar() {
   const { user, profile, loading, signOut } = useAuth()
   const { t } = useTranslation()
@@ -161,7 +167,7 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation (Mini App Style) */}
       <nav className={`mobile-bottom-nav ${isTelegram ? 'tma-mode' : ''}`}>
-        <NavLink to="/" end style={mobileLinkStyle}>
+        <NavLink to="/dashboard" style={mobileLinkStyle}>
           {({ isActive }) => (
             <>
               <div style={{ 
@@ -189,6 +195,22 @@ export default function Navbar() {
                 <IcoCourses active={isActive} />
               </div>
               <span>Darslar</span>
+            </>
+          )}
+        </NavLink>
+
+        <NavLink to="/shop" style={mobileLinkStyle}>
+          {({ isActive }) => (
+            <>
+              <div style={{ 
+                width: '48px', height: '32px', borderRadius: '16px', 
+                background: isActive ? 'var(--color-primary-dim)' : 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.2s ease',
+              }}>
+                <IcoShop active={isActive} />
+              </div>
+              <span>Do'kon</span>
             </>
           )}
         </NavLink>
