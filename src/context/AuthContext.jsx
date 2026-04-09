@@ -92,6 +92,9 @@ export function AuthProvider({ children }) {
     })
 
     if (!signInError && signInData?.user) {
+      // Set flag for future auto-logins
+      localStorage.setItem('bma_tg_autologin', 'true')
+      
       // Update profile with latest Telegram data
       await supabase.from('profiles').upsert({
         id:         signInData.user.id,
@@ -127,6 +130,7 @@ export function AuthProvider({ children }) {
     })
 
     if (finalData?.user) {
+      localStorage.setItem('bma_tg_autologin', 'true')
       await processReferral()
     }
 

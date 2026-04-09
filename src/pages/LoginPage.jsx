@@ -131,33 +131,44 @@ function TelegramBtn({ label }) {
   }
 
   return (
-    <motion.button
-      type="button"
-      onClick={handleClick}
-      disabled={state === 'loading'}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-      style={{
-        width: '100%', padding: '14px 20px', borderRadius: 16, border: 'none',
-        background: state === 'error'
-          ? 'linear-gradient(135deg, #ef4444, #dc2626)'
-          : 'linear-gradient(135deg, #229ED9 0%, #1880B8 100%)',
-        color: 'white', fontWeight: 700, fontSize: '0.9375rem',
-        fontFamily: 'inherit', cursor: state === 'loading' ? 'not-allowed' : 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-        boxShadow: '0 4px 18px rgba(34,158,217,0.32)',
-        opacity: state === 'loading' ? 0.8 : 1,
-      }}
-    >
-      {state === 'loading' ? (
-        <><div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Kirilmoqda...</>
-      ) : state === 'error' ? (
-        <><IconTelegram /> Xatolik yuz berdi</>
-      ) : (
-        <><IconTelegram /> {label}</>
+    <div style={{ width: '100%' }}>
+      <motion.button
+        type="button"
+        onClick={handleClick}
+        disabled={state === 'loading'}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+        style={{
+          width: '100%', padding: '16px 20px', borderRadius: 20, border: 'none',
+          background: state === 'error'
+            ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+            : 'linear-gradient(135deg, #229ED9 0%, #1880B8 100%)',
+          color: 'white', fontWeight: 800, fontSize: '1rem',
+          fontFamily: 'inherit', cursor: state === 'loading' ? 'not-allowed' : 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+          boxShadow: '0 8px 24px rgba(34,158,217,0.3)',
+          opacity: state === 'loading' ? 0.8 : 1,
+          position: 'relative'
+        }}
+      >
+        {state === 'loading' ? (
+          <div style={{ width: 20, height: 20, border: '3px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+        ) : state === 'error' ? (
+          <>Xatolik yuz berdi</>
+        ) : (
+          <>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="tg" style={{ width: 22, height: 22, filter: 'brightness(0) invert(1)' }} />
+            {isTelegram ? "Telegram orqali kirish" : "Telegram orqali bog'lanish"}
+          </>
+        )}
+      </motion.button>
+      
+      {isTelegram && (
+        <p style={{ marginTop: 12, fontSize: '0.75rem', color: '#64748B', textAlign: 'center', lineHeight: 1.4 }}>
+          Bir marta kirganingizdan so'ng, tizim sizni eslab qoladi va keyingi safar avtomatik profilingizga olib kiradi. ✨
+        </p>
       )}
-    </motion.button>
+    </div>
   )
 }
 

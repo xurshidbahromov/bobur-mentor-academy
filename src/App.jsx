@@ -17,9 +17,15 @@ function TelegramAutoLogin() {
   const { user, loading, signInWithTelegram } = useAuth()
 
   useEffect(() => {
+    // 1. Only run if in Telegram and not already logged in
     if (!isTelegram || loading || user || !tgUser) return
+
+    // 2. ONLY auto-login if they have successfully logged in before on this device
+    const shouldAutoLogin = localStorage.getItem('bma_tg_autologin') === 'true'
+    if (!shouldAutoLogin) return
+
     signInWithTelegram(tgUser).then(({ error }) => {
-      if (error) alert(`TMA Login xatosi:\n${error?.message || JSON.stringify(error)}`)
+      if (error) console.error("TMA Auto-login error:", error)
     })
   }, [isTelegram, tgUser, user, loading])
 
