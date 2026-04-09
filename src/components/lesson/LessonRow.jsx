@@ -80,15 +80,15 @@ export default function LessonRow({ lesson, index, isUnlocked = false, isWatched
       </span>
 
       {/* Right badge */}
-      {state === 'locked' && lesson.price ? (
+      {state === 'locked' && (lesson.coin_price > 0) ? (
         <div style={{
           display: 'flex', alignItems: 'center', gap: '5px',
           padding: '5px 12px', borderRadius: 'var(--radius-full)',
-          background: 'rgba(16, 185, 129, 0.1)',
-          border: '1px solid rgba(16, 185, 129, 0.2)',
-          color: 'var(--color-accent)', fontSize: '0.8125rem', fontWeight: 700
+          background: 'rgba(245, 158, 11, 0.1)',
+          border: '1px solid rgba(245, 158, 11, 0.2)',
+          color: '#d97706', fontSize: '0.8125rem', fontWeight: 700
         }}>
-          <Coins size={13} /> {lesson.price}
+          <Coins size={13} /> {lesson.coin_price}
         </div>
       ) : state === 'free' ? (
         <div style={{

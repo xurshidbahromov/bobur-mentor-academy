@@ -51,6 +51,24 @@ export function useAccess(lesson) {
     setLoading(false)
   }
 
+  const unlockWithCoins = async () => {
+    if (!user || !lesson) return { success: false, error: 'User or lesson missing' }
+    
+    // Call RPC to securely deduct coins and grant access
+    const { data, error } = await supabase.rpc('unlock_lesson_with_coins', {
+      p_lesson_id: lesson.id
+    })
+
+    if (error) {
+      console.error('Unlock error:', error)
+      return { success: false, error: error.message }
+    }
+
+    // Success! Refresh local access state
+    setHasAccessRecord(true)
+    return { success: true }
+  }
+
   useEffect(() => {
     setLoading(true)
     fetchAccess()
@@ -58,5 +76,5 @@ export function useAccess(lesson) {
 
   const canWatch = lesson?.is_free || hasAccessRecord
 
-  return { canWatch, loading, refetch: fetchAccess }
+  return { canWatch, loading, refetch: fetchAccess, unlockWithCoins }
 }

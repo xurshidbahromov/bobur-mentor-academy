@@ -13,9 +13,9 @@ export default function LessonDetailPage() {
   const { lessonId } = useParams()
   const navigate = useNavigate()
   const { lesson, loading } = useLesson(lessonId)
-  const { user } = useAuth()
+  const { user, profile, setProfile } = useAuth()
   
-  const { canWatch, loading: accessLoading, refetch } = useAccess(lesson)
+  const { canWatch, loading: accessLoading, refetch, unlockWithCoins } = useAccess(lesson)
   const { quizzes } = useQuizzes(canWatch ? lessonId : null)
 
   // Fetch all lessons for the sidebar queue
@@ -36,10 +36,29 @@ export default function LessonDetailPage() {
     </div>
   )
 
-  const handleUnlock = () => {
-    // Phase 3 MVP: Simulate unlock
-    console.log('Unlock requested for:', lesson.id)
-    refetch()
+  const handleUnlock = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    if (!profile || profile.coins < lesson.coin_price) {
+      alert("Balansingizda yetarli coin mavjud emas! Har kuni kirib coin ishlashingiz yoki sotib olishingiz mumkin.")
+      return
+    }
+
+    const confirmUnlock = window.confirm(`Ushbu darsni ${lesson.coin_price} coin evaziga qulfdan chiqarasizmi?`)
+    if (!confirmUnlock) return
+
+    const { success, error } = await unlockWithCoins()
+    if (success) {
+      // Optimistically update global UI state
+      if (setProfile) {
+        setProfile(prev => ({ ...prev, coins: prev.coins - lesson.coin_price }))
+      }
+    } else {
+      alert("Xatolik yuz berdi: " + error)
+    }
   }
 
   return (

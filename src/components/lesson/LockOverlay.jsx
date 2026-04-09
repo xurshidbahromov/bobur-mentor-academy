@@ -61,7 +61,7 @@ export default function LockOverlay({
         <p style={{ color: 'var(--text-secondary)', maxWidth: '320px', margin: '0 auto', lineHeight: 1.6 }}>
           Ushbu darsni davom ettirish uchun uni tangalar (coins) orqali ochishingiz kerak.
         </p>
-        {lesson.price ? (
+        {lesson.coin_price ? (
           <div style={{ 
             display: 'inline-flex', 
             alignItems: 'center', 
@@ -76,7 +76,7 @@ export default function LockOverlay({
             boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
           }}>
             <Coins size={20} />
-            {lesson.price}
+            {lesson.coin_price}
           </div>
         ) : null}
       </div>
