@@ -15,7 +15,7 @@ const IconGoogle = () => <svg width="18" height="18" viewBox="0 0 24 24"><path d
 
 // Logo
 const Logo = ({ size = 36 }) => (
-  <img src="/logo.png" alt="Bobur Mentor" width={size} height={size} style={{ objectFit: 'contain', borderRadius: size * 0.22 }} />
+  <img src="/logo.svg" alt="Bobur Mentor" width={size} height={size} style={{ objectFit: 'contain' }} />
 )
 
 // ─── Input Field ──────────────────────────────────────────────
