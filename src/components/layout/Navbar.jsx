@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext'
 import { useTranslation } from '../../hooks/useTranslation'
 import { useTelegram } from '../../context/TelegramProvider'
 import { Coins } from 'lucide-react'
-import { useStreak } from '../../hooks/useStreak'
 import Button from '../ui/Button'
 
 // Premium SVG Nav Icons
@@ -27,7 +26,6 @@ const IcoProfile = ({ active }) => active ? (
 
 export default function Navbar() {
   const { user, profile, loading, signOut } = useAuth()
-  const { streakData } = useStreak()
   const { t } = useTranslation()
   const { isTelegram } = useTelegram()
   const navigate = useNavigate()

@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, useLocation } from 'react-router-dom'
+import { BrowserRouter, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { TelegramProvider, useTelegram } from './context/TelegramProvider'
 import { useAuth } from './context/AuthContext'
@@ -10,23 +10,47 @@ import AppRoutes from './routes'
 
 const AUTH_ROUTES = ['/login', '/signup']
 
-// ── Auto-login for Telegram users ──────────────────────────────
-// Runs once on mount: if inside Telegram and not yet logged in,
-// silently signs in with the Telegram user's synthetic credentials.
+// ── Telegram Auto-login ────────────────────────────────────────
+// When opened inside Telegram, silently signs in with Telegram credentials.
 function TelegramAutoLogin() {
   const { tgUser, isTelegram } = useTelegram()
   const { user, loading, signInWithTelegram } = useAuth()
 
   useEffect(() => {
     if (!isTelegram || loading || user || !tgUser) return
-
     signInWithTelegram(tgUser).then(({ error }) => {
-      if (error) {
-        // Show visible error inside Telegram WebView
-        alert(`TMA Login xatosi:\n${error?.message || JSON.stringify(error)}`)
-      }
+      if (error) alert(`TMA Login xatosi:\n${error?.message || JSON.stringify(error)}`)
     })
   }, [isTelegram, tgUser, user, loading])
+
+  return null
+}
+
+// ── TMA Smart Redirect ─────────────────────────────────────────
+// Inside Telegram:
+//   - Not logged in → go to /login
+//   - Logged in on landing page → go to /courses (dashboard)
+function TMARedirect() {
+  const { isTelegram, isReady } = useTelegram()
+  const { user, loading } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!isTelegram || !isReady || loading) return
+
+    if (!user) {
+      // Not logged in → show login
+      if (!AUTH_ROUTES.includes(location.pathname)) {
+        navigate('/login', { replace: true })
+      }
+    } else {
+      // Logged in on landing or auth pages → go to courses
+      if (location.pathname === '/' || AUTH_ROUTES.includes(location.pathname)) {
+        navigate('/courses', { replace: true })
+      }
+    }
+  }, [isTelegram, isReady, user, loading, location.pathname])
 
   return null
 }
@@ -37,14 +61,18 @@ function AppShell() {
   const { isTelegram } = useTelegram()
   const isAuthPage = AUTH_ROUTES.includes(location.pathname)
 
-  // Inside Telegram: no auth pages needed (auto-login handles it)
-  // Hide navbar/footer inside Telegram — mobile bottom nav handles nav
+  // Auth pages in non-TMA mode: fullscreen, no nav/footer
   if (isAuthPage && !isTelegram) {
     return <AppRoutes />
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-base)' }}>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: 'var(--bg-base)'
+    }}>
       <Navbar />
       <main style={{ flex: 1 }}>
         <AppRoutes />
@@ -61,6 +89,7 @@ export default function App() {
       <TelegramProvider>
         <AuthProvider>
           <TelegramAutoLogin />
+          <TMARedirect />
           <AppShell />
         </AuthProvider>
       </TelegramProvider>

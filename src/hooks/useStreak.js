@@ -1,65 +1,57 @@
 // src/hooks/useStreak.js
 // Streak + Coin claim logic
 // -- On mount: updates streak (if new day) and checks claim availability
-// -- Returns streak data and claimDailyReward() function
+// -- Uses global profile from AuthContext to keep coin count in sync across app
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
 export function useStreak() {
   const { user, profile, setProfile } = useAuth()
-  const [loading, setLoading]       = useState(true)
-  const [claiming, setClaiming]     = useState(false)
-  const [canClaim, setCanClaim]     = useState(false)
+  const [claiming, setClaiming]       = useState(false)
+  const [canClaim, setCanClaim]       = useState(false)
   const [justClaimed, setJustClaimed] = useState(false)
+  const checkedRef = useRef(false) // prevent multiple streak checks per session
 
-  // ── Fetch profile ─────────────────────────────────────────────
-  const fetchProfile = useCallback(async () => {
-    if (!user) { setLoading(false); return }
-    // It's fetched by AuthContext, so we just run checkStreak if profile is there
-    if (profile) {
-      // Small delay or check to ensure we only check once
-      checkStreak(profile)
-    }
-    setLoading(false)
-  }, [user, profile])
+  // ── Check & update streak once on mount ───────────────────────
+  useEffect(() => {
+    if (!user || !profile || checkedRef.current) return
+    checkedRef.current = true
 
-  // ── Streak logic ──────────────────────────────────────────────
-  const checkStreak = async (p) => {
-    const today    = new Date().toISOString().split('T')[0]   // "2025-04-05"
-    const lastVisit = p.last_visit_date
-    const lastClaim = p.last_claimed_date
+    const today     = new Date().toISOString().split('T')[0]
+    const lastClaim = profile.last_claimed_date
+    const lastVisit = profile.last_visit_date
 
-    // Can claim if not yet claimed today
+    // 1. Update canClaim
     setCanClaim(lastClaim !== today)
 
-    if (lastVisit === today) return  // already updated today
+    // 2. Update streak if new day
+    if (lastVisit === today) return // already visited today
 
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
     const yStr = yesterday.toISOString().split('T')[0]
 
-    let newStreak = lastVisit === yStr
-      ? (p.streak_count || 0) + 1   // consecutive day
-      : 1                            // streak broken
+    const newStreak  = lastVisit === yStr ? (profile.streak_count || 0) + 1 : 1
+    const newLongest = Math.max(newStreak, profile.longest_streak || 0)
 
-    const newLongest = Math.max(newStreak, p.longest_streak || 0)
-
-    const { data } = await supabase
+    supabase
       .from('profiles')
       .update({
-        streak_count: newStreak,
-        longest_streak: newLongest,
+        streak_count:    newStreak,
+        longest_streak:  newLongest,
         last_visit_date: today,
-        updated_at: new Date().toISOString(),
+        updated_at:      new Date().toISOString(),
       })
-      .eq('id', p.id)
+      .eq('id', user.id)
       .select()
       .single()
+      .then(({ data }) => { if (data) setProfile(data) })
+  }, [user, profile])
 
-    if (data) setProfile(data)
-  }
+  // Reset checkedRef if user changes
+  useEffect(() => { checkedRef.current = false }, [user])
 
   // ── Claim daily reward ────────────────────────────────────────
   const claimDailyReward = async () => {
@@ -70,16 +62,16 @@ export function useStreak() {
     const { data } = await supabase
       .from('profiles')
       .update({
-        coins: (profile?.coins || 0) + 1,
+        coins:             (profile?.coins || 0) + 1,
         last_claimed_date: today,
-        updated_at: new Date().toISOString(),
+        updated_at:        new Date().toISOString(),
       })
       .eq('id', user.id)
       .select()
       .single()
 
     if (data) {
-      setProfile(data)
+      setProfile(data)   // <-- updates AuthContext.profile → Navbar coin re-renders instantly
       setCanClaim(false)
       setJustClaimed(true)
       setTimeout(() => setJustClaimed(false), 3000)
@@ -87,15 +79,12 @@ export function useStreak() {
     setClaiming(false)
   }
 
-  useEffect(() => { fetchProfile() }, [fetchProfile])
-
   return {
-    profile,
-    loading,
+    profile,       // same as useAuth().profile (global, always fresh)
+    loading: !profile && !!user,
     canClaim,
     claiming,
     justClaimed,
     claimDailyReward,
-    refetch: fetchProfile,
   }
 }
