@@ -8,8 +8,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
 export function useStreak() {
-  const { user } = useAuth()
-  const [profile, setProfile]       = useState(null)
+  const { user, profile, setProfile } = useAuth()
   const [loading, setLoading]       = useState(true)
   const [claiming, setClaiming]     = useState(false)
   const [canClaim, setCanClaim]     = useState(false)
@@ -18,17 +17,13 @@ export function useStreak() {
   // ── Fetch profile ─────────────────────────────────────────────
   const fetchProfile = useCallback(async () => {
     if (!user) { setLoading(false); return }
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single()
-    if (data) {
-      setProfile(data)
-      checkStreak(data)
+    // It's fetched by AuthContext, so we just run checkStreak if profile is there
+    if (profile) {
+      // Small delay or check to ensure we only check once
+      checkStreak(profile)
     }
     setLoading(false)
-  }, [user])
+  }, [user, profile])
 
   // ── Streak logic ──────────────────────────────────────────────
   const checkStreak = async (p) => {

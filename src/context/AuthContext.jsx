@@ -10,14 +10,25 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null)
   const [session, setSession] = useState(null)
+  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  const fetchProfile = async (userId) => {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+    if (data) setProfile(data)
+  }
 
   useEffect(() => {
     // 1. Get current session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
-      setLoading(false)
+      if (session?.user) {
+        fetchProfile(session.user.id).finally(() => setLoading(false))
+      } else {
+        setProfile(null)
+        setLoading(false)
+      }
     })
 
     // 2. Subscribe to auth state changes
@@ -25,7 +36,12 @@ export function AuthProvider({ children }) {
       (_event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
-        setLoading(false)
+        if (session?.user) {
+          fetchProfile(session.user.id).finally(() => setLoading(false))
+        } else {
+          setProfile(null)
+          setLoading(false)
+        }
       }
     )
 
@@ -110,7 +126,7 @@ export function AuthProvider({ children }) {
   }
 
   const value = {
-    user, session, loading,
+    user, session, loading, profile, setProfile,
     signIn, signUp, signOut,
     signInWithGoogle, signInWithTelegram,
   }

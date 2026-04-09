@@ -63,8 +63,7 @@ export default function Navbar() {
 
   return (
     <>
-      {!isTelegram && (
-        <header style={{
+      <header style={{
           position: 'sticky',
         top: 0,
         zIndex: 100,
@@ -171,7 +170,6 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
-      )}
 
       {/* Mobile Bottom Navigation (Mini App Style) */}
       <nav className={`mobile-bottom-nav ${isTelegram ? 'tma-mode' : ''}`}>
@@ -254,8 +252,8 @@ export default function Navbar() {
             display: flex !important;
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #0f172a);
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
             border-top: 1px solid var(--border-soft);
             padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 24px));
             justify-content: space-around;
