@@ -85,20 +85,10 @@ export default function Navbar() {
           gap: '24px',
         }}>
           {/* Logo */}
-          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 110 }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <img src="/favicon.svg" alt="Bobur Mentor" width={36} height={36} style={{ objectFit: 'contain', display: 'block' }} />
-            </div>
-            <span style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              Bobur Mentor
+          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 110 }}>
+            <img src="/favicon.svg" alt="Bobur Mentor" width={38} height={38} style={{ objectFit: 'contain', display: 'block', flexShrink: 0 }} />
+            <span style={{ fontWeight: 800, fontSize: '1.0625rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+              Bobur<span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}> Mentor</span>
             </span>
           </Link>
 

@@ -1,50 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3461FF;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#60A5FA;stop-opacity:0.3" />
-      <stop offset="100%" style="stop-color:#A78BFA;stop-opacity:0.1" />
-    </linearGradient>
+    <clipPath id="hex">
+      <path d="M256 24 L462 136 L462 376 L256 488 L50 376 L50 136 Z"/>
+    </clipPath>
   </defs>
 
-  <!-- Hexagon background -->
-  <polygon
-    points="256,28 450,140 450,372 256,484 62,372 62,140"
-    fill="url(#bgGrad)"
+  <!-- Rounded hexagon background -->
+  <rect width="512" height="512" fill="transparent"/>
+  <path
+    d="M256 28
+       L454 134
+       Q462 140 462 150
+       L462 362
+       Q462 372 454 378
+       L256 484
+       L58 378
+       Q50 372 50 362
+       L50 150
+       Q50 140 58 134
+       Z"
+    fill="#0F172A"
   />
 
-  <!-- Inner glow layer -->
-  <polygon
-    points="256,60 418,158 418,354 256,452 94,354 94,158"
-    fill="url(#glowGrad)"
-  />
-
-  <!-- Subtle inner border -->
-  <polygon
-    points="256,60 418,158 418,354 256,452 94,354 94,158"
+  <!-- Sigma Σ — thin stroke, centered, geometric -->
+  <path
+    d="M158 152 L354 152 L260 256 L354 360 L158 360"
     fill="none"
-    stroke="rgba(255,255,255,0.15)"
-    stroke-width="2"
+    stroke="white"
+    stroke-width="22"
+    stroke-linecap="round"
+    stroke-linejoin="round"
   />
-
-  <!-- Sigma symbol Σ (centered) -->
-  <text
-    x="256"
-    y="320"
-    text-anchor="middle"
-    font-family="Georgia, serif"
-    font-size="240"
-    font-weight="bold"
-    fill="white"
-    opacity="0.95"
-  >Σ</text>
-
-  <!-- Small decorative dots (math dots) -->
-  <circle cx="140" cy="180" r="8" fill="white" opacity="0.3"/>
-  <circle cx="372" cy="180" r="8" fill="white" opacity="0.3"/>
-  <circle cx="140" cy="332" r="8" fill="white" opacity="0.3"/>
-  <circle cx="372" cy="332" r="8" fill="white" opacity="0.3"/>
 </svg>
