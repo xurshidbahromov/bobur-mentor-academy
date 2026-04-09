@@ -71,7 +71,7 @@ function TelegramBtn({ label }) {
 
 
 const Logo = ({ size = 36 }) => (
-  <img src="/favicon.svg" alt="Bobur Mentor logo" width={size} height={size} style={{ objectFit: 'contain' }} />
+  <img src="/logo.png" alt="Bobur Mentor logo" width={size} height={size} style={{ objectFit: 'contain', borderRadius: size * 0.22 }} />
 )
 
 // ─── Field ────────────────────────────────────────────────────

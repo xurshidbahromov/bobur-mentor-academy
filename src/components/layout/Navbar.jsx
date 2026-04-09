@@ -86,7 +86,7 @@ export default function Navbar() {
         }}>
           {/* Logo */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 110 }}>
-            <img src="/favicon.svg" alt="Bobur Mentor" width={38} height={38} style={{ objectFit: 'contain', display: 'block', flexShrink: 0 }} />
+            <img src="/logo.png" alt="Bobur Mentor" width={38} height={38} style={{ objectFit: 'contain', display: 'block', flexShrink: 0, borderRadius: 10 }} />
             <span style={{ fontWeight: 800, fontSize: '1.0625rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>
               Bobur<span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}> Mentor</span>
             </span>

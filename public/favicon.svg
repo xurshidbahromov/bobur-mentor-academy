@@ -1,34 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <clipPath id="hex">
-      <path d="M256 24 L462 136 L462 376 L256 488 L50 376 L50 136 Z"/>
+    <radialGradient id="bgMain" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" style="stop-color:#7C5CE8"/>
+      <stop offset="55%" style="stop-color:#4F46E5"/>
+      <stop offset="100%" style="stop-color:#1a1060"/>
+    </radialGradient>
+    <radialGradient id="shine" cx="50%" cy="15%" r="45%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.22"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="roundedClip">
+      <rect width="512" height="512" rx="112" ry="112"/>
     </clipPath>
   </defs>
 
-  <!-- Rounded hexagon background -->
-  <rect width="512" height="512" fill="transparent"/>
-  <path
-    d="M256 28
-       L454 134
-       Q462 140 462 150
-       L462 362
-       Q462 372 454 378
-       L256 484
-       L58 378
-       Q50 372 50 362
-       L50 150
-       Q50 140 58 134
-       Z"
-    fill="#0F172A"
-  />
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="112" ry="112" fill="url(#bgMain)"/>
 
-  <!-- Sigma Σ — thin stroke, centered, geometric -->
-  <path
-    d="M158 152 L354 152 L260 256 L354 360 L158 360"
-    fill="none"
-    stroke="white"
-    stroke-width="22"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
+  <!-- Glass shine at top -->
+  <rect width="512" height="512" rx="112" ry="112" fill="url(#shine)"/>
+
+  <!-- Subtle border -->
+  <rect width="512" height="512" rx="112" ry="112"
+    fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+
+  <!-- Sigma Σ with glow -->
+  <text
+    x="256" y="340"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="310"
+    font-weight="700"
+    fill="white"
+    opacity="0.95"
+    filter="url(#glow)"
+  >Σ</text>
 </svg>
