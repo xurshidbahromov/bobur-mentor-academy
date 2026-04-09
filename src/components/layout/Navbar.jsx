@@ -110,42 +110,48 @@ export default function Navbar() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Profile avatar + Coin badge */}
             {!loading && user && (
-              <Link to="/profile" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {/* Avatar */}
-                <div style={{
-                  width: 34, height: 34, borderRadius: '50%',
-                  border: '2px solid rgba(52,97,255,0.2)',
-                  overflow: 'hidden',
-                  background: 'linear-gradient(135deg, #3461FF, #214CE5)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 2px 8px rgba(52,97,255,0.2)',
-                }}>
-                  {(user?.user_metadata?.avatar_url) ? (
-                    <img src={user.user_metadata.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <span style={{ color: 'white', fontSize: '0.8125rem', fontWeight: 800 }}>
-                      {(user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || 'U')[0].toUpperCase()}
-                    </span>
-                  )}
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Link to="/profile" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                  {/* Avatar */}
+                  <div style={{
+                    width: 34, height: 34, borderRadius: '50%',
+                    border: '2px solid rgba(52,97,255,0.2)',
+                    overflow: 'hidden',
+                    background: 'linear-gradient(135deg, #3461FF, #214CE5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 2px 8px rgba(52,97,255,0.2)',
+                  }}>
+                    {(user?.user_metadata?.avatar_url) ? (
+                      <img src={user.user_metadata.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ color: 'white', fontSize: '0.8125rem', fontWeight: 800 }}>
+                        {(user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || 'U')[0].toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+
                 {/* Coin badge */}
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '5px', 
-                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', 
-                  color: 'white', 
-                  padding: '4px 12px 4px 8px', 
-                  borderRadius: 'var(--radius-full)', 
-                  fontWeight: 700,
-                  fontSize: '0.9375rem',
-                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                }}>
-                  <Coins size={15} />
-                  <span>{profile?.coins ?? 0}</span>
-                </div>
-              </Link>
+                <Link to="/shop" style={{ textDecoration: 'none' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '5px', 
+                    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', 
+                    color: 'white', 
+                    padding: '4px 12px 4px 8px', 
+                    borderRadius: 'var(--radius-full)', 
+                    fontWeight: 700,
+                    fontSize: '0.9375rem',
+                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                    cursor: 'pointer'
+                  }}>
+                    <Coins size={15} />
+                    <span>{profile?.coins ?? 0}</span>
+                  </div>
+                </Link>
+              </div>
             )}
 
             {/* Desktop Auth Buttons — only for guests */}
