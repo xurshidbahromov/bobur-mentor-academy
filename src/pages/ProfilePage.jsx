@@ -96,6 +96,15 @@ export default function ProfilePage() {
             <ArrowRight size={18} color="#94A3B8" />
           </div>
 
+          {/* About */}
+          <Link to="/about" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer', textDecoration: 'none' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(52,97,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <strong style={{ color: '#3461FF', fontSize: '16px', fontFamily: 'serif', fontStyle: 'italic' }}>i</strong>
+            </div>
+            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#334155' }}>Biz haqimizda</p>
+            <ArrowRight size={18} color="#94A3B8" />
+          </Link>
+
           {/* Support */}
           <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer' }} onClick={() => alert('Qo\'llab-quvvatlash tez orada...')}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(52,211,153,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
