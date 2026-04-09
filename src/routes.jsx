@@ -15,6 +15,7 @@ import SignupPage from './pages/SignupPage'
 import NotFoundPage from './pages/NotFoundPage'
 import AboutPage from './pages/AboutPage'
 import ProfilePage from './pages/ProfilePage'
+import DashboardPage from './pages/DashboardPage'
 
 const pageVariants = {
   initial: { opacity: 0, y: 15, scale: 0.98 },
@@ -41,6 +42,7 @@ export default function AppRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/"                     element={<PageWrapper><LandingPage /></PageWrapper>} />
+        <Route path="/dashboard"            element={<PageWrapper><DashboardPage /></PageWrapper>} />
         <Route path="/courses"              element={<PageWrapper><CoursesPage /></PageWrapper>} />
         <Route path="/courses/:courseId"    element={<PageWrapper><CourseDetailPage /></PageWrapper>} />
         <Route path="/lessons/:lessonId"    element={<PageWrapper><LessonDetailPage /></PageWrapper>} />

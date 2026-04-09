@@ -45,9 +45,9 @@ function TMARedirect() {
         navigate('/login', { replace: true })
       }
     } else {
-      // Logged in on landing or auth pages → go to courses
+      // Logged in on landing or auth pages → go to dashboard
       if (location.pathname === '/' || AUTH_ROUTES.includes(location.pathname)) {
-        navigate('/courses', { replace: true })
+        navigate('/dashboard', { replace: true })
       }
     }
   }, [isTelegram, isReady, user, loading, location.pathname])
