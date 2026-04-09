@@ -21,91 +21,64 @@ export default function CoursesPage() {
     <div style={{ 
       maxWidth: '1200px', 
       margin: '0 auto', 
-      padding: `${isTelegram ? '110px' : '90px'} 24px 100px`, 
+      padding: `${isTelegram ? '120px' : '100px'} 24px 100px`, 
       minHeight: '100vh',
-      background: 'radial-gradient(circle at top right, rgba(139, 92, 246, 0.03), transparent 40%), radial-gradient(circle at bottom left, rgba(52, 97, 255, 0.03), transparent 40%)'
     }}>
       
-      {/* ── Premium Header Section ── */}
-      <div style={{ marginBottom: '60px', position: 'relative' }}>
-        <motion.h1 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          style={{
-            fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
-            fontWeight: 900,
-            letterSpacing: '-0.05em',
-            color: 'var(--text-primary)',
-            lineHeight: 1,
-            marginBottom: '24px'
-          }}
-        >
-          Bizning <br />
-          <span style={{
-            background: 'linear-gradient(135deg, #3461FF 0%, #8B5CF6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
-            Kurslarimiz.
-          </span>
-        </motion.h1>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '32px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+      {/* ── Compact Header & Search ── */}
+      <div style={{ marginBottom: '64px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <motion.h1 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              fontSize: 'clamp(2.5rem, 7vw, 4rem)',
+              fontWeight: 900,
+              letterSpacing: '-0.04em',
+              color: 'var(--text-primary)',
+              lineHeight: 1.1,
+              margin: 0
+            }}
+          >
+            Darslar <br />
+            <span style={{ color: 'var(--color-primary)' }}>Katalogi</span>
+          </motion.h1>
+          
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', maxWidth: '520px', lineHeight: 1.6, margin: 0 }}
+            transition={{ delay: 0.1 }}
+            style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', maxWidth: '500px', lineHeight: 1.6, margin: 0 }}
           >
-            Matematikadan eng sara video darslar va amaliy mashg'ulotlar to'plami. O'zingizga mos yo'nalishni tanlang.
+            Matematikadan sara darlarni o'rganing va darajangizni oshiring.
           </motion.p>
         </div>
-      </div>
 
-      {/* ── Search Island ── */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        style={{ 
-          marginBottom: '56px',
-          position: 'sticky',
-          top: isTelegram ? '74px' : '84px',
-          zIndex: 100,
-          background: 'rgba(255,255,255,0.01)',
-          padding: '4px 0'
-        }}
-      >
-        <div style={{
-          position: 'relative',
-          maxWidth: '600px',
-          margin: '0 auto',
-          borderRadius: '24px',
-          padding: '2px', // for gradient border effect
-          background: isFocused 
-            ? 'linear-gradient(135deg, #3461FF, #8B5CF6)' 
-            : 'rgba(52, 97, 255, 0.1)',
-          transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
-          boxShadow: isFocused 
-            ? '0 20px 40px rgba(52, 97, 255, 0.15), 0 0 0 4px rgba(52, 97, 255, 0.05)' 
-            : '0 4px 20px rgba(0,0,0,0.04)'
-        }}>
+        {/* ── Minimalist Search Bar ── */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          style={{ maxWidth: '420px', position: 'relative' }}
+        >
           <div style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderRadius: '22px',
+            background: 'rgba(255, 255, 255, 0.6)',
+            border: `1.5px solid ${isFocused ? 'rgba(52, 97, 255, 0.5)' : 'rgba(0,0,0,0.06)'}`,
+            borderRadius: '16px',
             display: 'flex',
             alignItems: 'center',
-            padding: '4px 8px 4px 20px',
+            padding: '0 16px',
             gap: '12px',
-            height: '64px'
+            height: '54px',
+            transition: 'all 0.3s ease',
+            boxShadow: isFocused ? '0 8px 30px rgba(52, 97, 255, 0.08)' : '0 2px 10px rgba(0,0,0,0.02)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
           }}>
-            <Search size={22} color={isFocused ? '#3461FF' : '#94A3B8'} style={{ transition: 'color 0.3s' }} />
+            <Search size={18} color={isFocused ? 'var(--color-primary)' : '#94A3B8'} />
             <input 
               type="text"
-              placeholder="Qaysi mavzuni o'rganamiz? (Masalan: Funksiya)"
+              placeholder="Qidiruv..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onFocus={() => setIsFocused(true)}
@@ -114,39 +87,26 @@ export default function CoursesPage() {
                 flex: 1,
                 border: 'none',
                 background: 'transparent',
-                fontSize: '1.0625rem',
+                fontSize: '0.9375rem',
                 fontWeight: 500,
                 color: 'var(--text-primary)',
                 outline: 'none',
-                height: '100%'
               }}
             />
-            <AnimatePresence>
-              {searchTerm && (
-                <motion.button 
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={() => setSearchTerm('')}
-                  style={{ 
-                    padding: '8px',
-                    background: '#F1F5F9',
-                    border: 'none',
-                    borderRadius: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: '#64748B'
-                  }}
-                >
-                  <X size={18} />
-                </motion.button>
-              )}
-            </AnimatePresence>
+            {searchTerm && (
+              <button 
+                onClick={() => setSearchTerm('')}
+                style={{ 
+                  background: 'none', border: 'none', padding: '4px', cursor: 'pointer',
+                  color: '#94A3B8', display: 'flex'
+                }}
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
       {loading ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>

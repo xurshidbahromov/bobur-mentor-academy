@@ -4,7 +4,7 @@ import { BookOpen, Target, LogOut, Lock, ArrowRight, LifeBuoy, Settings } from '
 import { useAuth } from '../context/AuthContext'
 
 export default function ProfilePage() {
-  const { user, profile, loading, signOut } = useAuth()
+  const { user, profile, loading, signOut, isAdmin } = useAuth()
   const navigate = useNavigate()
 
   const handleSignOut = async () => {
@@ -63,7 +63,7 @@ export default function ProfilePage() {
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1 style={{ margin: '0 0 4px', fontSize: '1.375rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h1>
-            <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem' }}>{user.email}</p>
+            <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem' }}>{user.email || profile?.role}</p>
           </div>
         </div>
 
@@ -87,6 +87,17 @@ export default function ProfilePage() {
 
         {/* ── Settings & Actions ── */}
         <div style={{ background: 'white', borderRadius: 20, border: '1.5px solid rgba(100,120,255,0.1)', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)', marginBottom: 24 }}>
+          {/* Admin Panel (Only for Admins) */}
+          {isAdmin && (
+            <Link to="/admin" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer', textDecoration: 'none', background: 'rgba(52,97,255,0.04)' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(52,97,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Settings size={18} color="#3461FF" />
+              </div>
+              <p style={{ margin: 0, flex: 1, fontWeight: 800, color: '#3461FF' }}>Admin Panel</p>
+              <ArrowRight size={18} color="#3461FF" />
+            </Link>
+          )}
+
           {/* Settings */}
           <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer' }} onClick={() => alert('Sozlamalar tez orada...')}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(100,116,139,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

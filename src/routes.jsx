@@ -2,7 +2,7 @@
 // Centralized route configuration — single source of truth for all app routes.
 // All pages are PUBLIC — auth is handled contextually inside components.
 
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import { Suspense, lazy } from 'react'
@@ -21,6 +21,17 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const ShopPage = lazy(() => import('./pages/ShopPage'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
+
+// Admin Pages
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'))
+const AdminLessons = lazy(() => import('./pages/admin/AdminLessons'))
+const AdminQuizzes = lazy(() => import('./pages/admin/AdminQuizzes'))
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+
+// Auth Wrappers
+import AdminProtectedRoute from './components/auth/AdminProtectedRoute'
 
 const pageVariants = {
   initial: { opacity: 0, y: 15, scale: 0.98 },
@@ -47,6 +58,7 @@ export default function AppRoutes() {
     <AnimatePresence mode="wait">
       <Suspense fallback={<PageSkeleton />}>
         <Routes location={location} key={location.pathname}>
+          {/* Public Routes */}
           <Route path="/"                     element={<PageWrapper><LandingPage /></PageWrapper>} />
           <Route path="/dashboard"            element={<PageWrapper><DashboardPage /></PageWrapper>} />
           <Route path="/courses"              element={<PageWrapper><CoursesPage /></PageWrapper>} />
@@ -58,6 +70,17 @@ export default function AppRoutes() {
           <Route path="/leaderboard"          element={<PageWrapper><LeaderboardPage /></PageWrapper>} />
           <Route path="/login"                element={<PageWrapper><LoginPage /></PageWrapper>} />
           <Route path="/signup"               element={<PageWrapper><SignupPage /></PageWrapper>} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="courses"   element={<AdminCourses />} />
+            <Route path="lessons"   element={<AdminLessons />} />
+            <Route path="quizzes"   element={<AdminQuizzes />} />
+            <Route path="users"     element={<AdminUsers />} />
+          </Route>
+
           <Route path="*"                     element={<PageWrapper><NotFoundPage /></PageWrapper>} />
         </Routes>
       </Suspense>

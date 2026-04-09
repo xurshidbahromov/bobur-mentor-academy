@@ -160,6 +160,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     user, session, loading, profile, setProfile,
+    isAdmin: profile?.role === 'admin',
     signIn, signUp, signOut,
     signInWithGoogle, signInWithTelegram,
   }
