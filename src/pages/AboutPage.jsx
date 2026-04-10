@@ -99,20 +99,7 @@ export default function AboutPage() {
         </div>
 
         <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <Link to="/" style={{
-            color: 'rgba(255,255,255,0.75)',
-            fontSize: '0.9375rem',
-            textDecoration: 'none',
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            marginBottom: '48px', padding: '8px 18px',
-            background: 'rgba(255,255,255,0.12)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '9999px'
-          }}>
-            <ArrowLeft size={15} /> Bosh sahifaga
-          </Link>
+
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }} className="about-hero-grid">
             <style>{`

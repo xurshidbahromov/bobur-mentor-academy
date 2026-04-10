@@ -13,6 +13,7 @@ import { Toaster } from 'sonner'
 import PublicNavbar from './components/layout/PublicNavbar'
 import AuthSidebar from './components/layout/AuthSidebar'
 import BottomTabNav from './components/layout/BottomTabNav'
+import PublicBottomNav from './components/layout/PublicBottomNav'
 import Footer from './components/layout/Footer'
 import AppRoutes from './routes'
 
@@ -111,12 +112,13 @@ function AppShell() {
 
   // ── Public zone (Landing, About) — PublicNavbar + optional Footer ──
   return (
-    <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
+    <div className="public-zone-wrapper" style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
       <PublicNavbar />
       <main style={{ flex: 1 }}>
         <AppRoutes />
       </main>
       {!isTelegram && <Footer />}
+      <PublicBottomNav />
     </div>
   )
 }
