@@ -34,7 +34,7 @@ function TelegramBtn({ label }) {
       setState('error')
       setTimeout(() => setState('idle'), 3000)
     } else {
-      navigate('/courses')
+      navigate('/dashboard')
     }
   }
 

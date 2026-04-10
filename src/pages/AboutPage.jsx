@@ -130,7 +130,7 @@ export default function AboutPage() {
               <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.65, maxWidth: '520px', marginBottom: '40px' }}>
                 Matematika — bu shunchaki raqamlar yig'indisi emas, bu hayotiy qarorlar va mantiqiy fikrlash poydevoridir.
               </p>
-              <Link to="/courses" style={{ textDecoration: 'none' }}>
+              <Link to="/dashboard" style={{ textDecoration: 'none' }}>
                 <Button variant="secondary" size="lg" style={{ background: 'white', color: '#3461FF' }}>
                   Darslarni ko'rish <ArrowRight size={18} />
                 </Button>

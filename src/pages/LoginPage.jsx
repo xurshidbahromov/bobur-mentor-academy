@@ -126,7 +126,7 @@ function TelegramBtn({ label }) {
       setState('error')
       setTimeout(() => setState('idle'), 3000)
     } else {
-      navigate('/courses')
+      navigate('/dashboard')
     }
   }
 
@@ -249,7 +249,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const redirectTo = location.state?.from || '/courses'
+  const redirectTo = location.state?.from || '/dashboard'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
