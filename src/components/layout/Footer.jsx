@@ -16,7 +16,7 @@ export default function Footer() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         gap: 16, flexWrap: 'wrap',
       }}>
-        <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
+        <span className="outfit-font" style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
           © {year} Bobur Mentor Academy
         </span>
         <div style={{ display: 'flex', gap: 20 }}>

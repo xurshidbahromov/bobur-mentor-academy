@@ -50,7 +50,7 @@ export default function PublicNavbar() {
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
           <img src="/logo.svg" alt="Bobur Mentor" width="40" height="40" style={{ objectFit: 'contain' }} />
-          <span style={{ fontWeight: 800, fontSize: '1.0625rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+          <span className="outfit-font" style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>
             Bobur<span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}> Mentor</span>
           </span>
         </Link>

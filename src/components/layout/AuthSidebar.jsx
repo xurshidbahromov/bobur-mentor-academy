@@ -45,7 +45,7 @@ export default function AuthSidebar() {
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', marginBottom: 40 }}>
           <img src="/logo.svg" alt="BMA" width="38" height="38" style={{ objectFit: 'contain' }} />
-          <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1 }}>
+          <span className="outfit-font" style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1 }}>
             Bobur<span style={{ fontWeight: 400, color: '#64748B' }}> Mentor</span>
           </span>
         </Link>
