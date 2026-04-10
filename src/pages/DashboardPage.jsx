@@ -255,7 +255,7 @@ export default function DashboardPage() {
   )
 
   return (
-    <div style={{ maxWidth: 640, margin: '0 auto', padding: '24px 16px 32px' }}>
+    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 40px' }}>
 
       {/* ── Header ── */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 24 }}>
@@ -312,8 +312,13 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* ── Courses ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* ── Courses Grid ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: 20,
+        alignItems: 'start'
+      }}>
         {loading ? (
           // Skeleton
           Array.from({ length: 3 }).map((_, i) => (

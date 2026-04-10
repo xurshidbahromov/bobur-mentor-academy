@@ -11,7 +11,7 @@ export default function CourseCard({ course }) {
   const accent = accentColors[Math.abs((course.title || '').charCodeAt(0)) % accentColors.length]
 
   return (
-    <Link to={`/courses/${course.id}`} style={{ textDecoration: 'none', display: 'flex' }}>
+    <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex' }}>
       <div
         className="course-card"
         style={{

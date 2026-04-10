@@ -37,7 +37,7 @@ export default function ProfilePage() {
   const email = user?.email || ''
 
   return (
-    <div style={{ maxWidth: 540, margin: '0 auto', padding: '24px 16px 32px' }}>
+    <div style={{ maxWidth: 880, margin: '0 auto', padding: '32px 24px 40px' }}>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
 
         {/* ── Avatar & Name ── */}

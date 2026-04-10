@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 import { Toaster } from 'sonner'
 
 import PublicNavbar from './components/layout/PublicNavbar'
+import AuthSidebar from './components/layout/AuthSidebar'
 import BottomTabNav from './components/layout/BottomTabNav'
 import Footer from './components/layout/Footer'
 import AppRoutes from './routes'
@@ -96,11 +97,14 @@ function AppShell() {
   // ── Authenticated app zone — BottomTabNav ──
   if (isAuthAppPage) {
     return (
-      <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
-        <main style={{ flex: 1 }}>
-          <AppRoutes />
-        </main>
-        <BottomTabNav />
+      <div className="auth-layout" style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex' }}>
+        <AuthSidebar />
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+          <main style={{ flex: 1 }}>
+            <AppRoutes />
+          </main>
+          <BottomTabNav />
+        </div>
       </div>
     )
   }

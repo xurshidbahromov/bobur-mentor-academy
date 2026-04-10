@@ -48,7 +48,7 @@ export default function ShopPage() {
   }
 
   return (
-    <div style={{ maxWidth: 540, margin: '0 auto', padding: '24px 16px 32px' }}>
+    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 40px' }}>
 
       {/* ── Header ── */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
@@ -79,7 +79,7 @@ export default function ShopPage() {
       </motion.div>
 
       {/* ── Packages ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20, marginBottom: 32 }}>
         {PACKAGES.map((pkg, i) => (
           <motion.div key={pkg.name} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
             style={{

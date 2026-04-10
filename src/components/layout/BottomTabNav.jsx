@@ -43,7 +43,7 @@ export default function BottomTabNav() {
 
   return (
     <>
-      <nav style={{
+      <nav className="mobile-bottom-nav" style={{
         position: 'fixed',
         bottom: 0, left: 0, right: 0,
         background: 'rgba(255,255,255,0.97)',
@@ -113,9 +113,14 @@ export default function BottomTabNav() {
         ))}
       </nav>
 
-      {/* Body padding so content isn't hidden behind nav */}
+      {/* Hide on desktop, show only on mobile */}
       <style>{`
-        body { padding-bottom: calc(80px + env(safe-area-inset-bottom, 16px)) !important; }
+        @media (min-width: 768px) {
+          .mobile-bottom-nav { display: none !important; }
+        }
+        @media (max-width: 767px) {
+          body { padding-bottom: calc(80px + env(safe-area-inset-bottom, 16px)) !important; }
+        }
       `}</style>
     </>
   )
