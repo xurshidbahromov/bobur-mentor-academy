@@ -11,28 +11,39 @@ import { motion } from 'framer-motion'
 // ── Icons ──
 const IcoHome = ({ active }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.7} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.55 5.45 21 6 21H9M19 10L21 12M19 10V20C19 20.55 18.55 21 18 21H15M9 21V15C9 14.45 9.45 14 10 14H14C14.55 14 15 14.45 15 15V21M9 21H15"/>
+    <path d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.55 5.45 21 6 21H9M19 10L21 12M19 10V20C19 20.55 18.55 21 18 21H15M9 21V15C9 14.45 9.45 14 10 14H14C14.55 14 15 14.45 15 15V21M9 21H15" />
   </svg>
 )
 
 const IcoShop = ({ active }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.7} strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+    <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
   </svg>
 )
 
 const IcoProfile = ({ active }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.7} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+)
+
+const IcoTrophy = ({ active }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.7} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 9H4a2 2 0 0 1-2-2V5h4" />
+    <path d="M18 9h2a2 2 0 0 0 2-2V5h-4" />
+    <path d="M6 2h12v7a6 6 0 0 1-12 0V2Z" />
+    <path d="M12 17v4" />
+    <path d="M8 21h8" />
   </svg>
 )
 
 const TABS = [
-  { to: '/dashboard', label: "Darslar", Icon: IcoHome },
-  { to: '/shop',      label: "Do'kon",  Icon: IcoShop },
-  { to: '/profile',   label: "Profil",  Icon: IcoProfile },
+  { to: '/dashboard',   label: "Darslar",  Icon: IcoHome    },
+  { to: '/shop',        label: "Do'kon",   Icon: IcoShop    },
+  { to: '/leaderboard', label: "Reyting",  Icon: IcoTrophy  },
+  { to: '/profile',     label: "Profil",   Icon: IcoProfile },
 ]
 
 export default function BottomTabNav() {

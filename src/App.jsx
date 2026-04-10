@@ -18,9 +18,9 @@ import Footer from './components/layout/Footer'
 import AppRoutes from './routes'
 
 // ── Route zones ──────────────────────────────────────
-const PUBLIC_ROUTES  = ['/', '/about']
-const AUTH_ROUTES    = ['/login', '/signup']
-const AUTH_APP_PREFIXES = ['/dashboard', '/lessons', '/shop', '/profile']
+const PUBLIC_ROUTES = ['/']  // only '/' auto-redirects logged-in users
+const AUTH_ROUTES = ['/login', '/signup']
+const AUTH_APP_PREFIXES = ['/dashboard', '/lessons', '/shop', '/profile', '/leaderboard']
 
 function isAuthAppRoute(pathname) {
   return AUTH_APP_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/'))
@@ -63,8 +63,8 @@ function SmartRedirect() {
         navigate('/login', { replace: true })
       }
     } else {
-      // Logged in: kick off landing/auth pages → dashboard
-      if (PUBLIC_ROUTES.includes(path) || AUTH_ROUTES.includes(path)) {
+      // Logged in: redirect away from landing & login pages (but NOT /about)
+      if (path === '/' || AUTH_ROUTES.includes(path)) {
         navigate('/dashboard', { replace: true })
       }
     }
@@ -75,15 +75,15 @@ function SmartRedirect() {
 
 // ── App Shell ──────────────────────────────────────────
 function AppShell() {
-  const location  = useLocation()
+  const location = useLocation()
   const { isTelegram } = useTelegram()
   const { user } = useAuth()
   const path = location.pathname
 
-  const isPublicPage  = PUBLIC_ROUTES.includes(path)
-  const isAuthPage    = AUTH_ROUTES.includes(path)
+  const isPublicPage = PUBLIC_ROUTES.includes(path)
+  const isAuthPage = AUTH_ROUTES.includes(path)
   const isAuthAppPage = isAuthAppRoute(path)
-  const isAdminPage   = path.startsWith('/admin')
+  const isAdminPage = path.startsWith('/admin')
 
   // ── Auth / Login / Signup pages — fullscreen no shell ──
   if (isAuthPage) {
@@ -96,7 +96,8 @@ function AppShell() {
   }
 
   // ── Authenticated app zone — BottomTabNav ──
-  if (isAuthAppPage) {
+  // Also render /about inside auth shell when user is already logged in
+  if (isAuthAppPage || (path === '/about' && user)) {
     return (
       <div className="auth-layout" style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex' }}>
         <AuthSidebar />
@@ -131,7 +132,24 @@ export default function App() {
         <AuthProvider>
           <TelegramAutoLogin />
           <SmartRedirect />
-          <Toaster position="top-center" richColors />
+          <Toaster
+            position="top-center"
+            richColors
+            toastOptions={{
+              style: {
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                borderRadius: '20px',
+                padding: '16px',
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1.5px solid rgba(255,255,255,0.8)',
+                boxShadow: '0 14px 34px rgba(0,0,0,0.08)',
+                fontWeight: 600,
+                fontSize: '0.9375rem'
+              }
+            }}
+          />
           <AppShell />
         </AuthProvider>
       </TelegramProvider>

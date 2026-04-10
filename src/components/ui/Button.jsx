@@ -91,10 +91,9 @@ export default function Button({
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      // Framer Motion spring physics on press
-      whileTap={disabled ? {} : { scale: 0.94 }}
-      whileHover={disabled ? {} : { scale: 1.02 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+      // Framer Motion tap scale (Apple style tactile press)
+      whileTap={disabled ? {} : { scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 450, damping: 25 }}
       style={{
         // Layout
         display: 'inline-flex',

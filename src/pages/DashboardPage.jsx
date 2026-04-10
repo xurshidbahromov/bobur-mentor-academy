@@ -59,8 +59,8 @@ function LessonRow({ lesson, userCoins, onNavigate }) {
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none',
       }}
-      whileHover={{ y: -1, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}
-      whileTap={{ scale: 0.985 }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 450, damping: 25 }}
     >
       {/* Play / Lock icon */}
       <div style={{
@@ -261,8 +261,8 @@ export default function DashboardPage() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: '1.625rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
-              Salom, {firstName}! 👋
+            <h1 className="outfit-font" style={{ margin: 0, fontSize: '1.625rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+              Assalomu aleykum, {firstName}! 👋
             </h1>
             <p style={{ margin: '4px 0 0', fontSize: '0.875rem', color: '#64748B' }}>
               Bugun nima o'rganamiz?

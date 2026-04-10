@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTelegram } from '../context/TelegramProvider'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
+import { toast } from 'sonner'
 
 // ─── Icons ────────────────────────────────────────────────────
 const IconMail    = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><polyline points="2,4 12,13 22,4"/></svg>
@@ -30,10 +31,10 @@ function TelegramBtn({ label }) {
     }
     setState('loading')
     const { error } = await signInWithTelegram(tgUser)
-    if (error) {
-      setState('error')
-      setTimeout(() => setState('idle'), 3000)
-    } else {
+      if (error) {
+        toast.error("Xatolik yuz berdi")
+        setState('idle')
+      } else {
       navigate('/dashboard')
     }
   }
@@ -43,9 +44,8 @@ function TelegramBtn({ label }) {
       type="button"
       onClick={handleClick}
       disabled={state === 'loading'}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       style={{
         width: '100%', padding: '14px 20px', borderRadius: 16, border: 'none',
         background: state === 'error'
@@ -134,7 +134,7 @@ function BrandPanelSignup() {
         <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Logo size={28} />
         </div>
-        <span style={{ fontSize: '1.125rem', fontWeight: 800, color: 'white', letterSpacing: '-0.02em' }}>Bobur Mentor</span>
+        <span className="outfit-font" style={{ fontSize: '1.25rem', fontWeight: 800, color: 'white', letterSpacing: '-0.02em' }}>Bobur Mentor</span>
       </Link>
 
       {/* Content */}
@@ -169,7 +169,6 @@ export default function SignupPage() {
 
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
   const [success,  setSuccess]  = useState(false)
 
@@ -199,11 +198,10 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
     const { error } = await signUp({ email, password })
     setLoading(false)
-    if (error) setError("Bu email allaqachon ro'yxatdan o'tgan yoki serverda xatolik yuz berdi.")
+    if (error) toast.error("Bu email allaqachon ro'yxatdan o'tgan yoki server xatosi.")
     else setSuccess(true)
   }
 
@@ -352,20 +350,10 @@ export default function SignupPage() {
                     <Field icon={IconMail} type="email" label="Email manzil" placeholder="name@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                     <Field icon={IconLock} type="password" label="Parol (kamida 6 belgi)" placeholder="Yangi parol kiriting" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
 
-                    <AnimatePresence>
-                      {error && (
-                        <motion.div key="err"
-                          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto', x: [0, -6, 6, -4, 4, 0] }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.35 }}
-                          style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 12, padding: '10px 14px', color: '#DC2626', fontSize: '0.875rem', fontWeight: 500, overflow: 'hidden' }}
-                        >{error}</motion.div>
-                      )}
-                    </AnimatePresence>
-
                     <motion.button
                       type="submit" disabled={loading}
-                      whileHover={!loading ? { scale: 1.02, boxShadow: '0 10px 28px rgba(52,97,255,0.42)' } : {}}
-                      whileTap={!loading ? { scale: 0.97 } : {}}
-                      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+                      whileTap={!loading ? { scale: 0.96 } : {}}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       style={{
                         width: '100%', padding: '15px 20px', borderRadius: 16, border: 'none',
                         background: loading ? '#94A3B8' : 'linear-gradient(135deg, #3461FF 0%, #214CE5 100%)',
