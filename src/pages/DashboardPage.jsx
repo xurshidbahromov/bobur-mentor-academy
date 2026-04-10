@@ -1,270 +1,354 @@
-import { useEffect } from 'react'
+// src/pages/DashboardPage.jsx
+// Auth zone home: kurslar ro'yxati + darslar accordion + coin balansi.
+// "CoursesPage" va "CourseDetailPage" endi bu yerga integratsiya qilingan.
+
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { useStreak } from '../hooks/useStreak'
-import { useCourses } from '../hooks/useCourses'
-import { Coins, Flame, ChevronRight, PlayCircle, BookOpen, Check, Trophy } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../context/AuthContext'
+import { useTelegram } from '../context/TelegramProvider'
+import { supabase } from '../lib/supabase'
+import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle } from 'lucide-react'
 
-// ════════════════════════════════════════════════════════════════
-// STREAK CARD
-// ════════════════════════════════════════════════════════════════
-function StreakCard({ streak, longest }) {
-  const filled = streak % 7 || (streak > 0 ? 7 : 0)
+// ─────────────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────────────
 
+function CoinBadge({ coins }) {
   return (
-    <div style={{
-      background: 'linear-gradient(135deg, #FFF7ED, #FFFBEB)',
-      border: '1.5px solid rgba(245,158,11,0.2)',
-      borderRadius: 20, padding: '22px',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      <div style={{ position: 'absolute', top: -32, right: -32, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(251,191,36,0.22) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-        <div>
-          <p style={{ margin: '0 0 4px', fontSize: '0.7rem', fontWeight: 700, color: '#92400E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Olov davri</p>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-            <span style={{ fontSize: '2.5rem', fontWeight: 900, color: '#D97706', lineHeight: 1, letterSpacing: '-0.03em' }}>{streak}</span>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#B45309' }}>kun</span>
-          </div>
-        </div>
-        <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Flame size={26} color="#F59E0B" strokeWidth={1.75} />
-        </div>
+    <Link to="/shop" style={{ textDecoration: 'none' }}>
+      <div style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+        color: 'white', padding: '6px 14px', borderRadius: 100,
+        fontWeight: 700, fontSize: '0.9375rem',
+        boxShadow: '0 4px 14px rgba(245,158,11,0.3)',
+        cursor: 'pointer',
+      }}>
+        <Coins size={16} />
+        <span>{coins ?? 0}</span>
       </div>
-
-      <div style={{ display: 'flex', gap: 5, marginBottom: 12 }}>
-        {Array.from({ length: 7 }, (_, i) => (
-          <div key={i} style={{ flex: 1, height: 5, borderRadius: 3, background: i < filled ? '#F59E0B' : 'rgba(217,119,6,0.12)', transition: 'background 0.3s ease' }} />
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.8125rem', color: '#B45309', fontWeight: 500 }}>
-          {streak === 0 ? "Bugun kiring va boshlang" : `${7 - filled} kun qoldi bonusga`}
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#D97706', fontSize: '0.8125rem', fontWeight: 700 }}>
-          <Trophy size={13} strokeWidth={2} /> MAX: {longest} kun
-        </span>
-      </div>
-    </div>
+    </Link>
   )
 }
 
-// ════════════════════════════════════════════════════════════════
-// COIN CARD
-// ════════════════════════════════════════════════════════════════
-function CoinCard({ coins, canClaim, claiming, justClaimed, onClaim }) {
-  return (
-    <div style={{
-      background: 'linear-gradient(135deg, #F0FDF4, #ECFDF5)',
-      border: '1.5px solid rgba(16,185,129,0.2)',
-      borderRadius: 20, padding: '22px',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      <div style={{ position: 'absolute', top: -32, left: -32, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+function LessonRow({ lesson, userCoins, onNavigate }) {
+  const isLocked = !lesson.is_free && (userCoins < (lesson.price || 0))
+  const canAccess = lesson.is_free || !isLocked
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-        <div>
-          <p style={{ margin: '0 0 4px', fontSize: '0.7rem', fontWeight: 700, color: '#065F46', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sizning balans</p>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-            <span style={{ fontSize: '2.5rem', fontWeight: 900, color: '#059669', lineHeight: 1, letterSpacing: '-0.03em' }}>{coins}</span>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#065F46' }}>coin</span>
-          </div>
-        </div>
-        <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Coins size={26} color="#10B981" strokeWidth={1.75} />
-        </div>
+  const handleClick = () => {
+    if (canAccess) {
+      onNavigate(`/lessons/${lesson.id}`)
+    } else {
+      onNavigate('/shop')
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      onClick={handleClick}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 14,
+        padding: '14px 16px', borderRadius: 14,
+        background: canAccess ? 'white' : 'rgba(255,255,255,0.6)',
+        border: '1.5px solid rgba(100,120,255,0.08)',
+        cursor: 'pointer',
+        transition: 'transform 0.15s, box-shadow 0.15s',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
+      }}
+      whileHover={{ y: -1, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}
+      whileTap={{ scale: 0.985 }}
+    >
+      {/* Play / Lock icon */}
+      <div style={{
+        width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: canAccess ? 'rgba(52,97,255,0.08)' : 'rgba(100,116,139,0.08)',
+      }}>
+        {canAccess
+          ? <Play size={18} color="#3461FF" fill="#3461FF" />
+          : <Lock size={18} color="#94A3B8" />
+        }
       </div>
 
-      <AnimatePresence mode="wait">
-        {justClaimed ? (
-          <motion.div key="ok"
-            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 14, background: 'rgba(16,185,129,0.1)', color: '#059669', fontWeight: 700, fontSize: '0.9375rem' }}
+      {/* Title & meta */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{
+          margin: 0, fontWeight: 600,
+          fontSize: '0.9375rem', lineHeight: 1.35,
+          color: canAccess ? '#0F172A' : '#94A3B8',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          #{lesson.order_index} {lesson.title}
+        </p>
+        {!lesson.is_free && (
+          <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: canAccess ? '#10B981' : '#EF4444', fontWeight: 700 }}>
+            {canAccess ? 'Ochilgan' : `${lesson.price} coin kerak`}
+          </p>
+        )}
+        {lesson.is_free && (
+          <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#10B981', fontWeight: 700 }}>Bepul</p>
+        )}
+      </div>
+
+      {/* Right badge */}
+      {!canAccess && (
+        <div style={{
+          flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4,
+          background: 'rgba(245,158,11,0.1)', color: '#D97706',
+          padding: '4px 10px', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700,
+        }}>
+          <Coins size={12} /> {lesson.price}
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
+function CourseCard({ course, userCoins, onNavigate }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [lessons, setLessons] = useState([])
+  const [lessonLoading, setLessonLoading] = useState(false)
+
+  const fetchLessons = async () => {
+    if (lessons.length > 0) { setIsOpen(v => !v); return }
+    setLessonLoading(true)
+    const { data } = await supabase
+      .from('lessons')
+      .select('*')
+      .eq('course_id', course.id)
+      .eq('is_published', true)
+      .order('order_index', { ascending: true })
+    setLessons(data || [])
+    setLessonLoading(false)
+    setIsOpen(true)
+  }
+
+  const toggle = () => {
+    if (isOpen) setIsOpen(false)
+    else fetchLessons()
+  }
+
+  return (
+    <div style={{
+      background: 'white',
+      borderRadius: 20,
+      border: '1.5px solid rgba(100,120,255,0.1)',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+      overflow: 'hidden',
+    }}>
+      {/* Course header — tap to expand */}
+      <button
+        onClick={toggle}
+        style={{
+          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+          padding: '20px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+            background: 'rgba(52,97,255,0.08)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <BookOpen size={22} color="#3461FF" />
+          </div>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h3 style={{
+              margin: 0, fontWeight: 800, fontSize: '1.0625rem',
+              color: '#0F172A', letterSpacing: '-0.02em',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {course.title}
+            </h3>
+            <p style={{ margin: '4px 0 0', fontSize: '0.8125rem', color: '#64748B', fontWeight: 500 }}>
+              {course.lesson_count} dars
+            </p>
+          </div>
+
+          <motion.div
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.25 }}
+            style={{ flexShrink: 0, color: '#94A3B8' }}
           >
-            <Check size={16} strokeWidth={3} /> +1 Coin qo'shildi!
+            <ChevronDown size={22} />
           </motion.div>
-        ) : (
-          <motion.button key="btn"
-            onClick={onClaim} disabled={!canClaim || claiming}
-            whileHover={canClaim ? { scale: 1.02 } : {}}
-            whileTap={canClaim ? { scale: 0.97 } : {}}
-            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            style={{
-              width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-              background: canClaim ? 'linear-gradient(135deg, #10B981, #059669)' : 'rgba(16,185,129,0.08)',
-              color: canClaim ? 'white' : '#6EE7B7',
-              fontWeight: 700, fontSize: '0.9375rem', fontFamily: 'inherit',
-              cursor: canClaim ? 'pointer' : 'not-allowed',
-              boxShadow: canClaim ? '0 4px 14px rgba(16,185,129,0.3)' : 'none',
-            }}
+        </div>
+
+        {course.description && (
+          <p style={{ margin: '12px 0 0', fontSize: '0.875rem', color: '#64748B', lineHeight: 1.55, textAlign: 'left' }}>
+            {course.description}
+          </p>
+        )}
+      </button>
+
+      {/* Lessons accordion */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: 'hidden' }}
           >
-            {claiming ? 'Yuklanmoqda...' : canClaim ? 'Bugungi coinni olish (+1)' : 'Bugun olindi — ertaga qaytib keling'}
-          </motion.button>
+            <div style={{
+              padding: '0 16px 16px',
+              borderTop: '1px solid rgba(100,120,255,0.06)',
+              display: 'flex', flexDirection: 'column', gap: 8,
+              paddingTop: 12,
+            }}>
+              {lessonLoading ? (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#94A3B8', fontSize: '0.875rem' }}>
+                  Darslar yuklanmoqda...
+                </div>
+              ) : lessons.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#94A3B8', fontSize: '0.875rem' }}>
+                  Hozircha darslar yo'q
+                </div>
+              ) : lessons.map(lesson => (
+                <LessonRow key={lesson.id} lesson={lesson} userCoins={userCoins} onNavigate={onNavigate} />
+              ))}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
   )
 }
 
-// Apple-inspired frosted glass card
-const GlassCard = ({ children, style = {} }) => (
-  <div style={{
-    background: 'white',
-    border: '1.5px solid rgba(100,120,255,0.1)',
-    borderRadius: '20px',
-    padding: '20px',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
-    ...style
-  }}>
-    {children}
-  </div>
-)
-
+// ─────────────────────────────────────────────────────
+// Main Dashboard Page
+// ─────────────────────────────────────────────────────
 export default function DashboardPage() {
   const { user, profile } = useAuth()
-  const { canClaim, claiming, justClaimed, claimDailyReward } = useStreak()
-  const { courses, loading: coursesLoading } = useCourses()
+  const { isTelegram } = useTelegram()
   const navigate = useNavigate()
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
 
-  // For display purposes, we take the top 2 courses
-  const topCourses = courses.slice(0, 2)
+  useEffect(() => {
+    async function fetchCourses() {
+      const { data } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: true })
+      setCourses(data || [])
+      setLoading(false)
+    }
+    fetchCourses()
+  }, [])
 
-  // Wait until user is fully loaded to prevent flash
-  if (!user || !profile) return null
+  const coins = profile?.coins ?? 0
+  const name = profile?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'O\'quvchi'
+  const firstName = name.split(' ')[0]
+  const streak = profile?.streak_count ?? 0
+
+  const filtered = courses.filter(c =>
+    c.title.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
-    <div style={{
-      maxWidth: '620px',
-      margin: '0 auto',
-      padding: '76px 20px 100px 20px', // padded for top nav & bottom tab
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '24px'
-    }}>
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        
-        {/* ── Greeting Section ── */}
-        <section style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-          <div style={{
-            width: '56px', height: '56px', borderRadius: '50%', overflow: 'hidden',
-            border: '2px solid rgba(52,97,255,0.2)', flexShrink: 0
-          }}>
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #3461FF, #214CE5)', color: 'white', fontSize: '1.5rem', fontWeight: 800 }}>
-                {(profile?.full_name || 'U').charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
+    <div style={{ maxWidth: 640, margin: '0 auto', padding: '24px 16px 32px' }}>
+
+      {/* ── Header ── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
           <div>
-            <p style={{ fontSize: '0.875rem', color: '#64748B', marginBottom: '2px' }}>Hush kelibsiz qahramon,</p>
-            <h1 style={{ fontSize: '1.375rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1 }}>
-              {profile?.full_name || user?.email?.split('@')[0] || 'O\'quvchi'}
+            <h1 style={{ margin: 0, fontSize: '1.625rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+              Salom, {firstName}! 👋
             </h1>
+            <p style={{ margin: '4px 0 0', fontSize: '0.875rem', color: '#64748B' }}>
+              Bugun nima o'rganamiz?
+            </p>
           </div>
-        </section>
+          <CoinBadge coins={coins} />
+        </div>
 
-        {/* ── Stats & Rewards Section ── */}
-        <section style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-          <CoinCard coins={profile.coins} canClaim={canClaim} claiming={claiming} justClaimed={justClaimed} onClaim={claimDailyReward} />
-          <StreakCard streak={profile.streak_count} longest={profile.longest_streak} />
-        </section>
-
-        {/* ── Referral Section ── */}
-        <section style={{ marginBottom: '32px' }}>
+        {/* Streak mini-banner */}
+        {streak > 0 && (
           <div style={{
-            background: 'linear-gradient(135deg, #1E1E2F, #09090E)',
-            borderRadius: 20, padding: '22px', color: 'white',
-            border: '1px solid rgba(255,255,255,0.1)',
-            position: 'relative', overflow: 'hidden'
+            marginTop: 14, display: 'flex', alignItems: 'center', gap: 8,
+            background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
+            borderRadius: 12, padding: '10px 14px',
           }}>
-            <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%)', pointerEvents: 'none' }} />
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, position: 'relative', zIndex: 1 }}>
-              <div>
-                <h3 style={{ margin: '0 0 4px', fontSize: '1.0625rem', fontWeight: 800 }}>Do'stlarni taklif qiling</h3>
-                <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94A3B8', maxWidth: '200px' }}>
-                  Har bir do'stingiz uchun <strong style={{ color: '#F59E0B' }}>+15 Coin</strong> sovga oling!
-                </p>
-              </div>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Coins size={22} color="#F59E0B" />
-              </div>
-            </div>
-
-            <button 
-              onClick={() => {
-                const botUsername = import.meta.env.VITE_TG_BOT_USERNAME || 'boburmentor_bot'
-                const refLink = `https://t.me/${botUsername}?startapp=ref_${profile.id}`
-                navigator.clipboard.writeText(refLink)
-                alert("Nusxa olindi! Do'stlaringizga yuboring.")
-              }}
-              style={{
-                width: '100%', padding: '12px', borderRadius: 12, border: 'none',
-                background: 'rgba(255,255,255,0.1)', color: 'white', fontWeight: 700,
-                fontSize: '0.9375rem', cursor: 'pointer', fontFamily: 'inherit',
-                borderTop: '1px solid rgba(255,255,255,0.1)'
-              }}
-            >
-              Havolani nusxalash
-            </button>
+            <Flame size={18} color="#F59E0B" />
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#92400E' }}>
+              {streak} kunlik streak davom etmoqda! Bugun ham o'rganing.
+            </span>
           </div>
-        </section>
-
-        {/* ── Continue Learning ── */}
-        <section>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em' }}>Davom etish</h2>
-            <Link to="/courses" style={{ fontSize: '0.875rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-              Barchasi <ChevronRight size={16} style={{ marginTop: '2px' }} />
-            </Link>
-          </div>
-
-          {coursesLoading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="skeleton-loader" style={{ height: '100px', borderRadius: '16px' }} />
-              <div className="skeleton-loader" style={{ height: '100px', borderRadius: '16px' }} />
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {topCourses.map(course => (
-                <GlassCard key={course.id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' }}>
-                  <div style={{
-                    width: '64px', height: '64px', borderRadius: '14px', background: 'rgba(52,97,255,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                  }}>
-                    <PlayCircle size={28} color="var(--color-primary)" />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0F172A', margin: '0 0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {course.title}
-                    </h3>
-                    <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <BookOpen size={14} /> {course.lesson_count || 0} dars
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => navigate(`/courses/${course.id}`)}
-                    style={{
-                      width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #3461FF, #214CE5)', color: '#fff',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer', flexShrink: 0,
-                      boxShadow: '0 4px 12px rgba(52,97,255,0.3)'
-                    }}
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </GlassCard>
-              ))}
-            </div>
-          )}
-        </section>
-
+        )}
       </motion.div>
+
+      {/* ── Search ── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} style={{ marginBottom: 24 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          background: 'white', border: '1.5px solid rgba(100,120,255,0.12)',
+          borderRadius: 14, padding: '12px 16px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          transition: 'border-color 0.2s, box-shadow 0.2s',
+        }}>
+          <Search size={18} color="#94A3B8" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Kurs qidirish..."
+            style={{
+              flex: 1, border: 'none', outline: 'none', background: 'transparent',
+              fontSize: '0.9375rem', color: '#0F172A', fontFamily: 'inherit',
+            }}
+          />
+          {searchTerm && (
+            <button onClick={() => setSearchTerm('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, fontSize: 18, lineHeight: 1 }}>×</button>
+          )}
+        </div>
+      </motion.div>
+
+      {/* ── Courses ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {loading ? (
+          // Skeleton
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} style={{
+              height: 96, borderRadius: 20, background: 'white',
+              border: '1.5px solid rgba(100,120,255,0.08)',
+              animation: 'shimmer 1.5s infinite',
+            }} />
+          ))
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
+            <AlertCircle size={40} style={{ marginBottom: 12, opacity: 0.4 }} />
+            <p style={{ margin: 0, fontSize: '0.9375rem' }}>
+              {searchTerm ? `"${searchTerm}" bo'yicha kurs topilmadi.` : "Hozircha kurslar mavjud emas."}
+            </p>
+          </div>
+        ) : filtered.map((course, i) => (
+          <motion.div
+            key={course.id}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <CourseCard course={course} userCoins={coins} onNavigate={navigate} />
+          </motion.div>
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0%   { opacity: 1; }
+          50%  { opacity: 0.5; }
+          100% { opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }

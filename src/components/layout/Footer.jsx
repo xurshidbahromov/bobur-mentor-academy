@@ -1,33 +1,27 @@
 // src/components/layout/Footer.jsx
-// Minimal, clean footer — not cluttered
+// Minimal footer, faqat public zone (Landing, About) uchun.
 
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
   const year = new Date().getFullYear()
-
   return (
     <footer style={{
-      borderTop: '1px solid var(--border-soft)',
-      padding: '32px 24px',
-      marginTop: 'auto',
+      borderTop: '1px solid rgba(100,120,255,0.08)',
+      padding: '28px 24px',
+      background: 'white',
     }}>
       <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '16px',
-        flexWrap: 'wrap',
+        maxWidth: 1200, margin: '0 auto',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 16, flexWrap: 'wrap',
       }}>
-        <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+        <span style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
           © {year} Bobur Mentor Academy
         </span>
-        <div style={{ display: 'flex', gap: '24px' }}>
-          <Link to="/courses" style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textDecoration: 'none' }}>
-            Kurslar
-          </Link>
+        <div style={{ display: 'flex', gap: 20 }}>
+          <Link to="/about" style={{ color: '#94A3B8', fontSize: '0.875rem', textDecoration: 'none' }}>Biz haqimizda</Link>
+          <Link to="/login" style={{ color: '#94A3B8', fontSize: '0.875rem', textDecoration: 'none' }}>Kirish</Link>
         </div>
       </div>
     </footer>

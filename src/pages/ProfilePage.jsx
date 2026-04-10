@@ -1,149 +1,155 @@
+// src/pages/ProfilePage.jsx
+// Auth zone: Avatar, stats, settings va chiqish.
+// Admin uchun Admin Panel havolasi ham ko'rinadi.
+
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Target, LogOut, Lock, ArrowRight, LifeBuoy, Settings } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { BookOpen, CheckCircle2, Flame, LogOut, Settings, ArrowRight, LifeBuoy, Trophy, ShieldCheck } from 'lucide-react'
 
 export default function ProfilePage() {
   const { user, profile, loading, signOut, isAdmin } = useAuth()
   const navigate = useNavigate()
 
   const handleSignOut = async () => {
+    localStorage.removeItem('bma_tg_autologin')
     await signOut()
     navigate('/')
   }
 
   if (loading) {
     return (
-      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="spinner" style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid var(--color-primary)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div style={{ padding: '24px 16px' }}>
+        {[80, 48, 100].map((h, i) => (
+          <div key={i} style={{ height: h, borderRadius: 16, background: '#E2E8F0', marginBottom: 12 }} />
+        ))}
       </div>
     )
   }
 
   if (!user) {
-    return (
-      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, padding: 24, textAlign: 'center' }}>
-        <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(148,163,184,0.08)', border: '1.5px solid rgba(148,163,184,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Lock size={34} color="#94A3B8" strokeWidth={1.5} />
-        </div>
-        <div>
-          <h2 style={{ margin: '0 0 8px', color: '#0F172A', letterSpacing: '-0.03em', fontSize: '1.375rem', fontWeight: 800 }}>Profil yopiq</h2>
-          <p style={{ margin: 0, color: '#64748B', fontSize: '0.9375rem' }}>Hisobingizga kiring va sozlamalarni boshqaring</p>
-        </div>
-        <Link to="/login" style={{ textDecoration: 'none' }}>
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-            style={{ padding: '13px 28px', borderRadius: 14, border: 'none', background: 'linear-gradient(135deg, #3461FF, #214CE5)', color: 'white', fontWeight: 700, fontSize: '1rem', fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 16px rgba(52,97,255,0.3)' }}>
-            Tizimga kirish
-          </motion.button>
-        </Link>
-      </div>
-    )
+    navigate('/login', { replace: true })
+    return null
   }
 
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url
-  const name = profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0]
+  const name = profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'O\'quvchi'
+  const email = user?.email || ''
 
   return (
-    <div style={{ maxWidth: 620, margin: '0 auto', padding: '80px 20px 100px 20px' }}>
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+    <div style={{ maxWidth: 540, margin: '0 auto', padding: '24px 16px 32px' }}>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
 
-        {/* ── Header ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
+        {/* ── Avatar & Name ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
           <div style={{ position: 'relative', flexShrink: 0 }}>
             {avatarUrl ? (
               <img src={avatarUrl} alt={name} style={{ width: 68, height: 68, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid white', boxShadow: '0 3px 14px rgba(0,0,0,0.1)' }} />
             ) : (
-              <div style={{ width: 68, height: 68, borderRadius: '50%', background: 'linear-gradient(135deg, #3461FF, #214CE5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 900, color: 'white', boxShadow: '0 3px 14px rgba(52,97,255,0.28)' }}>
-                {name?.[0]?.toUpperCase() || 'U'}
+              <div style={{ width: 68, height: 68, borderRadius: '50%', background: 'linear-gradient(135deg, #3461FF, #214CE5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.625rem', fontWeight: 900, color: 'white', boxShadow: '0 4px 16px rgba(52,97,255,0.28)' }}>
+                {name[0]?.toUpperCase() || 'U'}
               </div>
             )}
-            <div style={{ position: 'absolute', bottom: 1, right: 1, width: 14, height: 14, borderRadius: '50%', background: '#10B981', border: '2px solid white' }} />
+            <div style={{ position: 'absolute', bottom: 2, right: 2, width: 14, height: 14, borderRadius: '50%', background: '#10B981', border: '2px solid white' }} />
           </div>
-
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 style={{ margin: '0 0 4px', fontSize: '1.375rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.025em', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</h1>
-            <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem' }}>{user.email || profile?.role}</p>
+            <h1 style={{ margin: '0 0 3px', fontSize: '1.375rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.025em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {name}
+            </h1>
+            <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{email}</p>
+            {isAdmin && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 4, background: 'rgba(52,97,255,0.1)', color: '#3461FF', padding: '2px 8px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 700 }}>
+                <ShieldCheck size={11} /> Admin
+              </span>
+            )}
           </div>
         </div>
 
-        {/* ── Stats ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 32 }}>
+        {/* ── Stats Grid ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 24 }}>
           {[
-            { icon: <BookOpen size={20} color="#3461FF" strokeWidth={1.75} />, label: 'Tugatilgan darslar', value: '0', bg: 'rgba(52,97,255,0.08)' },
-            { icon: <Target size={20} color="#8B5CF6" strokeWidth={1.75} />,   label: 'Yechilgan testlar',  value: '0', bg: 'rgba(139,92,246,0.08)' },
+            { icon: <BookOpen size={18} color="#3461FF" />, bg: 'rgba(52,97,255,0.08)', value: '0', label: 'Darslar' },
+            { icon: <CheckCircle2 size={18} color="#8B5CF6" />, bg: 'rgba(139,92,246,0.08)', value: '0', label: 'Quizlar' },
+            { icon: <Flame size={18} color="#F59E0B" />, bg: 'rgba(245,158,11,0.08)', value: profile?.streak_count ?? 0, label: 'Streak' },
           ].map((s, i) => (
-            <div key={i} style={{ background: 'white', border: '1.5px solid rgba(100,120,255,0.1)', borderRadius: 18, padding: '16px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div key={i} style={{
+              background: 'white', border: '1.5px solid rgba(100,120,255,0.08)',
+              borderRadius: 16, padding: '14px 10px', textAlign: 'center',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+            }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
                 {s.icon}
               </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '1.375rem', fontWeight: 900, color: '#0F172A', lineHeight: 1, letterSpacing: '-0.025em', paddingBottom: '4px' }}>{s.value}</p>
-                <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>{s.label}</p>
-              </div>
+              <p style={{ margin: '0 0 2px', fontWeight: 900, fontSize: '1.25rem', color: '#0F172A', letterSpacing: '-0.02em' }}>{s.value}</p>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: '#94A3B8', fontWeight: 500 }}>{s.label}</p>
             </div>
           ))}
         </div>
 
-        {/* ── Settings & Actions ── */}
-        <div style={{ background: 'white', borderRadius: 20, border: '1.5px solid rgba(100,120,255,0.1)', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)', marginBottom: 24 }}>
-          {/* Admin Panel (Only for Admins) */}
+        {/* ── Menu Items ── */}
+        <div style={{ background: 'white', borderRadius: 20, border: '1.5px solid rgba(100,120,255,0.08)', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+          {/* Admin link (conditional) */}
           {isAdmin && (
-            <Link to="/admin" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer', textDecoration: 'none', background: 'rgba(52,97,255,0.04)' }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(52,97,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Settings size={18} color="#3461FF" />
-              </div>
-              <p style={{ margin: 0, flex: 1, fontWeight: 800, color: '#3461FF' }}>Admin Panel</p>
-              <ArrowRight size={18} color="#3461FF" />
-            </Link>
+            <MenuItem
+              to="/admin"
+              icon={<ShieldCheck size={18} color="#3461FF" />}
+              iconBg="rgba(52,97,255,0.12)"
+              label="Admin Panel"
+              labelColor="#3461FF"
+              bold
+              borderBottom
+            />
           )}
 
-          {/* Settings */}
-          <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer' }} onClick={() => alert('Sozlamalar tez orada...')}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(100,116,139,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Settings size={18} color="#475569" />
-            </div>
-            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#334155' }}>Sozlamalar</p>
-            <ArrowRight size={18} color="#94A3B8" />
-          </div>
+          <MenuItem
+            to="/leaderboard"
+            icon={<Trophy size={18} color="#F59E0B" />}
+            iconBg="rgba(245,158,11,0.1)"
+            label="Kuchlilar doskasi"
+            borderBottom
+          />
 
-          {/* Leaderboard */}
-          <Link to="/leaderboard" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer', textDecoration: 'none' }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <strong style={{ color: '#F59E0B', fontSize: '18px' }}>🏆</strong>
-            </div>
-            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#334155' }}>Kuchlilar doskasi (Top 100)</p>
-            <ArrowRight size={18} color="#94A3B8" />
-          </Link>
+          <MenuItem
+            to="/about"
+            icon={<span style={{ color: '#3461FF', fontWeight: 800, fontSize: '16px', fontFamily: 'serif', fontStyle: 'italic' }}>i</span>}
+            iconBg="rgba(52,97,255,0.08)"
+            label="Biz haqimizda"
+            borderBottom
+          />
 
-          {/* About */}
-          <Link to="/about" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer', textDecoration: 'none' }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(52,97,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <strong style={{ color: '#3461FF', fontSize: '16px', fontFamily: 'serif', fontStyle: 'italic' }}>i</strong>
-            </div>
-            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#334155' }}>Biz haqimizda</p>
-            <ArrowRight size={18} color="#94A3B8" />
-          </Link>
-
-          {/* Support */}
-          <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1.5px solid rgba(100,120,255,0.08)', cursor: 'pointer' }} onClick={() => alert('Qo\'llab-quvvatlash tez orada...')}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(52,211,153,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <LifeBuoy size={18} color="#10B981" />
-            </div>
-            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#334155' }}>Qo'llab-quvvatlash</p>
-            <ArrowRight size={18} color="#94A3B8" />
-          </div>
-
-          {/* Logout */}
-          <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', background: 'rgba(239,68,68,0.02)' }} onClick={handleSignOut}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            style={{
+              padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14,
+              cursor: 'pointer', background: 'rgba(239,68,68,0.02)',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+            onClick={handleSignOut}
+          >
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <LogOut size={18} color="#EF4444" />
             </div>
-            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#EF4444' }}>Tizimdan chiqish</p>
+            <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#EF4444', fontSize: '0.9375rem' }}>Tizimdan chiqish</p>
           </div>
         </div>
 
       </motion.div>
     </div>
+  )
+}
+
+function MenuItem({ to, icon, iconBg, label, labelColor, bold, borderBottom }) {
+  return (
+    <Link to={to} style={{
+      padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14,
+      textDecoration: 'none',
+      borderBottom: borderBottom ? '1px solid rgba(100,120,255,0.06)' : 'none',
+      WebkitTapHighlightColor: 'transparent',
+    }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        {icon}
+      </div>
+      <p style={{ margin: 0, flex: 1, fontWeight: bold ? 800 : 700, color: labelColor || '#334155', fontSize: '0.9375rem' }}>{label}</p>
+      <ArrowRight size={18} color={labelColor || '#94A3B8'} />
+    </Link>
   )
 }

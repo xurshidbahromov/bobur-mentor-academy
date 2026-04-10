@@ -1,85 +1,114 @@
 // src/App.jsx
-import { BrowserRouter, useLocation, useNavigate, Navigate } from 'react-router-dom'
+// Two-zone architecture:
+//   PUBLIC ZONE  (/  /about /login /signup)  → PublicNavbar + optional Footer
+//   AUTH ZONE    (/dashboard /lessons /shop /profile) → BottomTabNav only
+
+import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { TelegramProvider, useTelegram } from './context/TelegramProvider'
 import { useAuth } from './context/AuthContext'
 import { useEffect } from 'react'
-import Navbar from './components/layout/Navbar'
+import { Toaster } from 'sonner'
+
+import PublicNavbar from './components/layout/PublicNavbar'
+import BottomTabNav from './components/layout/BottomTabNav'
 import Footer from './components/layout/Footer'
 import AppRoutes from './routes'
 
-const AUTH_ROUTES = ['/login', '/signup']
+// ── Route zones ──────────────────────────────────────
+const PUBLIC_ROUTES  = ['/', '/about']
+const AUTH_ROUTES    = ['/login', '/signup']
+const AUTH_APP_PREFIXES = ['/dashboard', '/lessons', '/shop', '/profile']
 
-// ── Telegram Auto-login ────────────────────────────────────────
-// When opened inside Telegram, silently signs in with Telegram credentials.
+function isAuthAppRoute(pathname) {
+  return AUTH_APP_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/'))
+}
+
+// ── Telegram Auto-login ───────────────────────────────
+// Sadece localStorage'da flag varsa otomatik giriş
 function TelegramAutoLogin() {
   const { tgUser, isTelegram } = useTelegram()
   const { user, loading, signInWithTelegram } = useAuth()
 
   useEffect(() => {
-    // 1. Only run if in Telegram and not already logged in
     if (!isTelegram || loading || user || !tgUser) return
-
-    // 2. ONLY auto-login if they have successfully logged in before on this device
     const shouldAutoLogin = localStorage.getItem('bma_tg_autologin') === 'true'
     if (!shouldAutoLogin) return
-
     signInWithTelegram(tgUser).then(({ error }) => {
-      if (error) console.error("TMA Auto-login error:", error)
+      if (error) console.error('TMA Auto-login error:', error)
     })
   }, [isTelegram, tgUser, user, loading])
 
   return null
 }
 
-// ── TMA Smart Redirect ─────────────────────────────────────────
-// Inside Telegram:
-//   - Not logged in → go to /login
-//   - Logged in on landing page → go to /courses (dashboard)
-function TMARedirect() {
+// ── Smart Redirect ─────────────────────────────────────
+// Handles redirect after login/logout
+function SmartRedirect() {
   const { isTelegram, isReady } = useTelegram()
   const { user, loading } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!isTelegram || !isReady || loading) return
+    if (loading) return
+
+    const path = location.pathname
 
     if (!user) {
-      // Not logged in → show login
-      if (!AUTH_ROUTES.includes(location.pathname)) {
+      // Not logged in: kick out of auth zone
+      if (isAuthAppRoute(path)) {
         navigate('/login', { replace: true })
       }
     } else {
-      // Logged in on landing or auth pages → go to dashboard
-      if (location.pathname === '/' || AUTH_ROUTES.includes(location.pathname)) {
+      // Logged in: kick off landing/auth pages → dashboard
+      if (PUBLIC_ROUTES.includes(path) || AUTH_ROUTES.includes(path)) {
         navigate('/dashboard', { replace: true })
       }
     }
-  }, [isTelegram, isReady, user, loading, location.pathname])
+  }, [user, loading, location.pathname])
 
   return null
 }
 
-// ── App Shell ──────────────────────────────────────────────────
+// ── App Shell ──────────────────────────────────────────
 function AppShell() {
-  const location = useLocation()
+  const location  = useLocation()
   const { isTelegram } = useTelegram()
-  const isAuthPage = AUTH_ROUTES.includes(location.pathname)
+  const { user } = useAuth()
+  const path = location.pathname
 
-  // Auth pages in non-TMA mode: fullscreen, no nav/footer
-  if (isAuthPage && !isTelegram) {
+  const isPublicPage  = PUBLIC_ROUTES.includes(path)
+  const isAuthPage    = AUTH_ROUTES.includes(path)
+  const isAuthAppPage = isAuthAppRoute(path)
+  const isAdminPage   = path.startsWith('/admin')
+
+  // ── Auth / Login / Signup pages — fullscreen no shell ──
+  if (isAuthPage) {
     return <AppRoutes />
   }
 
+  // ── Admin pages — handled by AdminLayout ──
+  if (isAdminPage) {
+    return <AppRoutes />
+  }
+
+  // ── Authenticated app zone — BottomTabNav ──
+  if (isAuthAppPage) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
+        <main style={{ flex: 1 }}>
+          <AppRoutes />
+        </main>
+        <BottomTabNav />
+      </div>
+    )
+  }
+
+  // ── Public zone (Landing, About) — PublicNavbar + optional Footer ──
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      backgroundColor: 'var(--bg-base)'
-    }}>
-      <Navbar />
+    <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
+      <PublicNavbar />
       <main style={{ flex: 1 }}>
         <AppRoutes />
       </main>
@@ -88,16 +117,14 @@ function AppShell() {
   )
 }
 
-import { Toaster } from 'sonner'
-
-// ── Root ───────────────────────────────────────────────────────
+// ── Root ───────────────────────────────────────────────
 export default function App() {
   return (
     <BrowserRouter>
       <TelegramProvider>
         <AuthProvider>
           <TelegramAutoLogin />
-          <TMARedirect />
+          <SmartRedirect />
           <Toaster position="top-center" richColors />
           <AppShell />
         </AuthProvider>

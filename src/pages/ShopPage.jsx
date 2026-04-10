@@ -1,163 +1,168 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Coins, ArrowRight, Wallet, Info } from 'lucide-react'
-import { useAuth } from '../context/AuthContext'
-import Button from '../components/ui/Button'
+// src/pages/ShopPage.jsx
+// Coin paketlarini ko'rsatadi.
+// To'lov tizimi hozircha Telegram orqali manual — tez orada avtomatik bo'ladi.
 
-// Base calculation: 1 Coin = 300 UZS
+import { motion } from 'framer-motion'
+import { Coins, MessageCircle, Check, Zap, Star, Rocket } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+
 const PACKAGES = [
-  { id: 1, coins: 5,   price: 1500,   label: 'Starter' },
-  { id: 2, coins: 15,  price: 4500,   label: 'Basic' },
-  { id: 3, coins: 50,  price: 15000,  label: 'Student' },
-  { id: 4, coins: 100, price: 27000,  label: '+10% Bonus', popular: true },
-  { id: 5, coins: 500, price: 120000, label: '+20% Bonus' },
+  {
+    icon: <Zap size={28} />,
+    color: '#3461FF',
+    bg: 'rgba(52,97,255,0.08)',
+    name: "Starter",
+    coins: 100,
+    price: "5 000 so'm",
+    popular: false,
+  },
+  {
+    icon: <Star size={28} />,
+    color: '#8B5CF6',
+    bg: 'rgba(139,92,246,0.1)',
+    name: "Popular",
+    coins: 500,
+    price: "20 000 so'm",
+    popular: true,
+    badge: "Eng ko'p tanlanadi",
+  },
+  {
+    icon: <Rocket size={28} />,
+    color: '#F59E0B',
+    bg: 'rgba(245,158,11,0.1)',
+    name: "Pro",
+    coins: 1000,
+    price: "35 000 so'm",
+    popular: false,
+    badge: "Tejamkor",
+  },
 ]
 
 export default function ShopPage() {
   const { profile } = useAuth()
-  const [customCoins, setCustomCoins] = useState('')
+  const coins = profile?.coins ?? 0
 
-  const handlePurchase = (coins, amount) => {
-    alert(`Tez orada!\n\nSiz sotib olmoqchisiz: ${coins} Coin\nTo'lov summasi: ${amount.toLocaleString()} UZS\n\nBu yerga Click/Payme yoki Telegram Stars ulanadi.`)
+  const handleBuy = (pkg) => {
+    const text = encodeURIComponent(`Assalomu alaykum! ${pkg.coins} coin sotib olmoqchiman (${pkg.price}).`)
+    window.open(`https://t.me/BMASupport?text=${text}`, '_blank')
   }
 
-  const customPrice = customCoins ? (parseInt(customCoins, 10) * 300) : 0
-
   return (
-    <div style={{ maxWidth: 620, margin: '0 auto', padding: '80px 20px 100px 20px' }}>
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+    <div style={{ maxWidth: 540, margin: '0 auto', padding: '24px 16px 32px' }}>
 
-        {/* ── Top Balance Card ── */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', 
-          borderRadius: 24, 
-          padding: '28px 24px', 
-          color: 'white', 
-          boxShadow: '0 12px 32px rgba(245, 158, 11, 0.3)',
-          marginBottom: 32,
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          {/* Decorative Background Icon */}
-          <Coins size={140} color="rgba(255,255,255,0.15)" style={{ position: 'absolute', right: -20, top: -20, transform: 'rotate(15deg)' }} />
+      {/* ── Header ── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
+        <h1 style={{ margin: '0 0 6px', fontSize: '1.625rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
+          Coinlar Do'koni
+        </h1>
+        <p style={{ margin: 0, color: '#64748B', fontSize: '0.9375rem' }}>Qulfli darslarni ochish uchun coin sotib oling.</p>
+      </motion.div>
 
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <p style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>Joriy balansingiz</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <Coins size={44} strokeWidth={2} />
-              <h1 style={{ margin: 0, fontSize: '3.5rem', fontWeight: 900, lineHeight: 1, letterSpacing: '-0.03em' }}>
-                {profile?.coins || 0}
-              </h1>
-            </div>
-          </div>
+      {/* ── Current Balance ── */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        style={{
+          background: 'linear-gradient(135deg, #0F172A, #1E293B)',
+          borderRadius: 20, padding: '20px 24px', marginBottom: 28,
+          display: 'flex', alignItems: 'center', gap: 16,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        }}
+      >
+        <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Coins size={26} color="#F59E0B" />
         </div>
+        <div>
+          <p style={{ margin: '0 0 2px', color: '#94A3B8', fontSize: '0.8125rem', fontWeight: 600 }}>Hozirgi balans</p>
+          <p style={{ margin: 0, color: 'white', fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>
+            {coins.toLocaleString()} <span style={{ fontSize: '1rem', fontWeight: 600, color: '#F59E0B' }}>coin</span>
+          </p>
+        </div>
+      </motion.div>
 
-        {/* ── Standard Packages ── */}
-        <div style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', marginBottom: 16 }}>Coin xarid qilish</h2>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {PACKAGES.map(pkg => (
-              <motion.button key={pkg.id}
-                whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                onClick={() => handlePurchase(pkg.coins, pkg.price)}
-                style={{
-                  width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '16px 20px', borderRadius: 20, cursor: 'pointer', fontFamily: 'inherit',
-                  border: pkg.popular ? `1.5px solid rgba(52,97,255,0.3)` : '1.5px solid rgba(148,163,184,0.15)',
-                  background: pkg.popular ? `rgba(52,97,255,0.03)` : 'white',
-                  position: 'relative',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.02)'
-                }}
-              >
-                {pkg.popular && (
-                  <span style={{ position: 'absolute', top: -10, right: 24, background: '#3461FF', color: 'white', fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: 10, letterSpacing: '0.04em', boxShadow: '0 2px 8px rgba(52,97,255,0.4)' }}>
-                    ENG MASHHUR
-                  </span>
-                )}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(245, 158, 11, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Coins size={22} color="#D97706" strokeWidth={1.75} />
-                  </div>
-                  <div style={{ textAlign: 'left' }}>
-                    <p style={{ margin: 0, fontWeight: 800, color: '#0F172A', fontSize: '1.125rem', letterSpacing: '-0.02em', lineHeight: 1.2 }}>{pkg.coins} Coin</p>
-                    <p style={{ margin: 0, color: pkg.popular ? '#3461FF' : '#64748B', fontSize: '0.8125rem', fontWeight: 600, marginTop: 4 }}>{pkg.label}</p>
+      {/* ── Packages ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
+        {PACKAGES.map((pkg, i) => (
+          <motion.div key={pkg.name} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+            style={{
+              background: 'white',
+              border: pkg.popular ? '2px solid #8B5CF6' : '1.5px solid rgba(100,120,255,0.1)',
+              borderRadius: 20, padding: '20px',
+              boxShadow: pkg.popular ? '0 8px 32px rgba(139,92,246,0.15)' : '0 2px 12px rgba(0,0,0,0.04)',
+              position: 'relative',
+            }}
+          >
+            {pkg.badge && (
+              <div style={{
+                position: 'absolute', top: -10, right: 16,
+                background: pkg.popular ? '#8B5CF6' : '#F59E0B',
+                color: 'white', fontSize: '0.6875rem', fontWeight: 800,
+                padding: '3px 10px', borderRadius: 8, letterSpacing: '0.04em',
+              }}>
+                {pkg.badge}
+              </div>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 50, height: 50, borderRadius: 14, background: pkg.bg, color: pkg.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {pkg.icon}
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 2px', fontWeight: 800, fontSize: '1.0625rem', color: '#0F172A' }}>{pkg.name}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Coins size={14} color={pkg.color} />
+                    <span style={{ fontWeight: 900, fontSize: '1.375rem', color: pkg.color, letterSpacing: '-0.02em' }}>{pkg.coins}</span>
+                    <span style={{ color: '#94A3B8', fontSize: '0.875rem', fontWeight: 500 }}>coin</span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ margin: 0, fontWeight: 800, color: '#0F172A', fontSize: '1.0625rem', letterSpacing: '-0.01em' }}>{pkg.price.toLocaleString()} so'm</p>
-                  </div>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(148,163,184,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <ArrowRight size={16} color="#64748B" />
-                  </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: '0 0 8px', fontWeight: 800, fontSize: '1.125rem', color: '#0F172A' }}>{pkg.price}</p>
+                <button
+                  onClick={() => handleBuy(pkg)}
+                  style={{
+                    background: pkg.popular ? 'linear-gradient(135deg, #8B5CF6, #7C3AED)' : 'linear-gradient(135deg, #3461FF, #214CE5)',
+                    color: 'white', border: 'none', borderRadius: 12,
+                    padding: '9px 20px', fontWeight: 700, fontSize: '0.875rem',
+                    cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+                    boxShadow: pkg.popular ? '0 4px 14px rgba(139,92,246,0.3)' : '0 4px 14px rgba(52,97,255,0.25)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Sotib olish
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* ── How to buy info ── */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        style={{
+          background: 'rgba(52,97,255,0.04)', border: '1px solid rgba(52,97,255,0.1)',
+          borderRadius: 16, padding: '18px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+          <MessageCircle size={20} color="#3461FF" style={{ flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <p style={{ margin: '0 0 8px', fontWeight: 700, color: '#0F172A', fontSize: '0.9375rem' }}>Qanday sotib olish mumkin?</p>
+            {[
+              "\"Sotib olish\" tugmasini bosing",
+              "Telegram orqali bizga murojaat qiling",
+              "To'lovni amalga oshiring",
+              "Coinlar 5-10 daqiqa ichida qo'shiladi",
+            ].map((step, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
+                <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(52,97,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                  <span style={{ fontSize: '0.6875rem', fontWeight: 800, color: '#3461FF' }}>{i + 1}</span>
                 </div>
-              </motion.button>
+                <span style={{ color: '#475569', fontSize: '0.875rem', lineHeight: 1.5 }}>{step}</span>
+              </div>
             ))}
           </div>
         </div>
-
-        {/* ── Custom Coin Calculator ── */}
-        <div style={{ background: 'white', border: '1.5px solid rgba(148,163,184,0.15)', borderRadius: 24, padding: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.02)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <Wallet size={20} color="#3461FF" />
-            <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 800, color: '#0F172A' }}>Boshqa miqdor</h3>
-          </div>
-          
-          <p style={{ margin: '0 0 20px', color: '#64748B', fontSize: '0.875rem', lineHeight: 1.5 }}>
-            O'zingizga kerakli bo'lgan coin miqdorini tering va avtomatik ravishda to'lov summasini bilib oling. (1 Coin = 300 so'm)
-          </p>
-
-          <div style={{ position: 'relative', marginBottom: 20 }}>
-            <input 
-              type="number" 
-              value={customCoins}
-              onChange={(e) => setCustomCoins(e.target.value)}
-              placeholder="Coin miqdori... (masalan, 32)"
-              style={{
-                width: '100%',
-                padding: '16px 20px',
-                paddingLeft: '48px',
-                fontSize: '1rem',
-                fontWeight: 600,
-                color: '#0F172A',
-                background: '#F8FAFC',
-                border: '2px solid transparent',
-                borderRadius: 16,
-                outline: 'none',
-                transition: 'all 0.2s',
-                fontFamily: 'inherit'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3461FF'}
-              onBlur={(e) => e.target.style.borderColor = 'transparent'}
-            />
-            <Coins size={20} color="#94A3B8" style={{ position: 'absolute', left: 18, top: '50%', transform: 'translateY(-50%)' }} />
-          </div>
-
-          <div style={{ background: '#F1F5F9', borderRadius: 16, padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-            <span style={{ fontWeight: 600, color: '#475569', fontSize: '0.9375rem' }}>To'lov summasi:</span>
-            <span style={{ fontWeight: 800, color: '#0F172A', fontSize: '1.25rem' }}>{customPrice.toLocaleString()} UZS</span>
-          </div>
-
-          <Button 
-            variant="primary" 
-            style={{ width: '100%', padding: '16px', fontSize: '1.0625rem', borderRadius: 16 }}
-            disabled={!customCoins || customCoins <= 0}
-            onClick={() => handlePurchase(customCoins, customPrice)}
-          >
-            {customCoins > 0 ? `${customPrice.toLocaleString()} UZS to'lash` : 'Miqdorni kiriting'}
-          </Button>
-        </div>
-
-        {/* Note */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 24, padding: '16px', background: 'rgba(52,97,255,0.05)', borderRadius: 16 }}>
-          <Info size={18} color="#3461FF" style={{ flexShrink: 0, marginTop: 2 }} />
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#475569', lineHeight: 1.5 }}>
-            Xarid qilingan coinlar darhol balansingizga qo'shiladi va u orqali istalgan yopiq darslarni (unlock) faollashtirishingiz mumkin.
-          </p>
-        </div>
-
       </motion.div>
+
     </div>
   )
 }

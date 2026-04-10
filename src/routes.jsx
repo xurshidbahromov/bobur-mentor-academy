@@ -1,79 +1,69 @@
 // src/routes.jsx
-// Centralized route configuration — single source of truth for all app routes.
-// All pages are PUBLIC — auth is handled contextually inside components.
+// Clean route map — two zones, no legacy bloat.
 
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-
 import { Suspense, lazy } from 'react'
 import PageSkeleton from './components/ui/PageSkeleton'
-
-// Lazy loaded pages
-const LandingPage = lazy(() => import('./pages/LandingPage'))
-const CoursesPage = lazy(() => import('./pages/CoursesPage'))
-const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
-const LessonDetailPage = lazy(() => import('./pages/LessonDetailPage'))
-const LoginPage = lazy(() => import('./pages/LoginPage'))
-const SignupPage = lazy(() => import('./pages/SignupPage'))
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
-const AboutPage = lazy(() => import('./pages/AboutPage'))
-const ProfilePage = lazy(() => import('./pages/ProfilePage'))
-const DashboardPage = lazy(() => import('./pages/DashboardPage'))
-const ShopPage = lazy(() => import('./pages/ShopPage'))
-const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
-
-// Admin Pages
-const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
-const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'))
-const AdminLessons = lazy(() => import('./pages/admin/AdminLessons'))
-const AdminQuizzes = lazy(() => import('./pages/admin/AdminQuizzes'))
-const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
-
-// Auth Wrappers
 import AdminProtectedRoute from './components/auth/AdminProtectedRoute'
 
+// ── Public pages ──────────────────────────────────────
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const AboutPage   = lazy(() => import('./pages/AboutPage'))
+const LoginPage   = lazy(() => import('./pages/LoginPage'))
+const SignupPage  = lazy(() => import('./pages/SignupPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+
+// ── Auth-zone pages ───────────────────────────────────
+const DashboardPage    = lazy(() => import('./pages/DashboardPage'))
+const LessonDetailPage = lazy(() => import('./pages/LessonDetailPage'))
+const ShopPage         = lazy(() => import('./pages/ShopPage'))
+const ProfilePage      = lazy(() => import('./pages/ProfilePage'))
+
+// ── Admin pages ───────────────────────────────────────
+const AdminLayout    = lazy(() => import('./layouts/AdminLayout'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminCourses   = lazy(() => import('./pages/admin/AdminCourses'))
+const AdminLessons   = lazy(() => import('./pages/admin/AdminLessons'))
+const AdminQuizzes   = lazy(() => import('./pages/admin/AdminQuizzes'))
+const AdminUsers     = lazy(() => import('./pages/admin/AdminUsers'))
+
+// ── Page transition ───────────────────────────────────
 const pageVariants = {
-  initial: { opacity: 0, y: 15, scale: 0.98 },
-  enter: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
-  exit: { opacity: 0, y: -10, scale: 0.98, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }
+  initial: { opacity: 0, y: 14 },
+  enter:   { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] } },
+  exit:    { opacity: 0, y: -8, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } },
 }
 
-const PageWrapper = ({ children }) => (
-  <motion.div
-    variants={pageVariants}
-    initial="initial"
-    animate="enter"
-    exit="exit"
-    style={{ minHeight: '100%', width: '100%' }}
-  >
+const PW = ({ children }) => (
+  <motion.div variants={pageVariants} initial="initial" animate="enter" exit="exit" style={{ width: '100%' }}>
     {children}
   </motion.div>
 )
 
 export default function AppRoutes() {
   const location = useLocation()
-  
+
   return (
     <AnimatePresence mode="wait">
       <Suspense fallback={<PageSkeleton />}>
         <Routes location={location} key={location.pathname}>
-          {/* Public Routes */}
-          <Route path="/"                     element={<PageWrapper><LandingPage /></PageWrapper>} />
-          <Route path="/dashboard"            element={<PageWrapper><DashboardPage /></PageWrapper>} />
-          <Route path="/courses"              element={<PageWrapper><CoursesPage /></PageWrapper>} />
-          <Route path="/courses/:courseId"    element={<PageWrapper><CourseDetailPage /></PageWrapper>} />
-          <Route path="/lessons/:lessonId"    element={<PageWrapper><LessonDetailPage /></PageWrapper>} />
-          <Route path="/about"                element={<PageWrapper><AboutPage /></PageWrapper>} />
-          <Route path="/profile"              element={<PageWrapper><ProfilePage /></PageWrapper>} />
-          <Route path="/shop"                 element={<PageWrapper><ShopPage /></PageWrapper>} />
-          <Route path="/leaderboard"          element={<PageWrapper><LeaderboardPage /></PageWrapper>} />
-          <Route path="/login"                element={<PageWrapper><LoginPage /></PageWrapper>} />
-          <Route path="/signup"               element={<PageWrapper><SignupPage /></PageWrapper>} />
 
-          {/* Admin Routes */}
+          {/* ── Public ── */}
+          <Route path="/"       element={<PW><LandingPage /></PW>} />
+          <Route path="/about"  element={<PW><AboutPage /></PW>} />
+          <Route path="/login"  element={<PW><LoginPage /></PW>} />
+          <Route path="/signup" element={<PW><SignupPage /></PW>} />
+
+          {/* ── Auth zone ── */}
+          <Route path="/dashboard"         element={<PW><DashboardPage /></PW>} />
+          <Route path="/lessons/:lessonId" element={<PW><LessonDetailPage /></PW>} />
+          <Route path="/shop"              element={<PW><ShopPage /></PW>} />
+          <Route path="/profile"           element={<PW><ProfilePage /></PW>} />
+
+          {/* ── Admin ── */}
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route index        element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="courses"   element={<AdminCourses />} />
             <Route path="lessons"   element={<AdminLessons />} />
@@ -81,7 +71,8 @@ export default function AppRoutes() {
             <Route path="users"     element={<AdminUsers />} />
           </Route>
 
-          <Route path="*"                     element={<PageWrapper><NotFoundPage /></PageWrapper>} />
+          {/* ── 404 ── */}
+          <Route path="*" element={<PW><NotFoundPage /></PW>} />
         </Routes>
       </Suspense>
     </AnimatePresence>

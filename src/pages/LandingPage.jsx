@@ -1,280 +1,302 @@
+// src/pages/LandingPage.jsx
+// Public landing — platformaga kiruvchi hamma uchun.
+// Ma'lumotlar: kurslar haqida, qanday ishlaydi, statistika, CTA.
+// Profil / coin tugmalari yo'q — faqat "Kirish" va "Boshlash".
+
 import { Link } from 'react-router-dom'
-import { useCourses } from '../hooks/useCourses'
-import { ArrowRight, Sparkles, Trophy, BookOpen, MapPin, Users, Star, Target } from 'lucide-react'
-import CourseCard from '../components/course/CourseCard'
-import Button from '../components/ui/Button'
-import Badge from '../components/ui/Badge'
-import Card from '../components/ui/Card'
+import { motion } from 'framer-motion'
+import { ArrowRight, BookOpen, Award, GraduationCap, CheckCircle, Coins, Users, Zap, Lock } from 'lucide-react'
+
+// ── Fade-up animation variant ──
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.55, ease: [0.22, 1, 0.36, 1] } })
+}
+
+// ══════════════════════════════════════════════════════
+// KURS KARTALARI
+// ══════════════════════════════════════════════════════
+const COURSES = [
+  {
+    icon: <GraduationCap size={28} />,
+    color: '#3461FF',
+    bg: 'rgba(52,97,255,0.08)',
+    title: "Imtihonga Tayyorlov",
+    subtitle: "Majburiy fanlar (DTM, SAT)",
+    desc: "O'zbek matematika imtihonlariga stratejik tayyorgarlik — teoriya + yuzlab test savollari bilan.",
+    lessons: 120,
+    quizzes: 600,
+  },
+  {
+    icon: <Award size={28} />,
+    color: '#8B5CF6',
+    bg: 'rgba(139,92,246,0.08)',
+    title: "Sertifikat Kurslari",
+    subtitle: "Tan olingan bilim tasdiqlash",
+    desc: "Tugallangandan so'ng rasmiy sertifikat beruvchi chuqurlashtirilgan matematik kurs.",
+    lessons: 80,
+    quizzes: 400,
+  },
+  {
+    icon: <BookOpen size={28} />,
+    color: '#10B981',
+    bg: 'rgba(16,185,129,0.08)',
+    title: "Asosiy Matematika",
+    subtitle: "Poydevor bilimlar",
+    desc: "Maktab dasturidan tortib olimpiada va universitetgacha bo'lgan barcha asosiy mavzular.",
+    lessons: 60,
+    quizzes: 300,
+  },
+]
+
+// ══════════════════════════════════════════════════════
+// QADAMLAR
+// ══════════════════════════════════════════════════════
+const STEPS = [
+  { n: "01", label: "Ro'yxatdan o'ting", desc: "30 soniya ichida hisob yarating — email yoki Telegram orqali." },
+  { n: "02", label: "Kursni tanlang", desc: "Maqsadingizga mos kursni tanlang: imtihon, sertifikat yoki asosiy." },
+  { n: "03", label: "O'rganing va o'sing", desc: "Video darslar ko'ring, quizlarni yeching va coinlar to'plang." },
+]
+
+// ══════════════════════════════════════════════════════
+// STATISTIKA
+// ══════════════════════════════════════════════════════
+const STATS = [
+  { value: "2,400+", label: "Faol O'quvchi" },
+  { value: "260+",   label: "Video Dars" },
+  { value: "1,300+", label: "Test Savoli" },
+  { value: "98%",    label: "Muvaffaqiyat darajasi" },
+]
 
 export default function LandingPage() {
-  const { courses, loading } = useCourses()
-  const featuredCourses = courses.slice(0, 3)
-
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+    <div style={{ background: '#F8FAFC', minHeight: '100vh' }}>
 
-      {/* ── HERO ─────────────────────────────────── */}
+      {/* ─────────────────────── HERO ─────────────────────── */}
       <section style={{
-        minHeight: '88vh',
+        minHeight: '92vh',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        gap: '20px',
-        padding: '120px 0 80px',
-        position: 'relative'
+        padding: '60px 20px 80px',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        {/* Decorative orbs */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden',
-          borderRadius: '0 0 80px 80px'
-        }}>
-          <div style={{ position: 'absolute', top: '15%', left: '5%', width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.18) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-          <div style={{ position: 'absolute', top: '20%', right: '8%', width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-        </div>
+        {/* Background glow */}
+        <div style={{ position: 'absolute', top: -120, left: '50%', transform: 'translateX(-50%)', width: 800, height: 500, background: 'radial-gradient(ellipse, rgba(52,97,255,0.1) 0%, transparent 60%)', pointerEvents: 'none' }} />
 
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '8px',
-          padding: '6px 18px',
-          borderRadius: 'var(--radius-full)',
-          background: 'var(--bg-glass)',
-          backdropFilter: 'var(--blur-glass)',
-          WebkitBackdropFilter: 'var(--blur-glass)',
-          border: '1px solid var(--border-glass)',
-          fontSize: '0.8125rem', fontWeight: 600,
-          color: 'var(--color-primary)',
-          boxShadow: 'var(--shadow-glass)'
-        }}>
-          <Sparkles size={13} /> Matematikani yangicha o'rganing
-        </div>
-
-        <h1 style={{
-          maxWidth: '780px', margin: '0 auto',
-          color: 'var(--text-primary)',
-          fontSize: 'clamp(2.8rem, 8vw, 5rem)',
-          letterSpacing: '-0.04em', fontWeight: 900, lineHeight: 1.08,
-          position: 'relative', zIndex: 1
-        }}>
-          Matematikani chuqur va oson o'rganing
-        </h1>
-
-        <p style={{
-          maxWidth: '520px', color: 'var(--text-secondary)',
-          fontSize: '1.2rem', margin: '4px auto 24px', lineHeight: 1.6,
-          position: 'relative', zIndex: 1
-        }}>
-          DTM, abituriyentlar va olimpiadalarga tayyorlanuvchilar uchun professional interaktiv darslar platformasi.
-        </p>
-
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-          <Link to="/courses" style={{ textDecoration: 'none' }}>
-            <Button variant="primary" size="lg">Darslarni boshlash</Button>
-          </Link>
-          <Link to="/about" style={{ textDecoration: 'none' }}>
-            <Button variant="secondary" size="lg">Biz haqimizda</Button>
-          </Link>
-        </div>
-
-        {/* Trust badges */}
-        <div style={{
-          display: 'flex', gap: '32px', flexWrap: 'wrap', justifyContent: 'center',
-          marginTop: '48px', position: 'relative', zIndex: 1
-        }}>
-          {[
-            { icon: <Users size={16} />, text: '1,000+ o\'quvchi' },
-            { icon: <Star size={16} />, text: '4.9 reyting' },
-            { icon: <Trophy size={16} />, text: '95% DTM natija' },
-          ].map(({ icon, text }) => (
-            <div key={text} style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '10px 20px', borderRadius: 'var(--radius-full)',
-              background: 'var(--bg-glass)',
-              backdropFilter: 'var(--blur-glass)',
-              WebkitBackdropFilter: 'var(--blur-glass)',
-              border: '1px solid var(--border-glass)',
-              fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)',
-              boxShadow: 'var(--shadow-glass)'
+        <div style={{ maxWidth: 760, position: 'relative', zIndex: 1 }}>
+          <motion.div initial="hidden" animate="show" variants={fadeUp} custom={0}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'rgba(52,97,255,0.08)', border: '1px solid rgba(52,97,255,0.15)',
+              borderRadius: 100, padding: '6px 16px', marginBottom: 28,
             }}>
-              <span style={{ color: 'var(--color-primary)' }}>{icon}</span>
-              {text}
+              <Zap size={14} color="#3461FF" />
+              <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#3461FF' }}>
+                O'zbek tilidagi premium matematika platformasi
+              </span>
             </div>
+          </motion.div>
+
+          <motion.h1 initial="hidden" animate="show" variants={fadeUp} custom={1}
+            style={{ fontSize: 'clamp(2.5rem, 7vw, 4.5rem)', fontWeight: 900, lineHeight: 1.08, letterSpacing: '-0.04em', color: '#0F172A', margin: '0 0 24px' }}
+          >
+            Matematikani<br />
+            <span style={{ background: 'linear-gradient(135deg, #3461FF, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              ustozlar bilan
+            </span>{' '}o'rgan
+          </motion.h1>
+
+          <motion.p initial="hidden" animate="show" variants={fadeUp} custom={2}
+            style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', color: '#64748B', lineHeight: 1.65, margin: '0 auto 40px', maxWidth: 540 }}
+          >
+            Imtihonga tayyorlov, sertifikat kurslari va asosiy matematik bilimlar — barchasi bitta platformada.
+          </motion.p>
+
+          <motion.div initial="hidden" animate="show" variants={fadeUp} custom={3}
+            style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}
+          >
+            <Link to="/signup" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              background: 'linear-gradient(135deg, #3461FF, #214CE5)',
+              color: 'white', fontWeight: 700, fontSize: '1.0625rem',
+              padding: '15px 32px', borderRadius: 16, textDecoration: 'none',
+              boxShadow: '0 8px 30px rgba(52,97,255,0.35)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 40px rgba(52,97,255,0.4)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(52,97,255,0.35)' }}
+            >
+              Bepul Boshlash <ArrowRight size={20} />
+            </Link>
+            <Link to="/about" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              background: 'white', color: '#334155', fontWeight: 600, fontSize: '1.0625rem',
+              padding: '15px 32px', borderRadius: 16, textDecoration: 'none',
+              border: '1.5px solid rgba(100,120,255,0.15)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            }}>
+              Biz haqimizda
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ────────────────────── STATS ─────────────────────── */}
+      <section style={{ background: 'white', padding: '48px 20px', borderTop: '1px solid rgba(100,120,255,0.08)', borderBottom: '1px solid rgba(100,120,255,0.08)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 24, maxWidth: 900, margin: '0 auto' }}>
+          {STATS.map((s, i) => (
+            <motion.div key={s.label} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} custom={i * 0.5}
+              style={{ textAlign: 'center' }}
+            >
+              <div style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>{s.value}</div>
+              <div style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: 500, marginTop: 6 }}>{s.label}</div>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ── BENTO FEATURES ───────────────────────── */}
-      <section style={{ padding: '80px 0' }}>
-        <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-          <Badge variant="primary" style={{ marginBottom: '16px' }}>Platforma imkoniyatlari</Badge>
-          <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', marginBottom: '16px', color: 'var(--text-primary)' }}>
-            Nimalarni taqdim etamiz?
+      {/* ────────────────────── KURSLAR ──────────────────── */}
+      <section style={{ padding: '80px 20px', maxWidth: 1100, margin: '0 auto' }}>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={fadeUp}
+          style={{ textAlign: 'center', marginBottom: 52 }}
+        >
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.14em', color: '#3461FF', textTransform: 'uppercase', marginBottom: 14 }}>Kurslar</div>
+          <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', fontWeight: 900, letterSpacing: '-0.03em', color: '#0F172A', margin: '0 0 16px' }}>
+            Maqsadingizga mos kursni tanlang
           </h2>
-          <p style={{ color: 'var(--text-secondary)', maxWidth: '560px', margin: '0 auto', fontSize: '1.125rem', lineHeight: 1.6 }}>
-            Biz faqatgina onlayn videolar emas, balki to'laqonli ekotizim taklif qilamiz.
+          <p style={{ color: '#64748B', fontSize: '1.0625rem', maxWidth: 480, margin: '0 auto' }}>
+            Har bir kurs bosqichma-bosqich video darslar va quizlar bilan ta'minlangan.
           </p>
+        </motion.div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+          {COURSES.map((c, i) => (
+            <motion.div key={c.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={fadeUp} custom={i * 0.5}
+              style={{
+                background: 'white',
+                borderRadius: 24,
+                padding: 28,
+                border: '1.5px solid rgba(100,120,255,0.08)',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 0,
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default',
+              }}
+              whileHover={{ y: -4, boxShadow: '0 12px 40px rgba(0,0,0,0.08)' }}
+            >
+              <div style={{ width: 56, height: 56, borderRadius: 16, background: c.bg, color: c.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                {c.icon}
+              </div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: c.color, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>{c.subtitle}</div>
+              <h3 style={{ margin: '0 0 12px', fontSize: '1.375rem', fontWeight: 800, letterSpacing: '-0.025em', color: '#0F172A' }}>{c.title}</h3>
+              <p style={{ margin: '0 0 24px', color: '#64748B', lineHeight: 1.6, fontSize: '0.9375rem', flex: 1 }}>{c.desc}</p>
+              <div style={{ display: 'flex', gap: 16, paddingTop: 20, borderTop: '1px solid rgba(100,120,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#475569', fontSize: '0.875rem' }}>
+                  <BookOpen size={15} color={c.color} />
+                  <span><strong style={{ color: '#0F172A' }}>{c.lessons}</strong> dars</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#475569', fontSize: '0.875rem' }}>
+                  <CheckCircle size={15} color={c.color} />
+                  <span><strong style={{ color: '#0F172A' }}>{c.quizzes}</strong> test</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
+      </section>
 
-        {/* Bento Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gridAutoRows: 'minmax(240px, auto)',
-          gap: '20px'
-        }} className="landing-bento">
-          <style>{`
-            @media (max-width: 900px) {
-              .landing-bento { grid-template-columns: 1fr !important; }
-              .landing-bento > * { grid-column: span 1 !important; grid-row: span 1 !important; }
-            }
-          `}</style>
+      {/* ─────────────────── QANDAY ISHLAYDI ──────────────── */}
+      <section style={{ background: 'white', padding: '80px 20px', borderTop: '1px solid rgba(100,120,255,0.06)' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={fadeUp} style={{ textAlign: 'center', marginBottom: 52 }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.14em', color: '#3461FF', textTransform: 'uppercase', marginBottom: 14 }}>Jarayon</div>
+            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 900, letterSpacing: '-0.03em', color: '#0F172A', margin: 0 }}>
+              3 qadam bilan boshlang
+            </h2>
+          </motion.div>
 
-          {/* Big card — DTM (span 2) */}
-          <div style={{
-            gridColumn: 'span 2',
-            background: 'linear-gradient(140deg, #3461FF 0%, #1e3a8a 100%)',
-            borderRadius: 'var(--radius-card)',
-            padding: '48px',
-            color: 'white',
-            border: '1px solid rgba(255,255,255,0.15)',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: 'var(--shadow-xl)'
-          }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 0%, rgba(255,255,255,0.12) 0%, transparent 60%)', pointerEvents: 'none' }} />
-            <Trophy size={28} color="#FBBF24" style={{ marginBottom: '24px', position: 'relative', zIndex: 1 }} />
-            <h3 style={{ fontSize: '1.75rem', marginBottom: '14px', color: 'white', fontWeight: 700, position: 'relative', zIndex: 1, letterSpacing: '-0.02em' }}>
-              DTM & Milliy Sertifikat
-            </h3>
-            <p style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.65, fontSize: '1.05rem', maxWidth: '420px', position: 'relative', zIndex: 1, fontWeight: 400 }}>
-              Davlat standartidagi eng murakkab testlarga har tomonlama mukammal tayyorlov darslari ro'yxati.
-            </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
+            {STEPS.map((step, i) => (
+              <motion.div key={step.n} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={fadeUp} custom={i * 0.5}
+                style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+              >
+                <div style={{ fontWeight: 900, fontSize: '3rem', color: 'rgba(52,97,255,0.12)', letterSpacing: '-0.05em', lineHeight: 1 }}>{step.n}</div>
+                <div>
+                  <h3 style={{ margin: '0 0 8px', fontWeight: 800, fontSize: '1.1875rem', color: '#0F172A', letterSpacing: '-0.02em' }}>{step.label}</h3>
+                  <p style={{ margin: 0, color: '#64748B', lineHeight: 1.6, fontSize: '0.9375rem' }}>{step.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* Tall card — Quiz (span 2 rows) */}
-          <Card style={{
-            gridColumn: 'span 1', gridRow: 'span 2',
-            display: 'flex', flexDirection: 'column', padding: '40px 32px'
-          }}>
-            <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
-              <Sparkles size={24} color="var(--color-accent)" />
-            </div>
-            <h3 style={{ fontSize: '1.375rem', marginBottom: '14px', color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
-              Interaktiv Quiz<br />Tizimi
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '32px', flex: 1 }}>
-              Har bir dars so'ngida bilimlaringizni gamification elementlari bilan sinab ko'ring va tangalar to'plang.
-            </p>
-            <div style={{ marginTop: 'auto', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(10px)', padding: '16px 20px', borderRadius: '18px', border: '1px solid var(--border-soft)', display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <div style={{ width: 36, height: 36, borderRadius: 12, background: 'rgba(139,92,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Target size={18} color="#8B5CF6" />
+      {/* ───────────────────── COIN TIZIMI ─────────────────── */}
+      <section style={{ padding: '80px 20px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={fadeUp}
+            style={{
+              background: 'linear-gradient(135deg, #0F172A 60%, #1E293B)',
+              borderRadius: 28, padding: 'clamp(32px, 6vw, 56px)',
+              display: 'flex', flexDirection: 'column', gap: 24,
+              position: 'relative', overflow: 'hidden',
+            }}
+          >
+            {/* Background decoration */}
+            <div style={{ position: 'absolute', right: -60, top: -60, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.2) 0%, transparent 65%)', pointerEvents: 'none' }} />
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Coins size={26} color="#F59E0B" />
               </div>
               <div>
-                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>Gamification</div>
-                <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>O'ynab o'rganing</div>
+                <h2 style={{ margin: '0 0 4px', fontWeight: 900, fontSize: 'clamp(1.375rem, 3vw, 1.875rem)', color: 'white', letterSpacing: '-0.03em' }}>Coin tizimi bilan o'rganing</h2>
+                <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.9375rem' }}>Darslar ko'ring, quizlar yeching, coin to'plang va qulfli darslarni oching.</p>
               </div>
             </div>
-          </Card>
 
-          {/* Small card — Zero to Hero */}
-          <Card style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(6,182,212,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-              <BookOpen size={22} color="var(--color-teal)" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+              {[
+                { icon: <BookOpen size={18} color="#F59E0B" />, text: "Har bir dars uchun coin yeching" },
+                { icon: <CheckCircle size={18} color="#10B981" />, text: "Quizlarni yeching — coin qozonasiz" },
+                { icon: <Lock size={18} color="#3461FF" />, text: "Qulfli darslarni coinlar bilan oching" },
+              ].map(item => (
+                <div key={item.text} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 14, padding: '14px 18px' }}>
+                  {item.icon}
+                  <span style={{ color: '#CBD5E1', fontSize: '0.9375rem', lineHeight: 1.5 }}>{item.text}</span>
+                </div>
+              ))}
             </div>
-            <h3 style={{ fontSize: '1.125rem', marginBottom: '10px', color: 'var(--text-primary)' }}>Zero-to-Hero</h3>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '0.9375rem' }}>
-              Matematikadan tayyorgarligi yo'q o'quvchilarni eng yuqori natijagacha yetaklash.
-            </p>
-          </Card>
-
-          {/* Small card — Offline */}
-          <Card style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(139,92,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-              <MapPin size={22} color="#8B5CF6" />
-            </div>
-            <h3 style={{ fontSize: '1.125rem', marginBottom: '10px', color: 'var(--text-primary)' }}>Offline Kurslar</h3>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '0.9375rem' }}>
-              Jonli darslarda ishtirok etish uchun o'quv markazimizdagi qabullarga qo'shilish.
-            </p>
-          </Card>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── FEATURED COURSES ─────────────────────── */}
-      <section style={{ padding: '40px 0 80px' }}>
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-          marginBottom: '40px', flexWrap: 'wrap', gap: '16px'
-        }}>
-          <div>
-            <h2 style={{ marginBottom: '8px', fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
-              Mashhur Darslar
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.0625rem' }}>
-              Eng ko'p o'rganilayotgan matematik yo'nalishlar
-            </p>
-          </div>
-          <Link to="/courses" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9375rem' }}>
-            Barchasini ko'rish <ArrowRight size={16} />
+      {/* ──────────────────────── CTA ─────────────────────── */}
+      <section style={{ padding: '40px 20px 100px', textAlign: 'center' }}>
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={fadeUp}>
+          <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', fontWeight: 900, letterSpacing: '-0.035em', color: '#0F172A', margin: '0 0 16px' }}>
+            Bugun boshlang — bepul!
+          </h2>
+          <p style={{ color: '#64748B', fontSize: '1.0625rem', margin: '0 0 36px' }}>
+            Kredit karta talab qilinmaydi. 30 soniyada hisob yarating.
+          </p>
+          <Link to="/signup" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 12,
+            background: 'linear-gradient(135deg, #3461FF, #214CE5)',
+            color: 'white', fontWeight: 700, fontSize: '1.125rem',
+            padding: '17px 40px', borderRadius: 18, textDecoration: 'none',
+            boxShadow: '0 10px 36px rgba(52,97,255,0.35)',
+          }}>
+            Hozir Boshlash <ArrowRight size={22} />
           </Link>
-        </div>
-
-        {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-            {[1, 2, 3].map(i => (
-              <div key={i} className="skeleton-loader" style={{ aspectRatio: '4/5', borderRadius: 'var(--radius-card)' }} />
-            ))}
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-            {featuredCourses.map(course => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
-        )}
+        </motion.div>
       </section>
 
-      {/* ── SOCIAL PROOF ─────────────────────────── */}
-      <section style={{ padding: '40px 0 80px' }}>
-        <Card style={{
-          padding: 'clamp(40px, 6vw, 72px)',
-          display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '40px',
-          position: 'relative', overflow: 'hidden'
-        }}>
-          <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
-          <div>
-            <Badge variant="accent" style={{ marginBottom: '20px' }}>Nima uchun biz?</Badge>
-            <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: '16px', color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
-              Muvaffaqiyat — ko'rsatkich
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', maxWidth: '560px', lineHeight: 1.65 }}>
-              Ko'p yillar davomida minglab abituriyentlarni oliy ta'lim muassasalariga tayyorlab kelmoqdamiz.
-            </p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '20px', width: '100%' }}>
-            {[
-              { value: '1,000+', label: "O'quvchilar" },
-              { value: '95%',    label: "DTM natijalari" },
-              { value: '5+ Yil', label: "Tajriba" },
-              { value: '4.9', label: "O'rtacha baho" },
-            ].map(({ value, label }) => (
-              <div key={label} style={{
-                padding: '24px', borderRadius: '20px',
-                background: 'rgba(255,255,255,0.7)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid var(--border-soft)',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.02em' }}>{value}</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '4px' }}>{label}</div>
-              </div>
-            ))}
-          </div>
-          <Link to="/about" style={{ textDecoration: 'none' }}>
-            <Button variant="primary" size="lg">Batafsil tanishish <ArrowRight size={18} /></Button>
-          </Link>
-        </Card>
-      </section>
     </div>
   )
 }
