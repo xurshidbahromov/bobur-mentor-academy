@@ -21,6 +21,7 @@ const LessonDetailPage = lazy(() => import('./pages/LessonDetailPage'))
 const ShopPage = lazy(() => import('./pages/ShopPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const QuizPage = lazy(() => import('./pages/QuizPage'))
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
 
 // ── Admin pages ───────────────────────────────────────
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
@@ -59,6 +60,7 @@ export default function AppRoutes() {
 
           {/* ── Auth zone ── */}
           <Route path="/dashboard"         element={<PW><DashboardPage /></PW>} />
+          <Route path="/courses/:courseId" element={<PW><CourseDetailPage /></PW>} />
           <Route path="/lessons/:lessonId" element={<PW><LessonDetailPage /></PW>} />
           <Route path="/shop"              element={<PW><ShopPage /></PW>} />
           <Route path="/profile"           element={<PW><ProfilePage /></PW>} />

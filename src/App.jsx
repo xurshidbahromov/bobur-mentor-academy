@@ -20,7 +20,7 @@ import AppRoutes from './routes'
 // ── Route zones ──────────────────────────────────────
 const PUBLIC_ROUTES = ['/']  // only '/' auto-redirects logged-in users
 const AUTH_ROUTES = ['/login', '/signup']
-const AUTH_APP_PREFIXES = ['/dashboard', '/lessons', '/shop', '/profile', '/leaderboard', '/quiz']
+const AUTH_APP_PREFIXES = ['/dashboard', '/courses', '/lessons', '/shop', '/profile', '/leaderboard', '/quiz']
 
 function isAuthAppRoute(pathname) {
   return AUTH_APP_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/'))

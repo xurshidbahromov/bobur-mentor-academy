@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Award, Clock, Users, CheckCircle2, Shield, TrendingUp, GraduationCap, ArrowRight, Star, Send, ExternalLink } from 'lucide-react'
 import Badge from '../components/ui/Badge'
 import Card from '../components/ui/Card'
@@ -48,6 +48,7 @@ const SOCIAL = [
 ]
 
 export default function AboutPage() {
+  const navigate = useNavigate()
   const stats = [
     { icon: <Users size={24} />, value: '1,000+', label: "O'quvchilar", color: '#3461FF', bg: 'rgba(52,97,255,0.1)' },
     { icon: <TrendingUp size={24} />, value: '95%', label: "DTM natijalari", color: '#F59E0B', bg: 'rgba(245,158,11,0.1)' },
@@ -84,6 +85,35 @@ export default function AboutPage() {
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '100px' }}>
+
+      {/* ── BACK BUTTON (sticky top) ── */}
+      <div style={{
+        position: 'sticky', top: 16, zIndex: 50,
+        padding: '0 20px', marginBottom: -48, pointerEvents: 'none',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(15,23,42,0.08)',
+            borderRadius: 100, padding: '10px 18px',
+            fontWeight: 700, fontSize: '0.9375rem', color: '#334155',
+            cursor: 'pointer', fontFamily: 'inherit',
+            boxShadow: '0 4px 20px rgba(15,23,42,0.1)',
+            transition: 'background 0.15s, box-shadow 0.15s',
+            WebkitTapHighlightColor: 'transparent',
+            pointerEvents: 'all',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(15,23,42,0.14)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.92)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(15,23,42,0.1)' }}
+        >
+          <ArrowLeft size={18} />
+          Orqaga
+        </button>
+      </div>
 
       {/* ── HERO BANNER ──────────────────────────── */}
       <div style={{

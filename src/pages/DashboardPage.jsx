@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useTelegram } from '../context/TelegramProvider'
 import { supabase } from '../lib/supabase'
-import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle } from 'lucide-react'
+import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell } from 'lucide-react'
+import { toast } from 'sonner'
 
 // ─────────────────────────────────────────────────────
 // Sub-components
@@ -32,192 +33,73 @@ function CoinBadge({ coins }) {
   )
 }
 
-function LessonRow({ lesson, userCoins, onNavigate }) {
-  const isLocked = !lesson.is_free && (userCoins < (lesson.price || 0))
-  const canAccess = lesson.is_free || !isLocked
-
-  const handleClick = () => {
-    if (canAccess) {
-      onNavigate(`/lessons/${lesson.id}`)
-    } else {
-      onNavigate('/shop')
-    }
-  }
+function CourseCard({ course, onNavigate }) {
+  // Placeholder progress (can be replaced with real user progress calculation)
+  const progressPct = 0 
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      onClick={handleClick}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 14,
-        padding: '14px 16px', borderRadius: 14,
-        background: canAccess ? 'white' : 'rgba(255,255,255,0.6)',
-        border: '1.5px solid rgba(100,120,255,0.08)',
-        cursor: 'pointer',
-        transition: 'transform 0.15s, box-shadow 0.15s',
-        WebkitTapHighlightColor: 'transparent',
-        userSelect: 'none',
-      }}
+    <motion.button
       whileTap={{ scale: 0.96 }}
-      transition={{ type: 'spring', stiffness: 450, damping: 25 }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      onClick={() => onNavigate(`/courses/${course.id}`)}
+      style={{
+        position: 'relative', width: '100%', 
+        background: 'rgba(255, 255, 255, 0.75)', 
+        backdropFilter: 'blur(20px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+        border: '1px solid rgba(255, 255, 255, 0.5)', 
+        cursor: 'pointer',
+        padding: '24px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
+        display: 'flex', flexDirection: 'column', gap: 16,
+        borderRadius: 28, boxShadow: '0 8px 32px rgba(15,23,42,0.04)',
+        overflow: 'hidden'
+      }}
     >
-      {/* Play / Lock icon */}
+      {/* Absolute Large Background Sticker */}
       <div style={{
-        width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: canAccess ? 'rgba(52,97,255,0.08)' : 'rgba(100,116,139,0.08)',
+        position: 'absolute', top: -20, right: -20, opacity: 0.03,
+        transform: 'rotate(15deg)', pointerEvents: 'none', zIndex: 0
       }}>
-        {canAccess
-          ? <Play size={18} color="#3461FF" fill="#3461FF" />
-          : <Lock size={18} color="#94A3B8" />
-        }
+        <BookOpen size={180} />
       </div>
 
-      {/* Title & meta */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{
-          margin: 0, fontWeight: 600,
-          fontSize: '0.9375rem', lineHeight: 1.35,
-          color: canAccess ? '#0F172A' : '#94A3B8',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      {/* Course Info (Top part) */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <h3 style={{
+          margin: '0 0 6px', fontWeight: 800, fontSize: '1.25rem',
+          color: '#0F172A', letterSpacing: '-0.02em',
         }}>
-          #{lesson.order_index} {lesson.title}
-        </p>
-        {!lesson.is_free && (
-          <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: canAccess ? '#10B981' : '#EF4444', fontWeight: 700 }}>
-            {canAccess ? 'Ochilgan' : `${lesson.price} coin kerak`}
-          </p>
-        )}
-        {lesson.is_free && (
-          <p style={{ margin: '3px 0 0', fontSize: '0.75rem', color: '#10B981', fontWeight: 700 }}>Bepul</p>
-        )}
-      </div>
-
-      {/* Right badge */}
-      {!canAccess && (
-        <div style={{
-          flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4,
-          background: 'rgba(245,158,11,0.1)', color: '#D97706',
-          padding: '4px 10px', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700,
-        }}>
-          <Coins size={12} /> {lesson.price}
-        </div>
-      )}
-    </motion.div>
-  )
-}
-
-function CourseCard({ course, userCoins, onNavigate }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [lessons, setLessons] = useState([])
-  const [lessonLoading, setLessonLoading] = useState(false)
-
-  const fetchLessons = async () => {
-    if (lessons.length > 0) { setIsOpen(v => !v); return }
-    setLessonLoading(true)
-    const { data } = await supabase
-      .from('lessons')
-      .select('*')
-      .eq('course_id', course.id)
-      .eq('is_published', true)
-      .order('order_index', { ascending: true })
-    setLessons(data || [])
-    setLessonLoading(false)
-    setIsOpen(true)
-  }
-
-  const toggle = () => {
-    if (isOpen) setIsOpen(false)
-    else fetchLessons()
-  }
-
-  return (
-    <div style={{
-      background: 'white',
-      borderRadius: 20,
-      border: '1.5px solid rgba(100,120,255,0.1)',
-      boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-      overflow: 'hidden',
-    }}>
-      {/* Course header — tap to expand */}
-      <button
-        onClick={toggle}
-        style={{
-          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-          padding: '20px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: 14, flexShrink: 0,
-            background: 'rgba(52,97,255,0.08)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <BookOpen size={22} color="#3461FF" />
-          </div>
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h3 style={{
-              margin: 0, fontWeight: 800, fontSize: '1.0625rem',
-              color: '#0F172A', letterSpacing: '-0.02em',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {course.title}
-            </h3>
-            <p style={{ margin: '4px 0 0', fontSize: '0.8125rem', color: '#64748B', fontWeight: 500 }}>
-              {course.lesson_count} dars
-            </p>
-          </div>
-
-          <motion.div
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.25 }}
-            style={{ flexShrink: 0, color: '#94A3B8' }}
-          >
-            <ChevronDown size={22} />
-          </motion.div>
-        </div>
-
+          {course.title}
+        </h3>
         {course.description && (
-          <p style={{ margin: '12px 0 0', fontSize: '0.875rem', color: '#64748B', lineHeight: 1.55, textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748B', lineHeight: 1.55 }}>
             {course.description}
           </p>
         )}
-      </button>
+      </div>
 
-      {/* Lessons accordion */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            style={{ overflow: 'hidden' }}
-          >
-            <div style={{
-              padding: '0 16px 16px',
-              borderTop: '1px solid rgba(100,120,255,0.06)',
-              display: 'flex', flexDirection: 'column', gap: 8,
-              paddingTop: 12,
-            }}>
-              {lessonLoading ? (
-                <div style={{ textAlign: 'center', padding: '20px', color: '#94A3B8', fontSize: '0.875rem' }}>
-                  Darslar yuklanmoqda...
-                </div>
-              ) : lessons.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '20px', color: '#94A3B8', fontSize: '0.875rem' }}>
-                  Hozircha darslar yo'q
-                </div>
-              ) : lessons.map(lesson => (
-                <LessonRow key={lesson.id} lesson={lesson} userCoins={userCoins} onNavigate={onNavigate} />
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      {/* Bottom actions (Left: comments, Right: Progress Arrow) */}
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingTop: 16, borderTop: '1px solid rgba(15,23,42,0.06)' }}>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94A3B8' }}>
+          <MessageCircle size={18} />
+          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>0 izoh</span>
+        </div>
+
+        <div style={{ position: 'relative', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="44" height="44" viewBox="0 0 44 44" style={{ transform: 'rotate(-90deg)', position: 'absolute', inset: 0 }}>
+            <circle cx="22" cy="22" r="19" fill="none" stroke="#F1F5F9" strokeWidth="2.5" />
+            <circle cx="22" cy="22" r="19" fill="none" stroke="#3461FF" strokeWidth="3" 
+              strokeDasharray={`${2 * Math.PI * 19 * (progressPct / 100)} ${2 * Math.PI * 19}`} strokeLinecap="round" 
+              style={{ transition: 'stroke-dasharray 0.5s ease' }} 
+            />
+          </svg>
+          <ArrowRight size={20} color="#3461FF" />
+        </div>
+
+      </div>
+    </motion.button>
   )
 }
 
@@ -225,12 +107,51 @@ function CourseCard({ course, userCoins, onNavigate }) {
 // Main Dashboard Page
 // ─────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const { user, profile } = useAuth()
+  const { user, profile, setProfile } = useAuth()
   const { isTelegram } = useTelegram()
   const navigate = useNavigate()
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [claimedDaily, setClaimedDaily] = useState(false)
+
+  const handleClaimReward = async () => {
+    if (claimedDaily) return
+    setClaimedDaily(true)
+    
+    // Add coins roughly by local state, later adapt to real DB if needed
+    if (setProfile) {
+      setProfile(prev => ({ ...prev, coins: (prev?.coins || 0) + 1 }))
+    }
+    
+    toast.success("Ajoyib!", { description: "Sizga 1 ta Coin berildi. O'qishda davom eting!" })
+
+    const triggerConfetti = () => {
+      const duration = 2500;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
+
+      const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        const particleCount = 50 * (timeLeft / duration);
+        window.confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+        window.confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+      }, 250);
+    }
+
+    if (!window.confetti) {
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js'
+      script.onload = triggerConfetti
+      document.head.appendChild(script)
+    } else {
+      triggerConfetti()
+    }
+  }
 
   useEffect(() => {
     async function fetchCourses() {
@@ -258,57 +179,136 @@ export default function DashboardPage() {
     <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 40px' }}>
 
       {/* ── Header ── */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-          <div>
-            <h1 className="outfit-font" style={{ margin: 0, fontSize: '1.625rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em' }}>
-              Assalomu aleykum, {firstName}! 👋
-            </h1>
-            <p style={{ margin: '4px 0 0', fontSize: '0.875rem', color: '#64748B' }}>
-              Bugun nima o'rganamiz?
-            </p>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Avatar with Glassy Ring */}
+            <div style={{ 
+              width: 64, height: 64, borderRadius: '50%', 
+              background: 'white', flexShrink: 0, 
+              padding: 4, 
+              boxShadow: '0 8px 24px rgba(15,23,42,0.06)',
+              border: '1px solid var(--border-soft)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              position: 'relative'
+            }}>
+              <div style={{
+                width: '100%', height: '100%', borderRadius: '50%',
+                overflow: 'hidden', background: '#F1F5F9',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--color-primary)', fontWeight: 800, fontSize: '1.75rem'
+              }}>
+                {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
+                  <img 
+                    src={profile?.avatar_url || user?.user_metadata?.avatar_url} 
+                    alt="Avatar" 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  />
+                ) : (
+                  firstName[0]?.toUpperCase()
+                )}
+              </div>
+              {/* Active dot */}
+              <div style={{ position: 'absolute', bottom: 2, right: 2, width: 14, height: 14, borderRadius: '50%', background: '#10B981', border: '3px solid white' }} />
+            </div>
+            
+            {/* Greeting */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span style={{ 
+                margin: 0, fontSize: '0.8125rem', fontWeight: 700, 
+                color: 'var(--text-muted)', letterSpacing: '-0.01em' 
+              }}>
+                Assalomu alaykum,
+              </span>
+              <h2 className="outfit-font" style={{ 
+                margin: 0, fontSize: 'min(7vw, 1.75rem)', color: '#0F172A', 
+                fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1 
+              }}>
+                {firstName}
+              </h2>
+            </div>
           </div>
-          <CoinBadge coins={coins} />
+          
+          {/* Right Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <CoinBadge coins={coins} />
+            <button style={{ width: 44, height: 44, borderRadius: '50%', background: 'white', border: '1px solid rgba(15,23,42,0.04)', boxShadow: '0 4px 12px rgba(15,23,42,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
+              <Bell size={20} color="#0F172A" />
+            </button>
+          </div>
         </div>
 
-        {/* Streak mini-banner */}
-        {streak > 0 && (
-          <div style={{
-            marginTop: 14, display: 'flex', alignItems: 'center', gap: 8,
-            background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
-            borderRadius: 12, padding: '10px 14px',
-          }}>
-            <Flame size={18} color="#F59E0B" />
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#92400E' }}>
-              {streak} kunlik streak davom etmoqda! Bugun ham o'rganing.
-            </span>
-          </div>
-        )}
-      </motion.div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <h1 className="outfit-font" style={{ margin: 0, fontSize: '2.5rem', color: '#0F172A', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1 }}>
+            Darslar
+          </h1>
 
-      {/* ── Search ── */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} style={{ marginBottom: 24 }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 10,
-          background: 'white', border: '1.5px solid rgba(100,120,255,0.12)',
-          borderRadius: 14, padding: '12px 16px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          transition: 'border-color 0.2s, box-shadow 0.2s',
-        }}>
-          <Search size={18} color="#94A3B8" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Kurs qidirish..."
+          <motion.div
+            initial={false} animate={{ width: isSearchOpen ? 240 : 44 }}
+            className="glass-card"
             style={{
-              flex: 1, border: 'none', outline: 'none', background: 'transparent',
-              fontSize: '0.9375rem', color: '#0F172A', fontFamily: 'inherit',
+              height: 44, borderRadius: 100, background: 'rgba(52,97,255,0.04)',
+              border: isSearchOpen ? '1px solid rgba(52,97,255,0.15)' : '1px solid rgba(52,97,255,0.08)',
+              display: 'flex', alignItems: 'center', padding: isSearchOpen ? '0 16px 0 12px' : '0',
+              justifyContent: isSearchOpen ? 'flex-start' : 'center',
+              overflow: 'hidden', cursor: isSearchOpen ? 'text' : 'pointer'
             }}
-          />
-          {searchTerm && (
-            <button onClick={() => setSearchTerm('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, fontSize: 18, lineHeight: 1 }}>×</button>
-          )}
+            onClick={() => !isSearchOpen && setIsSearchOpen(true)}
+          >
+            <button onClick={(e) => { e.stopPropagation(); setIsSearchOpen(!isSearchOpen); if(isSearchOpen) setSearchTerm('') }} style={{ background:'none', border:'none', padding:0, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#3461FF', flexShrink: 0, width: isSearchOpen ? 24 : 44, height: 44 }}>
+              <Search size={20} strokeWidth={2.5} />
+            </button>
+            {isSearchOpen && (
+              <input
+                 autoFocus
+                 placeholder="Kurs qidirish..."
+                 value={searchTerm}
+                 onChange={e => setSearchTerm(e.target.value)}
+                 style={{ border:'none', outline:'none', background:'transparent', marginLeft:10, width:'100%', fontSize:'0.9375rem', fontWeight:600, color: '#0F172A' }}
+              />
+            )}
+          </motion.div>
+        </div>
+
+        {/* Daily Reward Box */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+          background: 'rgba(255, 255, 255, 0.5)', 
+          backdropFilter: 'blur(24px) saturate(2)',
+          WebkitBackdropFilter: 'blur(24px) saturate(2)',
+          border: '1px solid rgba(52,97,255,0.14)',
+          borderRadius: 24, padding: '20px 24px',
+          marginBottom: 32, boxShadow: '0 12px 32px rgba(52,97,255,0.06)',
+          flexWrap: 'wrap',
+          position: 'relative', overflow: 'hidden'
+        }}>
+          {/* Decorative glass glow */}
+          <div style={{ position: 'absolute', top: -30, left: -30, width: 120, height: 120, background: 'rgba(52,97,255,0.08)', borderRadius: '50%', filter: 'blur(40px)' }} />
+
+          <div style={{ flex: '1 1 200px' }}>
+            <h3 style={{ margin: '0 0 6px', fontSize: '1.1875rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
+              {claimedDaily ? 'Mukofot olindi!' : 'Bugungi mukofotingiz tayyor!'}
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.9375rem', color: '#64748B', fontWeight: 500 }}>
+              {claimedDaily ? 'Ertaga yana kiring va tanga yig\'ing.' : 'Quyidagi tugmani bosib, 1 ta coin (tanga) oling va bilimlarga investitsiya qiling.'}
+            </p>
+          </div>
+          <motion.button
+            whileTap={claimedDaily ? {} : { scale: 0.95 }}
+            onClick={handleClaimReward}
+            disabled={claimedDaily}
+            style={{
+              padding: '12px 24px', borderRadius: 100, border: 'none',
+              background: claimedDaily ? 'rgba(15,23,42,0.05)' : '#3461FF',
+              color: claimedDaily ? '#94A3B8' : 'white',
+              fontWeight: 800, fontSize: '0.9375rem', cursor: claimedDaily ? 'default' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, width: 'max-content',
+              boxShadow: claimedDaily ? 'none' : '0 4px 16px rgba(52,97,255,0.2)'
+            }}
+          >
+            {claimedDaily ? <CheckCircle2 size={18} /> : <Gift size={18} />}
+            {claimedDaily ? 'Olindi' : 'Olish (+1)'}
+          </motion.button>
         </div>
       </motion.div>
 
@@ -320,13 +320,20 @@ export default function DashboardPage() {
         alignItems: 'start'
       }}>
         {loading ? (
-          // Skeleton
-          Array.from({ length: 3 }).map((_, i) => (
+          // Soft Premium Skeleton
+          Array.from({ length: 4 }).map((_, i) => (
             <div key={i} style={{
-              height: 96, borderRadius: 20, background: 'white',
-              border: '1.5px solid rgba(100,120,255,0.08)',
-              animation: 'shimmer 1.5s infinite',
-            }} />
+              height: 180, borderRadius: 28, background: '#FFFFFF',
+              border: '1px solid rgba(15,23,42,0.04)',
+              boxShadow: '0 8px 30px rgba(15,23,42,0.02)',
+              position: 'relative', overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(90deg, rgba(241,245,249,0) 0%, rgba(241,245,249,0.8) 50%, rgba(241,245,249,0) 100%)',
+                backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite linear'
+              }} />
+            </div>
           ))
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
@@ -338,9 +345,9 @@ export default function DashboardPage() {
         ) : filtered.map((course, i) => (
           <motion.div
             key={course.id}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <CourseCard course={course} userCoins={coins} onNavigate={navigate} />
           </motion.div>

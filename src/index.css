@@ -8,12 +8,12 @@
    ============================================ */
 
 :root {
-  /* --- Backgrounds (Warm White with Blue tint) --- */
-  --bg-base:           #EEF2FF;
-  --bg-surface:        rgba(255, 255, 255, 0.75);
-  --bg-elevated:       rgba(255, 255, 255, 0.9);
-  --bg-glass:          rgba(255, 255, 255, 0.6);
-  --bg-glass-strong:   rgba(255, 255, 255, 0.85);
+  /* --- Backgrounds (Clean Minimalist Slate) --- */
+  --bg-base:           #F8FAFC;
+  --bg-surface:        rgba(255, 255, 255, 0.9);
+  --bg-elevated:       #FFFFFF;
+  --bg-glass:          rgba(248, 250, 252, 0.8);
+  --bg-glass-strong:   rgba(255, 255, 255, 0.95);
 
   /* --- Borders --- */
   --border-soft:       rgba(100, 120, 255, 0.08);
@@ -94,13 +94,6 @@ html {
 body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-base);
-  /* Premium morphing orb background */
-  background-image:
-    radial-gradient(ellipse 80% 60% at 10% -10%,  rgba(120, 140, 255, 0.25) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 90% 10%,   rgba(100, 220, 255, 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 50% 100%,  rgba(52, 97, 255, 0.12)  0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 80% 60%,   rgba(16, 185, 129, 0.08) 0%, transparent 50%);
-  background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -174,5 +167,30 @@ p  { font-size: 1rem;    font-weight: 400; line-height: 1.75; color: var(--text-
   box-shadow: var(--shadow-glass);
 }
 
-/* === Global Utilities === */
-.no-scroll { overflow: hidden !important; }
+/* === Lesson Detail Responsiveness === */
+.lesson-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .lesson-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lesson-sidebar {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .lesson-sidebar {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}

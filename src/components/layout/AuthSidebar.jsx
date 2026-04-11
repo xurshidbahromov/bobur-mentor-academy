@@ -50,40 +50,6 @@ export default function AuthSidebar() {
           </span>
         </Link>
 
-        {/* User Card */}
-        <div style={{
-          background: 'linear-gradient(135deg, #0F172A, #1E293B)',
-          borderRadius: 16,
-          padding: 16,
-          marginBottom: 32,
-          position: 'relative',
-          overflow: 'hidden',
-          boxShadow: '0 8px 20px rgba(15,23,42,0.15)'
-        }}>
-          <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: 80, height: 80, background: 'rgba(52,97,255,0.2)', filter: 'blur(20px)', borderRadius: '50%' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, position: 'relative', zIndex: 1 }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: '50%',
-              background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: '2px solid rgba(255,255,255,0.2)', flexShrink: 0, overflow: 'hidden'
-            }}>
-              {(user?.user_metadata?.avatar_url || profile?.avatar_url) ? (
-                <img src={user.user_metadata?.avatar_url || profile?.avatar_url} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <span style={{ color: '#3461FF', fontSize: '1.25rem', fontWeight: 900 }}>{name[0].toUpperCase()}</span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: '0 0 2px', color: 'white', fontWeight: 700, fontSize: '0.9375rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {name}
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F59E0B', fontSize: '0.8125rem', fontWeight: 700 }}>
-                <Coins size={14} /> {profile?.coins ?? 0} coin
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Navigation */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
           <p style={{ margin: '0 0 8px', fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: 12 }}>
