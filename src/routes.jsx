@@ -20,6 +20,7 @@ const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 const LessonDetailPage = lazy(() => import('./pages/LessonDetailPage'))
 const ShopPage = lazy(() => import('./pages/ShopPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const QuizPage = lazy(() => import('./pages/QuizPage'))
 
 // ── Admin pages ───────────────────────────────────────
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
@@ -62,6 +63,7 @@ export default function AppRoutes() {
           <Route path="/shop"              element={<PW><ShopPage /></PW>} />
           <Route path="/profile"           element={<PW><ProfilePage /></PW>} />
           <Route path="/leaderboard"       element={<PW><LeaderboardPage /></PW>} />
+          <Route path="/quiz/:lessonId"    element={<PW><QuizPage /></PW>} />
 
           {/* ── Admin ── */}
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>

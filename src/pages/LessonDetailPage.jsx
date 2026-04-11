@@ -3,12 +3,13 @@
 // Qulfli bo'lsa: Coin sarflab ochish yoki Shop-ga yo'naltirish.
 
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Lock, Coins, CheckCircle2, XCircle } from 'lucide-react'
+import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight } from 'lucide-react'
 import { useLesson, useQuizzes } from '../hooks/useLessons'
 import { useAccess } from '../hooks/useAccess'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabase'
 import VideoPlayer from '../components/lesson/VideoPlayer'
 import { toast } from 'sonner'
 
@@ -19,6 +20,22 @@ export default function LessonDetailPage() {
   const { user, profile, setProfile } = useAuth()
   const { canWatch, loading: accessLoading, unlockWithCoins } = useAccess(lesson)
   const { quizzes } = useQuizzes(canWatch ? lessonId : null)
+  const [bestScore, setBestScore] = useState(null)
+
+  // Load best previous score
+  useEffect(() => {
+    if (!user || !canWatch) return
+    supabase
+      .from('quiz_attempts')
+      .select('score, total')
+      .eq('user_id', user.id)
+      .eq('lesson_id', lessonId)
+      .order('score', { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) setBestScore(data[0])
+      })
+  }, [user, canWatch, lessonId])
 
   if (loading || accessLoading) {
     return (
@@ -106,18 +123,11 @@ export default function LessonDetailPage() {
       {/* ── Quiz section ── */}
       {canWatch && quizzes.length > 0 && (
         <div style={{ margin: '28px 16px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(139,92,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CheckCircle2 size={20} color="#8B5CF6" />
-            </div>
-            <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 800, color: '#0F172A' }}>
-              Bilimni tekshirish
-            </h2>
-            <span style={{ marginLeft: 'auto', fontSize: '0.8125rem', fontWeight: 700, color: '#8B5CF6', background: 'rgba(139,92,246,0.08)', padding: '3px 10px', borderRadius: 8 }}>
-              {quizzes.length} ta savol
-            </span>
-          </div>
-          <QuizSection quizzes={quizzes} />
+          <QuizStartCard
+            quizzes={quizzes}
+            bestScore={bestScore}
+            onStart={() => navigate(`/quiz/${lessonId}`)}
+          />
         </div>
       )}
 
@@ -173,125 +183,70 @@ function LockScreen({ lesson, profile, onUnlock, onShop }) {
   )
 }
 
-// ── Quiz Section ─────────────────────────────────────
-function QuizSection({ quizzes }) {
-  const [current, setCurrent] = useState(0)
-  const [selected, setSelected] = useState(null)
-  const [submitted, setSubmitted] = useState(false)
-  const [score, setScore] = useState(0)
-  const [done, setDone] = useState(false)
-
-  const q = quizzes[current]
-  const options = ['a', 'b', 'c', 'd'].filter(o => q[`option_${o}`])
-  const isCorrect = selected === q.correct_option
-
-  const handleSubmit = () => {
-    if (!selected) return
-    if (!submitted) {
-      setSubmitted(true)
-      if (isCorrect) setScore(s => s + 1)
-    } else {
-      if (current + 1 < quizzes.length) {
-        setCurrent(c => c + 1)
-        setSelected(null)
-        setSubmitted(false)
-      } else {
-        setDone(true)
-      }
-    }
-  }
-
-  if (done) return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-      style={{
-        background: 'white', borderRadius: 20, padding: 28, textAlign: 'center',
-        border: '1.5px solid rgba(100,120,255,0.1)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-      }}
-    >
-      <div style={{ fontSize: '3rem', marginBottom: 12 }}>
-        {score === quizzes.length ? '🏆' : score > quizzes.length / 2 ? '🎉' : '📚'}
-      </div>
-      <h3 style={{ margin: '0 0 8px', fontSize: '1.375rem', fontWeight: 800, color: '#0F172A' }}>
-        {score}/{quizzes.length} to'g'ri!
-      </h3>
-      <p style={{ color: '#64748B', margin: '0 0 20px' }}>
-        {score === quizzes.length ? 'Mukammal natija! Barcha savollar to\'g\'ri.' : 'Yaxshi harakat! Bilimni mustahkamlay boring.'}
-      </p>
-      <button onClick={() => { setCurrent(0); setSelected(null); setSubmitted(false); setScore(0); setDone(false) }}
-        style={{
-          background: 'linear-gradient(135deg, #3461FF, #214CE5)', color: 'white',
-          border: 'none', borderRadius: 14, padding: '12px 28px', fontWeight: 700,
-          fontSize: '0.9375rem', cursor: 'pointer',
-        }}>
-        Qayta boshlash
-      </button>
-    </motion.div>
-  )
+// ── Quiz Start Card (Minimalist) ─────────────────────────────
+function QuizStartCard({ quizzes, bestScore, onStart }) {
+  const pct = bestScore ? Math.round((bestScore.score / bestScore.total) * 100) : null
 
   return (
-    <div style={{ background: 'white', borderRadius: 20, padding: 20, border: '1.5px solid rgba(100,120,255,0.1)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-      {/* Progress */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#94A3B8' }}>{current + 1} / {quizzes.length}</span>
-        <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#F1F5F9', margin: '0 12px' }}>
-          <div style={{ height: '100%', borderRadius: 2, background: '#3461FF', width: `${((current + 1) / quizzes.length) * 100}%`, transition: 'width 0.3s' }} />
+    <motion.div
+      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      style={{
+        background: 'white', borderRadius: 24, padding: '24px',
+        border: '1.5px solid #F1F5F9',
+        boxShadow: '0 4px 20px rgba(15,23,42,0.04)',
+        position: 'relative',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+        <div style={{ width: 48, height: 48, borderRadius: 16, background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <ClipboardList size={24} />
         </div>
-        <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#10B981' }}>{score} ✓</span>
+        <div>
+          <h2 style={{ margin: '0 0 2px', fontSize: '1.125rem', fontWeight: 800, color: '#0F172A' }}>
+            Bilimni tekshirish
+          </h2>
+          <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', fontWeight: 500 }}>
+            {quizzes.length} ta savol · Har biriga 60s
+          </p>
+        </div>
       </div>
 
-      <p style={{ fontWeight: 700, fontSize: '1rem', color: '#0F172A', lineHeight: 1.5, margin: '0 0 16px' }}>{q.question}</p>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-        {options.map(opt => {
-          const val = q[`option_${opt}`]
-          let bg = 'rgba(100,120,255,0.04)'
-          let border = 'rgba(100,120,255,0.12)'
-          let color = '#334155'
-          if (submitted) {
-            if (opt === q.correct_option) { bg = 'rgba(16,185,129,0.08)'; border = '#10B981'; color = '#0F172A' }
-            else if (opt === selected) { bg = 'rgba(239,68,68,0.06)'; border = '#EF4444'; color = '#EF4444' }
-          } else if (opt === selected) {
-            bg = 'rgba(52,97,255,0.08)'; border = '#3461FF'; color = '#3461FF'
-          }
-          return (
-            <button key={opt} onClick={() => !submitted && setSelected(opt)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                background: bg, border: `1.5px solid ${border}`,
-                borderRadius: 12, padding: '12px 14px', cursor: submitted ? 'default' : 'pointer',
-                textAlign: 'left', transition: 'all 0.15s', WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <span style={{ width: 24, height: 24, borderRadius: 8, background: `${border}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8125rem', color: border, flexShrink: 0 }}>
-                {opt.toUpperCase()}
+      {bestScore && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          background: '#F8FAFC', borderRadius: 16, padding: '14px 16px', marginBottom: 20,
+          border: '1px solid #F1F5F9',
+        }}>
+          <Trophy size={20} color="#F59E0B" style={{ flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: '0 0 2px', color: '#94A3B8', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Eng yaxshi natija
+            </p>
+            <p style={{ margin: 0, color: '#1E293B', fontWeight: 800, fontSize: '1rem' }}>
+              {bestScore.score}/{bestScore.total} to'g'ri
+              <span style={{ marginLeft: 8, color: pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#EF4444', fontWeight: 700 }}>
+                ({pct}%)
               </span>
-              <span style={{ fontWeight: 500, fontSize: '0.9375rem', color, flex: 1 }}>{val}</span>
-              {submitted && opt === q.correct_option && <CheckCircle2 size={18} color="#10B981" />}
-              {submitted && opt === selected && opt !== q.correct_option && <XCircle size={18} color="#EF4444" />}
-            </button>
-          )
-        })}
-      </div>
-
-      {submitted && q.explanation && (
-        <div style={{ background: 'rgba(139,92,246,0.06)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, fontSize: '0.875rem', color: '#6D28D9', lineHeight: 1.55 }}>
-          <strong>Izoh:</strong> {q.explanation}
+            </p>
+          </div>
+          <CheckCircle2 size={20} color={pct >= 70 ? '#10B981' : '#F59E0B'} />
         </div>
       )}
 
       <button
-        onClick={handleSubmit}
-        disabled={!selected}
+        onClick={onStart}
         style={{
-          width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-          background: selected ? 'linear-gradient(135deg, #3461FF, #214CE5)' : '#E2E8F0',
-          color: selected ? 'white' : '#94A3B8', fontWeight: 700, fontSize: '1rem',
-          cursor: selected ? 'pointer' : 'not-allowed', transition: 'all 0.2s',
+          width: '100%', padding: '16px', borderRadius: 16, border: 'none',
+          background: '#1E293B', color: 'white', fontWeight: 800, fontSize: '1rem',
+          cursor: 'pointer', fontFamily: 'inherit',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          boxShadow: '0 4px 12px rgba(30,41,59,0.15)',
           WebkitTapHighlightColor: 'transparent',
         }}
       >
-        {!submitted ? 'Javobni tekshirish' : current + 1 < quizzes.length ? 'Keyingi savol →' : 'Natijani ko\'rish →'}
+        {bestScore ? 'Qayta topshirish' : 'Testni boshlash'}
+        <ChevronRight size={18} />
       </button>
-    </div>
+    </motion.div>
   )
 }
