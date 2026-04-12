@@ -108,45 +108,24 @@ function AppShell() {
       <div className="auth-layout" style={{ 
         minHeight: '100vh', 
         background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)', 
-        display: 'flex', 
         position: 'relative', 
-        overflow: 'hidden' 
       }}>
         {/* Subtle Light Aura Orbs for the Dashboard */}
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.07) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'floatOrb 20s ease-in-out infinite' }} />
           <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'floatOrbReverse 25s ease-in-out infinite' }} />
         </div>
         
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', width: '100%', height: '100vh' }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', width: '100%', minHeight: '100vh' }}>
           <AuthSidebar />
-          {/* Scroll container — gets padding so content clears the navbar */}
-          <div 
-            id="main-scroll-container"
-            style={{ 
-              flex: 1, 
-              minWidth: 0, 
-              height: '100vh', 
-              overflowY: 'auto',
-              overflowX: 'hidden',
-              // iOS momentum scroll
-              WebkitOverflowScrolling: 'touch',
-              // Prevent scroll chaining into Telegram's native view
-              overscrollBehavior: 'none',
-              // Space for fixed BottomTabNav (navbar height ~80px + safe area)
-              paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 16px))',
-              scrollbarWidth: 'none', // Firefox
-            }}
-          >
-            <style>{`
-              #main-scroll-container::-webkit-scrollbar { display: none; }
-            `}</style>
-            <main style={{ flex: 1 }}>
+          {/* Main content area — naturally scrolls with body */}
+          <div style={{ flex: 1, minWidth: 0, paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 16px))' }}>
+            <main>
               <AppRoutes />
             </main>
           </div>
         </div>
-        {/* BottomTabNav is OUTSIDE the scroll div so it stays fixed correctly */}
+        {/* BottomTabNav is fixed visually onto the viewport */}
         <BottomTabNav />
       </div>
     )
