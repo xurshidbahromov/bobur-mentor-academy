@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthContext'
 import {
   BookOpen, CheckCircle2, Flame, LogOut,
   ArrowRight, Trophy, ShieldCheck, Coins, ChevronRight,
-  MoreVertical, Calendar as CalendarIcon, Sparkles, Check, ArrowUpRight, Clock
+  MoreVertical, Calendar as CalendarIcon, Sparkles, Check, ArrowUpRight, Clock, Zap
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { toast } from 'sonner'
 
 const container = {
   hidden: {},
@@ -29,8 +30,18 @@ export default function ProfilePage() {
     performanceScore: 0
   })
 
+  // Daily Reward State
+  const [claimedDaily, setClaimedDaily] = useState(false)
+
+  // Initialization & Data Fetch
   useEffect(() => {
     if (!user) return
+
+    // Quick init of claimed status from local storage
+    const today = new Date().toISOString().split('T')[0]
+    if (localStorage.getItem(`bma_daily_${user.id}_${today}`)) {
+      setClaimedDaily(true)
+    }
     const fetchStats = async () => {
       // 1. Lessons completed
       const { count: lCount } = await supabase
@@ -73,6 +84,41 @@ export default function ProfilePage() {
     localStorage.removeItem('bma_tg_autologin')
     await signOut()
     navigate('/')
+  }
+
+  const handleClaimReward = async () => {
+    if (claimedDaily || !user) return
+    
+    // Optimistic UI updates
+    const today = new Date().toISOString().split('T')[0]
+    localStorage.setItem(`bma_daily_${user.id}_${today}`, 'true')
+    setClaimedDaily(true)
+    
+    // AuthContext'da setProfile yo'q bo'lsa, profile'ni fetch qilish qiyinroq
+    // Ammo oddiy user o'zgaruvchisi orqali xavolani berib o'tishimiz mumkin
+    const newCoins = (profile?.coins || 0) + 1
+    
+    // DB background sync
+    supabase.from('profiles').update({ coins: newCoins }).eq('id', user.id).then()
+    
+    toast.success("Ajoyib! 🎉", { description: "Sizga mukofot tariqasida 1 ta Coin berildi!" })
+
+    // Confetti
+    if (window.confetti) {
+      const duration = 2400
+      const end = Date.now() + duration
+      const colors = ['#3461FF', '#8B5CF6', '#F59E0B', '#10B981']
+
+      ;(function frame() {
+        window.confetti({
+          particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors, gravity: 0.6
+        })
+        window.confetti({
+          particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors, gravity: 0.6
+        })
+        if (Date.now() < end) requestAnimationFrame(frame)
+      })()
+    }
   }
 
   if (loading) {
@@ -230,6 +276,59 @@ export default function ProfilePage() {
               <ShieldCheck size={12} /> Admin
             </span>
           )}
+        </motion.div>
+
+        {/* ── Daily Reward Box (Permanent Home) ── */}
+        <motion.div variants={item} className="card-glow-hover glow-amber" style={{
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
+          background: 'rgba(255, 255, 255, 0.4)', 
+          backdropFilter: 'blur(32px) saturate(2.5)',
+          WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
+          border: '1px solid rgba(255, 255, 255, 0.6)',
+          borderRadius: 24, padding: '20px 24px',
+          boxShadow: '0 12px 32px rgba(245,158,11,0.05)',
+          marginBottom: 16
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: '1 1 200px' }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 16, flexShrink: 0,
+              background: claimedDaily ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: claimedDaily ? 'none' : 'inset 0 2px 4px rgba(255,255,255,0.4)',
+              border: claimedDaily ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(245,158,11,0.3)'
+            }}>
+              {claimedDaily ? (
+                <CheckCircle2 color="#10B981" size={26} strokeWidth={2.5} />
+              ) : (
+                <Zap color="#F59E0B" size={26} fill="#F59E0B" />
+              )}
+            </div>
+            <div>
+              <p className="outfit-font" style={{ margin: '0 0 4px', fontWeight: 800, fontSize: '1.0625rem', color: '#0F172A', letterSpacing: '-0.01em' }}>
+                {claimedDaily ? "Kunlik mukofotingiz olindi" : "Kunlik mukofot mavjud!"}
+              </p>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', fontWeight: 500 }}>
+                {claimedDaily ? "Ertaga qaytib keling, biz sizni kutamiz!" : "Hoziroq olib coinlar sonini ko'paytiring"}
+              </p>
+            </div>
+          </div>
+
+          <motion.button
+            whileTap={!claimedDaily ? { scale: 0.95 } : {}}
+            onClick={handleClaimReward}
+            disabled={claimedDaily}
+            style={{
+              padding: '12px 24px', borderRadius: 14, border: 'none', cursor: claimedDaily ? 'default' : 'pointer',
+              background: claimedDaily ? 'rgba(15,23,42,0.04)' : 'linear-gradient(135deg, #F59E0B, #D97706)',
+              color: claimedDaily ? '#94A3B8' : 'white',
+              fontWeight: 800, fontSize: '0.9375rem', fontFamily: 'inherit',
+              boxShadow: claimedDaily ? 'none' : '0 6px 16px rgba(245,158,11,0.3)',
+              WebkitTapHighlightColor: 'transparent', flex: '1 1 auto', minWidth: 120,
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+          >
+            {claimedDaily ? "Olindi" : "Olish"}
+          </motion.button>
         </motion.div>
 
         {/* ── Progress Section ── */}

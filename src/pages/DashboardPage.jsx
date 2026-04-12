@@ -416,14 +416,14 @@ export default function DashboardPage() {
 
         {/* Daily Reward Box */}
         <AnimatePresence>
-          {!isSearchOpen && (
+          {!isSearchOpen && !claimedDaily && (
             <motion.div 
               initial={{ opacity: 0, height: 0, marginBottom: 0 }} 
               animate={{ opacity: 1, height: 'auto', marginBottom: 32 }} 
               exit={{ opacity: 0, height: 0, marginBottom: 0, overflow: 'hidden' }}
             >
               <div className="card-glow-hover" style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+                display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
                 background: 'rgba(255, 255, 255, 0.5)', 
                 backdropFilter: 'blur(24px) saturate(2)',
                 WebkitBackdropFilter: 'blur(24px) saturate(2)',
