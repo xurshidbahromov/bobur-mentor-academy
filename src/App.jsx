@@ -172,7 +172,7 @@ function AppShell() {
           fontSize: '1.25rem', fontWeight: 800, color: '#0F172A',
           margin: '0 0 4px', letterSpacing: '-0.02em',
         }}>
-          Bobur Mentor Academy
+          Bobur Mentor
         </h2>
         <p style={{
           margin: 0, color: '#64748B', fontSize: '0.875rem', fontWeight: 500,

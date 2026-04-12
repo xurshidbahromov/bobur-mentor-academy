@@ -17,7 +17,7 @@ export default function Footer() {
         gap: 16, flexWrap: 'wrap',
       }}>
         <span className="outfit-font" style={{ color: '#94A3B8', fontSize: '0.875rem' }}>
-          © {year} Bobur Mentor Academy
+          © {year} Bobur Mentor
         </span>
         <div style={{ display: 'flex', gap: 20 }}>
           <Link to="/about" style={{ color: '#94A3B8', fontSize: '0.875rem', textDecoration: 'none' }}>Biz haqimizda</Link>

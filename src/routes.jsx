@@ -26,9 +26,7 @@ const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
 // ── Admin pages ───────────────────────────────────────
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
-const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'))
-const AdminLessons = lazy(() => import('./pages/admin/AdminLessons'))
-const AdminQuizzes = lazy(() => import('./pages/admin/AdminQuizzes'))
+const AdminContent = lazy(() => import('./pages/admin/AdminContent'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 
 // ── Page transition ───────────────────────────────────
@@ -71,9 +69,7 @@ export default function AppRoutes() {
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="courses" element={<AdminCourses />} />
-            <Route path="lessons" element={<AdminLessons />} />
-            <Route path="quizzes" element={<AdminQuizzes />} />
+            <Route path="content" element={<AdminContent />} />
             <Route path="users" element={<AdminUsers />} />
           </Route>
 

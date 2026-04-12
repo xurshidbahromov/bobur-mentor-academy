@@ -21,9 +21,7 @@ export default function AdminLayout() {
 
   const menuItems = [
     { name: 'Statistika', path: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Kurslar', path: '/admin/courses', icon: BookOpen },
-    { name: 'Darslar', path: '/admin/lessons', icon: Video },
-    { name: 'Quizlar', path: '/admin/quizzes', icon: HelpCircle },
+    { name: 'Dars Boshqaruvi', path: '/admin/content', icon: BookOpen },
     { name: 'Foydalanuvchilar', path: '/admin/users', icon: Users },
   ]
 
