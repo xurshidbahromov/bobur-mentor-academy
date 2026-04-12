@@ -181,8 +181,29 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
             <div className="spinner" style={{ border: '3px solid rgba(0,0,0,0.05)', borderTop: '3px solid var(--color-primary)', borderRadius: '50%', width: 24, height: 24, animation: 'spin 1s linear infinite', margin: '0 auto' }} />
           </div>
         ) : comments.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94A3B8' }}>
-            <p style={{ margin: 0, fontWeight: 500 }}>Hozircha izohlar yo'q. Birinchi bo'lib fikr bildiring!</p>
+          <div style={{ 
+            textAlign: 'center', padding: '64px 20px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            background: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(32px) saturate(2)',
+            WebkitBackdropFilter: 'blur(32px) saturate(2)',
+            borderRadius: 28,
+            border: '1px solid rgba(255,255,255,0.6)',
+          }}>
+            <div style={{ 
+              width: 56, height: 56, borderRadius: '50%', 
+              background: 'rgba(52,97,255,0.08)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              marginBottom: 14 
+            }}>
+              <MessageCircle size={24} color="#3461FF" strokeWidth={2} />
+            </div>
+            <p className="outfit-font" style={{ margin: '0 0 6px', fontSize: '1.125rem', fontWeight: 800, color: '#0F172A' }}>
+              Hali izohlar yo'q
+            </p>
+            <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748B' }}>
+              Birinchi bo'lib fikr bildiring!
+            </p>
           </div>
         ) : (
           <AnimatePresence initial={false}>

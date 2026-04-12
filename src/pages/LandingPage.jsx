@@ -35,8 +35,9 @@ export default function LandingPage() {
           position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden',
           borderRadius: '0 0 80px 80px'
         }}>
-          <div style={{ position: 'absolute', top: '15%', left: '5%', width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.18) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-          <div style={{ position: 'absolute', top: '20%', right: '8%', width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+          <div style={{ position: 'absolute', top: '10%', left: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.25) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrb 15s ease-in-out infinite' }} />
+          <div style={{ position: 'absolute', top: '30%', right: '5%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrbReverse 20s ease-in-out infinite' }} />
+          <div style={{ position: 'absolute', bottom: '-10%', left: '30%', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrb 18s ease-in-out infinite' }} />
         </div>
 
         <div style={{
@@ -54,9 +55,8 @@ export default function LandingPage() {
           <Sparkles size={13} /> Matematikani yangicha o'rganing
         </div>
 
-        <h1 style={{
+        <h1 className="outfit-font text-gradient-premium" style={{
           maxWidth: '780px', margin: '0 auto',
-          color: 'var(--text-primary)',
           fontSize: 'clamp(2.8rem, 8vw, 5rem)',
           letterSpacing: '-0.04em', fontWeight: 900, lineHeight: 1.08,
           position: 'relative', zIndex: 1
@@ -135,9 +135,9 @@ export default function LandingPage() {
           `}</style>
 
           {/* Big card — DTM (span 2) */}
-          <div style={{
+          <div className="card-glow-hover" style={{
             gridColumn: 'span 2',
-            background: 'linear-gradient(140deg, #3461FF 0%, #1e3a8a 100%)',
+            background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E3A8A 100%)',
             borderRadius: 'var(--radius-card)',
             padding: '48px',
             color: 'white',
@@ -157,7 +157,7 @@ export default function LandingPage() {
           </div>
 
           {/* Tall card — Quiz (span 2 rows) */}
-          <Card style={{
+          <Card className="card-glow-hover" style={{
             gridColumn: 'span 1', gridRow: 'span 2',
             display: 'flex', flexDirection: 'column', padding: '40px 32px'
           }}>
@@ -182,7 +182,7 @@ export default function LandingPage() {
           </Card>
 
           {/* Small card — Zero to Hero */}
-          <Card style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
+          <Card className="card-glow-hover" style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(6,182,212,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
               <BookOpen size={22} color="var(--color-teal)" />
             </div>
@@ -193,7 +193,7 @@ export default function LandingPage() {
           </Card>
 
           {/* Small card — Offline */}
-          <Card style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
+          <Card className="card-glow-hover" style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(139,92,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
               <MapPin size={22} color="#8B5CF6" />
             </div>

@@ -117,15 +117,15 @@ export default function AboutPage() {
 
       {/* ── HERO BANNER ──────────────────────────── */}
       <div style={{
-        background: 'linear-gradient(140deg, #3461FF 0%, #1e3a8a 100%)',
+        background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E3A8A 100%)',
         padding: '120px 24px 100px',
         position: 'relative',
         overflow: 'hidden'
       }}>
         {/* Orbs */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-          <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 65%)', filter: 'blur(10px)' }} />
-          <div style={{ position: 'absolute', bottom: '-20%', left: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(100,200,255,0.15) 0%, transparent 60%)', filter: 'blur(20px)' }} />
+          <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.4) 0%, transparent 65%)', filter: 'blur(60px)', animation: 'floatOrb 15s ease-in-out infinite' }} />
+          <div style={{ position: 'absolute', bottom: '-20%', left: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrbReverse 18s ease-in-out infinite' }} />
         </div>
 
         <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -142,7 +142,7 @@ export default function AboutPage() {
               </div>
               <h1 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.08, marginBottom: '24px', color: 'white' }}>
                 Bobur<br />
-                <span style={{ color: 'rgba(255,255,255,0.55)' }}>Mentor</span>
+                <span className="text-gradient-fire">Mentor</span>
               </h1>
               <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.65, maxWidth: '520px', marginBottom: '40px' }}>
                 Matematika — bu shunchaki raqamlar yig'indisi emas, bu hayotiy qarorlar va mantiqiy fikrlash poydevoridir.
@@ -162,8 +162,8 @@ export default function AboutPage() {
                 aspectRatio: '3/4',
                 borderRadius: '32px',
                 overflow: 'hidden',
-                boxShadow: '0 40px 80px rgba(0,0,0,0.3)',
-                border: '2px solid rgba(255,255,255,0.2)',
+                boxShadow: '0 0 80px rgba(6,182,212,0.4)',
+                border: '2px solid rgba(255,255,255,0.25)',
                 marginLeft: 'auto'
               }}>
                 <img

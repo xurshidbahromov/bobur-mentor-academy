@@ -105,13 +105,21 @@ function AppShell() {
   // Also render /about inside auth shell when user is already logged in
   if (isAuthAppPage || (path === '/about' && user)) {
     return (
-      <div className="auth-layout" style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex' }}>
-        <AuthSidebar />
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
-          <main style={{ flex: 1 }}>
-            <AppRoutes />
-          </main>
-          <BottomTabNav />
+      <div className="auth-layout" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)', display: 'flex', position: 'relative', overflow: 'hidden' }}>
+        {/* Subtle Light Aura Orbs for the Dashboard */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+          <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.07) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'floatOrb 20s ease-in-out infinite' }} />
+          <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'floatOrbReverse 25s ease-in-out infinite' }} />
+        </div>
+        
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', width: '100%', height: '100vh' }}>
+          <AuthSidebar />
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+            <main style={{ flex: 1 }}>
+              <AppRoutes />
+            </main>
+            <BottomTabNav />
+          </div>
         </div>
       </div>
     )

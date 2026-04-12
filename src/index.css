@@ -113,6 +113,12 @@ h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.3;  letter-spacing: -0
 h4 { font-size: 1.1rem;  font-weight: 600; line-height: 1.4;  letter-spacing: -0.01em; }
 p  { font-size: 1rem;    font-weight: 400; line-height: 1.75; color: var(--text-secondary); }
 
+/* === Form Elements === */
+input, textarea {
+  min-width: 0;
+  caret-color: var(--color-primary);
+}
+
 /* === Focus Ring (Accessibility) === */
 :focus-visible {
   outline: 2px solid var(--color-primary);
@@ -193,4 +199,74 @@ p  { font-size: 1rem;    font-weight: 400; line-height: 1.75; color: var(--text-
     max-height: none;
     overflow-y: visible;
   }
+}
+
+/* === Aura Glassmorphism Utilities === */
+
+/* Floating Orbs Animation */
+@keyframes floatOrb {
+  0% { transform: translateY(0px) scale(1); opacity: 0.6; }
+  50% { transform: translateY(-30px) scale(1.1); opacity: 0.8; }
+  100% { transform: translateY(0px) scale(1); opacity: 0.6; }
+}
+
+@keyframes floatOrbReverse {
+  0% { transform: translateY(0px) scale(1.1); opacity: 0.8; }
+  50% { transform: translateY(30px) scale(1); opacity: 0.6; }
+  100% { transform: translateY(0px) scale(1.1); opacity: 0.8; }
+}
+
+/* High-end Text Gradients */
+.text-gradient-premium {
+  background: linear-gradient(135deg, #3461FF 0%, #8B5CF6 50%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-fire {
+  background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Interactive Card Glows */
+/* Interactive Card Glows - TMA (Touch) Friendly */
+@keyframes cardBreathe {
+  0%   { box-shadow: 0 4px 16px rgba(var(--glow-rgb), 0.04); border-color: rgba(var(--glow-rgb), 0.1); }
+  50%  { box-shadow: 0 12px 36px rgba(var(--glow-rgb), 0.15); border-color: rgba(var(--glow-rgb), 0.25); }
+  100% { box-shadow: 0 4px 16px rgba(var(--glow-rgb), 0.04); border-color: rgba(var(--glow-rgb), 0.1); }
+}
+
+.card-glow-hover {
+  --glow-rgb: 52, 97, 255; /* Default primary blue */
+  position: relative;
+  animation: cardBreathe 4s ease-in-out infinite;
+  transition: filter 0.1s ease;
+}
+
+/* Semantic Overrides */
+.card-glow-hover.glow-red    { --glow-rgb: 239, 68, 68; }
+.card-glow-hover.glow-green  { --glow-rgb: 16, 185, 129; }
+.card-glow-hover.glow-purple { --glow-rgb: 139, 92, 246; }
+.card-glow-hover.glow-amber  { --glow-rgb: 245, 158, 11; }
+.card-glow-hover.glow-sky    { --glow-rgb: 14, 165, 233; }
+
+.card-glow-hover::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, rgba(var(--glow-rgb), 0) 0%, rgba(var(--glow-rgb), 0.15) 100%);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 1; /* Always show the subtle edge gradient */
+}
+
+/* Active/Tap state for mobile interaction */
+.card-glow-hover:active {
+  filter: brightness(0.95);
+  animation-play-state: paused;
 }

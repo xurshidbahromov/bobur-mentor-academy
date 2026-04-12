@@ -35,23 +35,32 @@ const PODIUM_ORDER = [1, 0, 2]      // display order: 2nd, 1st, 3rd
 
 function PodiumCard({ user, rank, isSelf, tab }) {
   const isFirst = rank === 0
+  
+  // Assign glow color based on rank: Gold (amber), Silver (sky), Bronze (redish/orange)
+  let glowClass = ''
+  if (rank === 0) glowClass = 'glow-amber'
+  else if (rank === 1) glowClass = 'glow-sky'
+  else if (rank === 2) glowClass = 'glow-red' // acting as bronze here
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
+      whileTap={{ scale: 0.97 }}
       transition={{ delay: 0.15 + rank * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      className={`card-glow-hover ${glowClass}`}
       style={{
-        flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-        background: isFirst ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.65)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: isFirst ? '1.5px solid #FDE68A' : '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: isFirst ? '0 12px 32px rgba(245,158,11,0.12)' : '0 4px 16px rgba(15,23,42,0.03)',
-        borderTopLeftRadius: 16, borderTopRightRadius: 16,
-        borderBottomLeftRadius: isFirst ? 16 : 8, borderBottomRightRadius: isFirst ? 16 : 8,
-        padding: isFirst ? '14px 4px' : '10px 4px',
+        flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+        background: isFirst ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.6)',
+        backdropFilter: 'blur(32px) saturate(2)',
+        WebkitBackdropFilter: 'blur(32px) saturate(2)',
+        border: isFirst ? '1.5px solid #FDE68A' : '1px solid rgba(255, 255, 255, 0.6)',
+        boxShadow: isFirst ? '0 16px 40px rgba(245,158,11,0.15)' : '0 8px 24px rgba(15,23,42,0.04)',
+        borderTopLeftRadius: 24, borderTopRightRadius: 24,
+        borderBottomLeftRadius: isFirst ? 24 : 16, borderBottomRightRadius: isFirst ? 24 : 16,
+        padding: isFirst ? '18px 8px' : '12px 6px',
         zIndex: isFirst ? 10 : 1, position: 'relative',
-        marginTop: isFirst ? -16 : 0, maxWidth: '33.33%'
+        marginTop: isFirst ? -24 : 0, maxWidth: '33.33%', cursor: 'pointer'
       }}
     >
       {isFirst && (
@@ -92,22 +101,28 @@ function PodiumCard({ user, rank, isSelf, tab }) {
   )
 }
 
-// ─── Row for rank 4+ ──────────────────────────────
 function LeaderRow({ user, rank, isSelf, tab }) {
+  const glowClasses = ['', 'glow-purple', 'glow-green', 'glow-amber', 'glow-sky']
+  const glowClass = glowClasses[rank % glowClasses.length]
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min((rank - 3) * 0.05 + 0.3, 0.8), duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ delay: Math.min((rank - 3) * 0.05 + 0.3, 0.8), duration: 0.4, ease: "easeOut" }}
+      className={`card-glow-hover ${glowClass}`}
       style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '12px', borderRadius: 16,
-        background: isSelf ? 'rgba(52, 97, 255, 0.08)' : 'transparent',
-        backdropFilter: isSelf ? 'blur(8px)' : 'none',
-        border: isSelf ? '1.5px solid rgba(52, 97, 255, 0.15)' : '1.5px solid transparent',
-        transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
-        marginBottom: 4,
-        position: 'relative'
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '12px 16px', borderRadius: 20,
+        background: isSelf ? 'rgba(52, 97, 255, 0.1)' : 'rgba(255, 255, 255, 0.5)',
+        backdropFilter: 'blur(20px) saturate(2)',
+        WebkitBackdropFilter: 'blur(20px) saturate(2)',
+        border: '1px solid',
+        borderColor: isSelf ? 'rgba(52, 97, 255, 0.2)' : 'rgba(255, 255, 255, 0.6)',
+        boxShadow: isSelf ? '0 8px 32px rgba(52,97,255,0.1)' : '0 4px 12px rgba(15,23,42,0.02)',
+        marginBottom: 8,
+        position: 'relative', cursor: 'pointer'
       }}
     >
       <span style={{
@@ -211,10 +226,10 @@ export default function LeaderboardPage() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 className="outfit-font" style={{ margin: '0 0 4px', fontSize: '2.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>
+            <h1 className="outfit-font" style={{ margin: '0 0 8px', fontSize: '2.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
               Reyting
             </h1>
-            <p style={{ margin: 0, color: '#64748B', fontSize: '0.9375rem', fontWeight: 500 }}>
+            <p style={{ margin: 0, color: '#64748B', fontSize: '1rem', fontWeight: 500 }}>
               Top 50 o'quvchilar ro'yxati
             </p>
           </div>
@@ -222,12 +237,13 @@ export default function LeaderboardPage() {
           {myRank >= 0 && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              background: 'white', border: '1px solid rgba(15,23,42,0.06)',
-              borderRadius: 100, padding: '10px 20px',
-              boxShadow: '0 4px 16px rgba(15,23,42,0.04)',
+              background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(24px) saturate(2)',
+              border: '1px solid rgba(52,97,255,0.15)',
+              borderRadius: 100, padding: '10px 24px',
+              boxShadow: '0 12px 32px rgba(52,97,255,0.08)',
             }}>
               <span style={{ color: '#475569', fontSize: '0.9375rem', fontWeight: 600 }}>Sizning o'rningiz:</span>
-              <span style={{ color: '#3461FF', fontWeight: 800, fontSize: '1.0625rem' }}>#{myRank + 1}</span>
+              <span style={{ color: '#3461FF', fontWeight: 900, fontSize: '1.25rem' }}>#{myRank + 1}</span>
             </div>
           )}
         </div>
@@ -298,19 +314,34 @@ export default function LeaderboardPage() {
 
       {/* List */}
       <div style={{
-        background: 'rgba(255, 255, 255, 0.65)', 
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderRadius: 24, padding: '12px',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 8px 32px rgba(15,23,42,0.03)',
+        background: 'rgba(255, 255, 255, 0.3)', 
+        backdropFilter: 'blur(40px) saturate(2.5)',
+        WebkitBackdropFilter: 'blur(40px) saturate(2.5)',
+        borderRadius: 32, padding: '20px',
+        border: '1px solid rgba(255, 255, 255, 0.6)',
+        boxShadow: '0 16px 40px rgba(15,23,42,0.05)',
       }}>
         {loading ? (
           <SkeletonRows />
         ) : leaders.length === 0 ? (
-          <div style={{ padding: '48px 20px', textAlign: 'center', color: '#94A3B8' }}>
-            <Trophy size={40} style={{ opacity: 0.2, marginBottom: 12 }} />
-            <p style={{ margin: 0, fontSize: '0.9375rem' }}>Hozircha hech kim yo'q</p>
+          <div style={{ 
+            padding: '80px 20px', textAlign: 'center', 
+            display: 'flex', flexDirection: 'column', alignItems: 'center' 
+          }}>
+            <div style={{ 
+              width: 64, height: 64, borderRadius: '50%', 
+              background: 'rgba(245,158,11,0.1)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              marginBottom: 16
+            }}>
+              <Trophy size={28} color="#F59E0B" />
+            </div>
+            <p className="outfit-font" style={{ margin: '0 0 8px', fontSize: '1.25rem', fontWeight: 800, color: '#0F172A' }}>
+              Hali hech kim yo'q
+            </p>
+            <p style={{ margin: 0, fontSize: '0.9375rem', color: '#64748B' }}>
+              Birinchi bo'lib reyting listiga kiring!
+            </p>
           </div>
         ) : (
           <>

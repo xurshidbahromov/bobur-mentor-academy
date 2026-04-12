@@ -153,8 +153,8 @@ export default function ProfilePage() {
       <motion.div variants={container} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* ── Avatar Hero Card ── */}
-        <motion.div variants={item} style={{
-          background: 'white', borderRadius: 28,
+        <motion.div variants={item} className="card-glow-hover" style={{
+          background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(20px) saturate(1.8)', WebkitBackdropFilter: 'blur(20px) saturate(1.8)', borderRadius: 28,
           border: '1px solid rgba(15,23,42,0.05)',
           boxShadow: '0 4px 24px rgba(15,23,42,0.04)',
           padding: '32px 24px', marginBottom: 16,
@@ -208,7 +208,7 @@ export default function ProfilePage() {
           {/* Name */}
           <h1 className="outfit-font" style={{
             margin: '0 0 4px', fontSize: '1.625rem', fontWeight: 900,
-            color: '#0F172A', letterSpacing: '-0.03em',
+            color: '#0F172A', letterSpacing: '-0.03em'
           }}>
             {name}
           </h1>
@@ -242,14 +242,14 @@ export default function ProfilePage() {
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16
           }}>
             {/* Progress Gauge */}
-            <motion.div variants={item} style={{
-              background: 'rgba(255, 255, 255, 0.7)', 
-              backdropFilter: 'blur(20px) saturate(1.6)',
-              WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+            <motion.div variants={item} className="card-glow-hover glow-purple" style={{
+              background: 'rgba(255, 255, 255, 0.4)', 
+              backdropFilter: 'blur(32px) saturate(2.5)',
+              WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
               borderRadius: 32, padding: '24px',
               display: 'flex', flexDirection: 'column',
-              border: '1px solid rgba(255, 255, 255, 0.5)',
-              boxShadow: '0 8px 32px rgba(139, 92, 246, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: '0 12px 40px rgba(139, 92, 246, 0.05)',
               position: 'relative', overflow: 'hidden'
             }}>
               {/* Decorative background tint */}
@@ -297,13 +297,13 @@ export default function ProfilePage() {
             </motion.div>
 
             {/* Activity Calendar */}
-            <motion.div variants={item} style={{
-              background: 'rgba(255, 255, 255, 0.7)', 
-              backdropFilter: 'blur(20px) saturate(1.6)',
-              WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+            <motion.div variants={item} className="card-glow-hover glow-green" style={{
+              background: 'rgba(255, 255, 255, 0.4)', 
+              backdropFilter: 'blur(32px) saturate(2.5)',
+              WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
               borderRadius: 32, padding: '24px',
-              border: '1px solid rgba(255, 255, 255, 0.5)',
-              boxShadow: '0 8px 32px rgba(16, 185, 129, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: '0 12px 40px rgba(16, 185, 129, 0.05)',
               display: 'flex', flexDirection: 'column',
               position: 'relative', overflow: 'hidden'
             }}>
@@ -370,14 +370,14 @@ export default function ProfilePage() {
             <motion.div
               key={i}
               style={{
-                background: 'rgba(255, 255, 255, 0.6)', 
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
+                background: 'rgba(255, 255, 255, 0.4)', 
+                backdropFilter: 'blur(32px) saturate(2.5)',
+                WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
                 borderRadius: 28, padding: '24px',
                 display: 'flex', flexDirection: 'column', gap: 20,
                 position: 'relative', overflow: 'hidden',
                 border: `1px solid rgba(255, 255, 255, 0.6)`,
-                boxShadow: '0 4px 20px rgba(15, 23, 42, 0.03)'
+                boxShadow: '0 12px 40px rgba(15, 23, 42, 0.04)'
               }}
             >
               {/* Subtle background color tint */}
@@ -420,24 +420,26 @@ export default function ProfilePage() {
 
         {/* ── Menu Groups ── */}
         {MENU_GROUPS.map((group, gi) => (
-          <motion.div key={gi} variants={item} style={{
-            background: 'white', borderRadius: 20,
-            border: '1px solid rgba(15,23,42,0.05)',
+          <motion.div key={gi} variants={item} className="card-glow-hover" style={{
+            background: 'rgba(255, 255, 255, 0.4)', borderRadius: 24,
+            backdropFilter: 'blur(32px) saturate(2.5)',
+            WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
             overflow: 'hidden', marginBottom: 12,
-            boxShadow: '0 2px 8px rgba(15,23,42,0.02)',
+            boxShadow: '0 8px 32px rgba(15,23,42,0.03)',
           }}>
             {group.items.map((m, j) => (
               <Link
                 key={j}
                 to={m.to}
                 style={{
-                  padding: '15px 16px', display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16,
                   textDecoration: 'none',
-                  borderBottom: j < group.items.length - 1 ? '1px solid rgba(15,23,42,0.04)' : 'none',
+                  borderBottom: j < group.items.length - 1 ? '1px solid rgba(255,255,255,0.4)' : 'none',
                   WebkitTapHighlightColor: 'transparent',
-                  transition: 'background 0.15s',
+                  transition: 'background 0.2s ease',
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 <div style={{
@@ -465,16 +467,19 @@ export default function ProfilePage() {
           <motion.div
             whileTap={{ scale: 0.98 }}
             onClick={handleSignOut}
+            className="card-glow-hover glow-red"
             style={{
-              background: 'white', borderRadius: 20,
-              border: '1px solid rgba(239,68,68,0.12)',
-              padding: '15px 16px', display: 'flex', alignItems: 'center', gap: 14,
+              background: 'rgba(255,255,255,0.4)', borderRadius: 24,
+              backdropFilter: 'blur(32px) saturate(2.5)',
+              WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
+              border: '1px solid rgba(255,255,255,0.5)',
+              padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16,
               cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-              boxShadow: '0 2px 8px rgba(239,68,68,0.04)',
-              transition: 'background 0.15s',
+              boxShadow: '0 8px 32px rgba(239,68,68,0.05)',
+              transition: 'background 0.2s',
             }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.02)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'white'}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.05)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
             <div style={{
               width: 38, height: 38, borderRadius: 11,

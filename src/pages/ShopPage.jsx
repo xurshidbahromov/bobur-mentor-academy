@@ -1,56 +1,67 @@
 // src/pages/ShopPage.jsx
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Coins, MessageCircle, Zap, Star, Rocket, Crown, Gift, ArrowRight, Sparkles } from 'lucide-react'
+import { Coins, ShoppingCart, CreditCard, Zap, Star, Rocket, Crown, Gift, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'sonner'
+import PaymentModal from '../components/PaymentModal'
 
 const PACKAGES = [
   {
     id: 'starter', icon: Zap, color: '#3461FF', bg: 'rgba(52,97,255,0.08)',
     name: 'Starter', coins: 100, price: '5 000', perCoin: '50 so\'m/coin',
+    glowClass: '', // Default blue
   },
   {
     id: 'standard', icon: Star, color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)',
     name: 'Standard', coins: 300, price: '12 000', perCoin: '40 so\'m/coin',
-    badge: 'Mashhur',
+    badge: 'Mashhur', glowClass: 'glow-purple',
   },
   {
     id: 'pro', icon: Rocket, color: '#0EA5E9', bg: 'rgba(14,165,233,0.1)',
     name: 'Pro', coins: 600, price: '21 000', perCoin: '35 so\'m/coin',
-    popular: true, badge: 'Eng ko\'p tanlanadi',
+    popular: true, badge: 'Eng ko\'p tanlanadi', glowClass: 'glow-sky',
   },
   {
     id: 'premium', icon: Crown, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
     name: 'Premium', coins: 1200, price: '36 000', perCoin: '30 so\'m/coin',
-    badge: 'Tejamkor',
+    badge: 'Tejamkor', glowClass: 'glow-amber',
   },
   {
     id: 'ultimate', icon: Gift, color: '#10B981', bg: 'rgba(16,185,129,0.1)',
     name: 'Ultimate', coins: 2500, price: '62 500', perCoin: '25 so\'m/coin',
-    badge: 'Eng foydali',
+    badge: 'Eng foydali', glowClass: 'glow-green',
   },
 ]
 
 const STEPS = [
-  { emoji: '👇', text: '"Sotib olish" tugmasini bosing' },
-  { emoji: '💬', text: 'Telegram orqali bizga murojaat qiling' },
-  { emoji: '💳', text: 'To\'lovni amalga oshiring (karta yoki naqd)' },
-  { emoji: '⚡', text: 'Coinlar 5–10 daqiqa ichida hisobingizga tushadi' },
+  { 
+    icon: ShoppingCart, color: '#3461FF', bg: 'rgba(52,97,255,0.1)',
+    title: 'Paket tanlang',
+    text: 'Kerakli coin paketini tanlang va "Sotib olish" tugmasini bosing'
+  },
+  { 
+    icon: CreditCard, color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)',
+    title: "To'lov usulini tanlang",
+    text: "Click yoki Payme orqali qulay va xavfsiz to'lov amalga oshiring"
+  },
+  { 
+    icon: CheckCircle2, color: '#10B981', bg: 'rgba(16,185,129,0.1)',
+    title: 'Tasdiqlang',
+    text: "To'lov ma'lumotlarini tekshirib, tasdiqlash tugmasini bosing"
+  },
+  { 
+    icon: Zap, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
+    title: 'Coinlar tushadi',
+    text: "To'lov tasdiqlangandan so'ng coinlar darhol hisobingizga qo'shiladi"
+  },
 ]
 
 export default function ShopPage() {
   const { profile } = useAuth()
   const coins = profile?.coins ?? 0
   const [customCoins, setCustomCoins] = useState('')
-  const [selected, setSelected] = useState(null)
-
-  const handleBuy = (pkg) => {
-    const text = encodeURIComponent(
-      `Assalomu alaykum! "${pkg.name}" paketni xohlayman — ${pkg.coins} coin (${pkg.price} so'm).`
-    )
-    window.open(`https://t.me/BMASupport?text=${text}`, '_blank')
-  }
+  const [selectedPkg, setSelectedPkg] = useState(null)
 
   const handleCustomBuy = () => {
     const amount = parseInt(customCoins)
@@ -58,11 +69,17 @@ export default function ShopPage() {
       toast.error('Kamida 10 coin kiriting!')
       return
     }
-    const estimatedPrice = (amount * 35).toLocaleString()
-    const text = encodeURIComponent(
-      `Assalomu alaykum! ${amount} coin sotib olmoqchiman (~${estimatedPrice} so'm).`
-    )
-    window.open(`https://t.me/BMASupport?text=${text}`, '_blank')
+    // Custom amount — create a virtual package and open modal
+    const price = amount * 35
+    setSelectedPkg({
+      id: 'custom',
+      name: `Maxsus (${amount} coin)`,
+      coins: amount,
+      price: price.toLocaleString(),
+      perCoin: '35 so\'m/coin',
+      color: '#3461FF',
+      bg: 'rgba(52,97,255,0.08)',
+    })
   }
 
   const estimatedPrice = customCoins ? (parseInt(customCoins || 0) * 35).toLocaleString() : null
@@ -80,7 +97,7 @@ export default function ShopPage() {
           margin: '0 0 6px', fontSize: '2.5rem', fontWeight: 900,
           color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1,
         }}>
-          Do'kon 🛍️
+          Do'kon
         </h1>
         <p style={{ margin: 0, color: '#64748B', fontSize: '0.9375rem', fontWeight: 500 }}>
           Qulfli darslarni ochish uchun coin sotib oling
@@ -92,14 +109,14 @@ export default function ShopPage() {
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: 'blur(20px) saturate(2)',
-          WebkitBackdropFilter: 'blur(20px) saturate(2)',
+          background: 'rgba(255, 255, 255, 0.4)',
+          backdropFilter: 'blur(32px) saturate(2.5)',
+          WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
           border: '1px solid rgba(245,158,11,0.25)',
-          borderRadius: 24, padding: '24px',
+          borderRadius: 32, padding: '24px',
           marginBottom: 36,
           display: 'flex', alignItems: 'center', gap: 20,
-          boxShadow: '0 8px 32px rgba(245,158,11,0.08)',
+          boxShadow: '0 12px 40px rgba(245,158,11,0.1)',
           position: 'relative', overflow: 'hidden',
         }}
       >
@@ -154,16 +171,17 @@ export default function ShopPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 + i * 0.07, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -3, boxShadow: isPopular ? `0 16px 40px ${pkg.color}30` : '0 8px 24px rgba(15,23,42,0.08)' }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => handleBuy(pkg)}
+              whileHover={{ y: -3, boxShadow: isPopular ? `0 16px 40px ${pkg.color}30` : '0 12px 32px rgba(15,23,42,0.05)' }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => setSelectedPkg(pkg)}
+              className={`card-glow-hover ${pkg.glowClass || ''}`}
               style={{
-                background: isPopular ? `rgba(255, 255, 255, 0.8)` : 'rgba(255, 255, 255, 0.65)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: isPopular ? `1.5px solid ${pkg.color}60` : '1px solid rgba(255, 255, 255, 0.5)',
-                borderRadius: 20, padding: '20px',
-                boxShadow: isPopular ? `0 8px 32px ${pkg.color}15` : '0 4px 20px rgba(15,23,42,0.04)',
+                background: isPopular ? `rgba(255, 255, 255, 0.8)` : 'rgba(255, 255, 255, 0.4)',
+                backdropFilter: 'blur(24px) saturate(2)',
+                WebkitBackdropFilter: 'blur(24px) saturate(2)',
+                border: isPopular ? `1.5px solid ${pkg.color}60` : '1px solid rgba(255, 255, 255, 0.6)',
+                borderRadius: 24, padding: '20px',
+                boxShadow: isPopular ? `0 12px 40px ${pkg.color}15` : '0 8px 32px rgba(15,23,42,0.03)',
                 position: 'relative', cursor: 'pointer',
                 transition: 'all 0.3s ease',
               }}
@@ -244,12 +262,12 @@ export default function ShopPage() {
         initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.38, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: 'rgba(255, 255, 255, 0.6)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.5)',
-          borderRadius: 24, padding: '24px', marginBottom: 24,
-          boxShadow: '0 8px 24px rgba(15,23,42,0.03)',
+          background: 'rgba(255, 255, 255, 0.4)',
+          backdropFilter: 'blur(32px) saturate(2)',
+          WebkitBackdropFilter: 'blur(32px) saturate(2)',
+          border: '1px solid rgba(255, 255, 255, 0.6)',
+          borderRadius: 32, padding: '28px', marginBottom: 24,
+          boxShadow: '0 12px 40px rgba(15,23,42,0.04)',
         }}
       >
         <p className="outfit-font" style={{ margin: '0 0 4px', fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>
@@ -275,6 +293,7 @@ export default function ShopPage() {
             style={{
               flex: 1, border: 'none', outline: 'none', background: 'transparent',
               fontSize: '1.0625rem', fontWeight: 700, color: '#0F172A', fontFamily: 'inherit',
+              borderRadius: 0, WebkitAppearance: 'none'
             }}
           />
           <AnimatePresence mode="wait">
@@ -305,8 +324,8 @@ export default function ShopPage() {
             WebkitTapHighlightColor: 'transparent',
           }}
         >
-          <MessageCircle size={18} />
-          Telegram orqali buyurtma berish
+          <ArrowRight size={18} />
+          To'lovga o'tish
         </motion.button>
       </motion.div>
 
@@ -315,56 +334,67 @@ export default function ShopPage() {
         initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.46, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: 'white', border: '1px solid rgba(15,23,42,0.05)',
-          borderRadius: 24, padding: '24px',
-          boxShadow: '0 2px 12px rgba(15,23,42,0.02)',
+          background: 'rgba(255, 255, 255, 0.4)', 
+          backdropFilter: 'blur(32px) saturate(2.5)',
+          WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
+          border: '1px solid rgba(255,255,255,0.6)',
+          borderRadius: 32, padding: '28px',
+          boxShadow: '0 12px 32px rgba(15,23,42,0.03)',
         }}
       >
         <p className="outfit-font" style={{ margin: '0 0 20px', fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>
           Qanday sotib olish mumkin?
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {STEPS.map((step, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 + i * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                display: 'flex', alignItems: 'flex-start', gap: 16,
-                paddingBottom: i < STEPS.length - 1 ? 18 : 0,
-                position: 'relative',
-              }}
-            >
-              {/* Connector line */}
-              {i < STEPS.length - 1 && (
+          {STEPS.map((step, i) => {
+            const StepIcon = step.icon
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 + i * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 16,
+                  paddingBottom: i < STEPS.length - 1 ? 20 : 0,
+                  position: 'relative',
+                }}
+              >
+                {/* Connector line */}
+                {i < STEPS.length - 1 && (
+                  <div style={{
+                    position: 'absolute', left: 19, top: 42,
+                    width: 2, height: 'calc(100% - 2px)',
+                    background: `linear-gradient(to bottom, ${step.color}40, transparent)`,
+                    borderRadius: 2,
+                  }} />
+                )}
+
+                {/* Step icon */}
                 <div style={{
-                  position: 'absolute', left: 19, top: 38,
-                  width: 2, height: '100%',
-                  background: 'linear-gradient(to bottom, rgba(15,23,42,0.06), transparent)',
-                  borderRadius: 2,
-                }} />
-              )}
+                  width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+                  background: step.bg,
+                  border: `1px solid ${step.color}30`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginTop: 14,
+                }}>
+                  <StepIcon size={18} color={step.color} strokeWidth={2} />
+                </div>
 
-              {/* Step dot */}
-              <div style={{
-                width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                background: i === 0 ? '#EFF6FF' : '#F8FAFC',
-                border: `1px solid ${i === 0 ? 'rgba(52,97,255,0.15)' : 'rgba(15,23,42,0.06)'}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '1.125rem',
-              }}>
-                {step.emoji}
-              </div>
-
-              <div style={{ paddingTop: 10 }}>
-                <span style={{ color: '#334155', fontSize: '0.9375rem', fontWeight: 500, lineHeight: 1.5 }}>
-                  {step.text}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+                <div style={{ paddingTop: 8, flex: 1 }}>
+                  <p className="outfit-font" style={{ margin: '0 0 3px', fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>
+                    {step.title}
+                  </p>
+                  <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5 }}>
+                    {step.text}
+                  </p>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       </motion.div>
+      {/* Payment Modal */}
+      <PaymentModal pkg={selectedPkg} onClose={() => setSelectedPkg(null)} />
 
     </div>
   )

@@ -96,7 +96,7 @@ function Field({ icon: Icon, type: baseType, label, placeholder, value, onChange
         <input type={type} placeholder={placeholder} value={value} onChange={onChange}
           required={required} minLength={minLength}
           onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-          style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '0.9375rem', color: '#0F172A', fontFamily: 'inherit' }}
+          style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '1rem', color: '#0F172A', fontFamily: 'inherit', borderRadius: 0, WebkitAppearance: 'none' }}
         />
         {isPw && (
           <button type="button" onClick={() => setShow(s => !s)}
@@ -121,13 +121,13 @@ function BrandPanelSignup() {
   return (
     <div style={{
       width: '460px', flexShrink: 0,
-      background: 'linear-gradient(145deg, #1e1b4b 0%, #0f172a 55%, #0d1117 100%)',
+      background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E3A8A 100%)',
       padding: '44px 52px',
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
       position: 'relative', overflow: 'hidden',
     }}>
-      <div style={{ position: 'absolute', top: '-100px', right: '-80px', width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.22) 0%, transparent 65%)', filter: 'blur(30px)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', bottom: '-100px', left: '-60px', width: 360, height: 360, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.15) 0%, transparent 60%)', filter: 'blur(25px)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: '-100px', right: '-80px', width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.4) 0%, transparent 65%)', filter: 'blur(40px)', animation: 'floatOrb 15s ease-in-out infinite', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '-100px', left: '-60px', width: 360, height: 360, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.3) 0%, transparent 60%)', filter: 'blur(40px)', animation: 'floatOrbReverse 18s ease-in-out infinite', pointerEvents: 'none' }} />
 
       {/* Logo */}
       <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', position: 'relative', zIndex: 1 }}>
