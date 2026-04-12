@@ -128,9 +128,6 @@ export default function BottomTabNav() {
         @media (min-width: 768px) {
           .mobile-bottom-nav { display: none !important; }
         }
-        @media (max-width: 767px) {
-          body { padding-bottom: calc(80px + env(safe-area-inset-bottom, 16px)) !important; }
-        }
       `}</style>
     </>
   )

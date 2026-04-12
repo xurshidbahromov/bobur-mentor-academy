@@ -105,7 +105,13 @@ function AppShell() {
   // Also render /about inside auth shell when user is already logged in
   if (isAuthAppPage || (path === '/about' && user)) {
     return (
-      <div className="auth-layout" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)', display: 'flex', position: 'relative', overflow: 'hidden' }}>
+      <div className="auth-layout" style={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)', 
+        display: 'flex', 
+        position: 'relative', 
+        overflow: 'hidden' 
+      }}>
         {/* Subtle Light Aura Orbs for the Dashboard */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
           <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.07) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'floatOrb 20s ease-in-out infinite' }} />
@@ -114,13 +120,34 @@ function AppShell() {
         
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', width: '100%', height: '100vh' }}>
           <AuthSidebar />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+          {/* Scroll container — gets padding so content clears the navbar */}
+          <div 
+            id="main-scroll-container"
+            style={{ 
+              flex: 1, 
+              minWidth: 0, 
+              height: '100vh', 
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              // iOS momentum scroll
+              WebkitOverflowScrolling: 'touch',
+              // Prevent scroll chaining into Telegram's native view
+              overscrollBehavior: 'none',
+              // Space for fixed BottomTabNav (navbar height ~80px + safe area)
+              paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 16px))',
+              scrollbarWidth: 'none', // Firefox
+            }}
+          >
+            <style>{`
+              #main-scroll-container::-webkit-scrollbar { display: none; }
+            `}</style>
             <main style={{ flex: 1 }}>
               <AppRoutes />
             </main>
-            <BottomTabNav />
           </div>
         </div>
+        {/* BottomTabNav is OUTSIDE the scroll div so it stays fixed correctly */}
+        <BottomTabNav />
       </div>
     )
   }
