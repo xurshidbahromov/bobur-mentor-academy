@@ -161,28 +161,35 @@ export default function AdminLayout() {
 
 // ── Reusable sidebar body ────────────────────────────────
 function SidebarContents({ open, location, profile, onSignOut, onClose }) {
+  const tStyle = { 
+    opacity: open ? 1 : 0, 
+    maxWidth: open ? 200 : 0, 
+    overflow: 'hidden', 
+    whiteSpace: 'nowrap',
+    transition: 'opacity 0.2s, max-width 0.3s cubic-bezier(0.23, 1, 0.32, 1)' 
+  }
+
   return (
     <>
       {/* Logo + close (mobile) */}
       <div style={{ padding: '20px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', minHeight: 64 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden' }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <span style={{ color: 'white', fontWeight: 900, fontSize: '0.875rem' }}>BM</span>
           </div>
-          {open && <span style={{ fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>BMA Admin</span>}
+          <span style={{ ...tStyle, fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', maxWidth: open ? 180 : 0 }}>BMA Admin</span>
         </div>
         {onClose && (
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: 4 }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: 4, flexShrink: 0 }}>
             <X size={20} />
           </button>
         )}
       </div>
 
       {/* Nav links */}
-      <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
-        {open && (
-          <p style={{ margin: '0 0 8px 4px', fontSize: '0.7rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Menyu</p>
-        )}
+      <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto', overflowX: 'hidden' }}>
+        <p style={{ ...tStyle, margin: '0 0 8px 4px', fontSize: '0.7rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Menyu</p>
+        
         {MENU.map(item => {
           const isActive = location.pathname === item.path
           return (
@@ -192,19 +199,19 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
               title={!open ? item.name : undefined}
               style={{
                 display: 'flex', alignItems: 'center', gap: 12,
-                padding: `12px ${open ? 14 : 0}px`,
-                justifyContent: open ? 'flex-start' : 'center',
+                padding: '12px 14px',
                 borderRadius: 12, textDecoration: 'none',
                 color: isActive ? 'white' : '#94A3B8',
                 background: isActive ? '#3461FF' : 'transparent',
                 fontWeight: isActive ? 700 : 500,
-                transition: 'all 0.2s',
+                transition: 'background 0.2s, color 0.2s',
                 whiteSpace: 'nowrap',
+                overflow: 'hidden',
               }}
             >
               <item.icon size={20} style={{ flexShrink: 0 }} />
-              {open && <span style={{ flex: 1 }}>{item.name}</span>}
-              {open && isActive && <ChevronRight size={16} />}
+              <span style={{ ...tStyle, flex: 1 }}>{item.name}</span>
+              <ChevronRight size={16} style={{ flexShrink: 0, opacity: isActive && open ? 1 : 0, transition: 'opacity 0.2s' }} />
             </Link>
           )
         })}
@@ -212,20 +219,18 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
 
       {/* Footer: user + signout */}
       <div style={{ padding: '16px 12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        {open && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, padding: '8px 4px' }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#334155', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {profile?.avatar_url
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, padding: '4px 4px', overflow: 'hidden', opacity: open ? 1 : 0, maxHeight: open ? 60 : 0, transition: 'opacity 0.2s, max-height 0.3s cubic-bezier(0.23, 1, 0.32, 1)' }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#334155', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {profile?.avatar_url
                 ? <img src={profile.avatar_url} alt="admin" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <span style={{ fontWeight: 800, fontSize: '0.875rem', color: '#94A3B8' }}>{(profile?.full_name || 'A')[0]}</span>
-              }
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile?.full_name || 'Admin'}</p>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>Boshqaruvchi</p>
-            </div>
+            }
           </div>
-        )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile?.full_name || 'Admin'}</p>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>Boshqaruvchi</p>
+          </div>
+        </div>
         <button
           onClick={onSignOut}
           title={!open ? 'Chiqish' : undefined}
@@ -234,14 +239,12 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
             border: '1px solid rgba(239,68,68,0.2)',
             background: 'rgba(239,68,68,0.05)',
             color: '#EF4444',
-            display: 'flex', alignItems: 'center',
-            justifyContent: open ? 'flex-start' : 'center',
-            gap: 10, cursor: 'pointer', fontWeight: 600,
-            transition: 'background 0.2s',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 10, cursor: 'pointer', fontWeight: 600, overflow: 'hidden',
           }}
         >
-          <LogOut size={18} />
-          {open && <span>Chiqish</span>}
+          <LogOut size={18} style={{ flexShrink: 0 }} />
+          <span style={{ ...tStyle, maxWidth: open ? 120 : 0 }}>Chiqish</span>
         </button>
       </div>
     </>

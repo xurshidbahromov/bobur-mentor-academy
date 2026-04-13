@@ -491,7 +491,7 @@ export default function DashboardPage() {
                   <div style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.2)', borderRadius: 100, fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Yangi</div>
                   <h3 className="outfit-font" style={{ margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>Testlar Markazi</h3>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.9375rem', opacity: 0.9, lineHeight: 1.4, maxWidth: '85%' }}>
+                <p style={{ margin: 0, fontSize: '0.9375rem', color: 'rgba(255, 255, 255, 0.9)', lineHeight: 1.4, maxWidth: '85%' }}>
                   Darslarga va Umumiy mavzularga oid random qiziqarli savollarni yechib bilimingizni charxlang!
                 </p>
               </div>
