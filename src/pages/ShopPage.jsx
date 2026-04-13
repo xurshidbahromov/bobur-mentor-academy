@@ -109,14 +109,14 @@ export default function ShopPage() {
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: 'rgba(255, 255, 255, 0.4)',
-          backdropFilter: 'blur(32px) saturate(2.5)',
-          WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
-          border: '1px solid rgba(245,158,11,0.25)',
+          background: 'rgba(255, 255, 255, 0.78)',
+          backdropFilter: 'blur(32px) saturate(2)',
+          WebkitBackdropFilter: 'blur(32px) saturate(2)',
+          border: '1px solid var(--border-medium)',
           borderRadius: 32, padding: '24px',
           marginBottom: 36,
           display: 'flex', alignItems: 'center', gap: 20,
-          boxShadow: '0 12px 40px rgba(245,158,11,0.1)',
+          boxShadow: '0 8px 32px rgba(15, 23, 42, 0.05)',
           position: 'relative', overflow: 'hidden',
         }}
       >
@@ -171,19 +171,19 @@ export default function ShopPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 + i * 0.07, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -3, boxShadow: isPopular ? `0 16px 40px ${pkg.color}30` : '0 12px 32px rgba(15,23,42,0.05)' }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setSelectedPkg(pkg)}
               className={`card-glow-hover ${pkg.glowClass || ''}`}
               style={{
-                background: isPopular ? `rgba(255, 255, 255, 0.8)` : 'rgba(255, 255, 255, 0.4)',
+                background: isPopular ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.78)',
                 backdropFilter: 'blur(24px) saturate(2)',
                 WebkitBackdropFilter: 'blur(24px) saturate(2)',
-                border: isPopular ? `1.5px solid ${pkg.color}60` : '1px solid rgba(255, 255, 255, 0.6)',
+                border: isPopular ? `1.8px solid ${pkg.color}` : '1px solid var(--border-medium)',
                 borderRadius: 24, padding: '20px',
-                boxShadow: isPopular ? `0 12px 40px ${pkg.color}15` : '0 8px 32px rgba(15,23,42,0.03)',
+                boxShadow: isPopular ? `0 12px 40px ${pkg.color}15` : '0 8px 32px rgba(15,23,42,0.04)',
                 position: 'relative', cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.25s ease',
               }}
             >
               {/* Popular glow ring */}
@@ -262,12 +262,12 @@ export default function ShopPage() {
         initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.38, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: 'rgba(255, 255, 255, 0.4)',
+          background: 'rgba(255, 255, 255, 0.78)',
           backdropFilter: 'blur(32px) saturate(2)',
           WebkitBackdropFilter: 'blur(32px) saturate(2)',
-          border: '1px solid rgba(255, 255, 255, 0.6)',
+          border: '1px solid var(--border-medium)',
           borderRadius: 32, padding: '28px', marginBottom: 24,
-          boxShadow: '0 12px 40px rgba(15,23,42,0.04)',
+          boxShadow: '0 12px 40px rgba(15,23,42,0.05)',
         }}
       >
         <p className="outfit-font" style={{ margin: '0 0 4px', fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>
@@ -334,12 +334,12 @@ export default function ShopPage() {
         initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.46, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: 'rgba(255, 255, 255, 0.4)', 
-          backdropFilter: 'blur(32px) saturate(2.5)',
-          WebkitBackdropFilter: 'blur(32px) saturate(2.5)',
-          border: '1px solid rgba(255,255,255,0.6)',
+          background: 'rgba(255, 255, 255, 0.78)', 
+          backdropFilter: 'blur(32px) saturate(2)',
+          WebkitBackdropFilter: 'blur(32px) saturate(2)',
+          border: '1px solid var(--border-medium)',
           borderRadius: 32, padding: '28px',
-          boxShadow: '0 12px 32px rgba(15,23,42,0.03)',
+          boxShadow: '0 12px 40px rgba(15,23,42,0.05)',
         }}
       >
         <p className="outfit-font" style={{ margin: '0 0 20px', fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>

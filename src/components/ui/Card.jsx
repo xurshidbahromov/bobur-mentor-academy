@@ -11,15 +11,15 @@ export default function Card({
   ...props 
 }) {
   const baseStyle = {
-    background: glass ? 'var(--bg-glass)' : 'var(--bg-surface)',
-    backdropFilter: glass ? 'var(--blur-glass)' : 'none',
-    WebkitBackdropFilter: glass ? 'var(--blur-glass)' : 'none',
-    border: '1px solid var(--border-glass)',
+    background: glass ? 'rgba(255, 255, 255, 0.82)' : 'var(--bg-surface)',
+    backdropFilter: glass ? 'blur(20px) saturate(2)' : 'none',
+    WebkitBackdropFilter: glass ? 'blur(20px) saturate(2)' : 'none',
+    border: '1.2px solid var(--border-medium)',
     borderRadius: 'var(--radius-card)',
     padding,
     overflow: 'hidden',
     position: 'relative',
-    boxShadow: 'var(--shadow-glass)',
+    boxShadow: '0 8px 32px rgba(15, 23, 42, 0.05)',
     ...style
   }
 
@@ -37,9 +37,8 @@ export default function Card({
                         border-color 0.35s ease;
           }
           .ui-card--hover:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-elevated);
-            border-color: var(--border-medium);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
           }
           .ui-card--hover:active {
             transform: scale(0.985) translateY(-1px);

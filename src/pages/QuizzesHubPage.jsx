@@ -143,12 +143,18 @@ export default function QuizzesHubPage() {
                           whileTap={{ scale: 0.97 }}
                           onClick={() => navigate(`/quiz/${lesson.id}`)}
                           style={{
-                            background: 'white', padding: '16px 20px', borderRadius: 20,
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                            boxShadow: '0 4px 16px rgba(15,23,42,0.05)',
-                            border: '1px solid rgba(15,23,42,0.04)',
+                            background: 'rgba(255, 255, 255, 0.78)',
+                            padding: '16px 20px',
+                            borderRadius: 20,
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
+                            border: '1px solid var(--border-medium)',
                             cursor: 'pointer',
                             WebkitTapHighlightColor: 'transparent',
+                            backdropFilter: 'blur(24px) saturate(2)',
+                            WebkitBackdropFilter: 'blur(24px) saturate(2)',
                           }}
                         >
                           <div style={{ flex: 1, minWidth: 0, paddingRight: 12 }}>

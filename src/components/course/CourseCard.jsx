@@ -7,8 +7,7 @@ export default function CourseCard({ course }) {
 
   const subjects = ['Algebra', 'Geometriya', 'Trigonometriya', 'Analiz', 'Arifmetika']
   const subject = subjects[Math.abs((course.title || '').charCodeAt(0)) % subjects.length]
-  const accentColors = ['#3461FF', '#10B981', '#06B6D4', '#8B5CF6', '#F59E0B']
-  const accent = accentColors[Math.abs((course.title || '').charCodeAt(0)) % accentColors.length]
+  const accent = '#3461FF' // Unified brand color as requested
 
   return (
     <Link to="/dashboard" style={{ textDecoration: 'none', display: 'flex' }}>
@@ -18,14 +17,14 @@ export default function CourseCard({ course }) {
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
-          background: 'var(--bg-glass)',
-          backdropFilter: 'var(--blur-glass)',
-          WebkitBackdropFilter: 'var(--blur-glass)',
-          border: '1px solid var(--border-glass)',
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(20px) saturate(2)',
+          WebkitBackdropFilter: 'blur(20px) saturate(2)',
+          border: '1.2px solid var(--border-medium)',
           borderRadius: 'var(--radius-card)',
           overflow: 'hidden',
-          boxShadow: 'var(--shadow-glass)',
-          transition: 'transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1)',
+          boxShadow: '0 8px 32px rgba(15, 23, 42, 0.05)',
+          transition: 'transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s cubic-bezier(0.22,1,0.36,1)',
           cursor: 'pointer'
         }}
       >

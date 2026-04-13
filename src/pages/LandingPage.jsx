@@ -141,7 +141,7 @@ export default function LandingPage() {
             borderRadius: 'var(--radius-card)',
             padding: '48px',
             color: 'white',
-            border: '1px solid rgba(255,255,255,0.15)',
+            border: '1.2px solid rgba(255,255,255,0.25)',
             position: 'relative',
             overflow: 'hidden',
             boxShadow: 'var(--shadow-xl)'
@@ -241,8 +241,8 @@ export default function LandingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
             {[
               { title: 'Imtihonga Tayyorlov', desc: 'DTM va Milliy Sertifikat testlariga professional tayyorgarlik.', color: '#3461FF' },
-              { title: 'Sertifikat Kursi', desc: "Matematik bilimingizni rasmiy sertifikat bilan tasdiqlang.", color: '#8B5CF6' },
-              { title: 'Asosiy Matematika', desc: "Algebra, geometriya va analitika asoslarini puxta o'rganing.", color: '#10B981' },
+              { title: 'Sertifikat Kursi', desc: "Matematik bilimingizni rasmiy sertifikat bilan tasdiqlang.", color: '#3461FF' },
+              { title: 'Asosiy Matematika', desc: "Algebra, geometriya va analitika asoslarini puxta o'rganing.", color: '#3461FF' },
             ].map((item) => (
               <div key={item.title} style={{
                 background: 'white', borderRadius: 'var(--radius-card)',

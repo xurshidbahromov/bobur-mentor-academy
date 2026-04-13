@@ -51,11 +51,11 @@ function PodiumCard({ user, rank, isSelf, tab }) {
       className={`card-glow-hover ${glowClass}`}
       style={{
         flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-        background: isFirst ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.6)',
+        background: isFirst ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.78)',
         backdropFilter: 'blur(32px) saturate(2)',
         WebkitBackdropFilter: 'blur(32px) saturate(2)',
-        border: isFirst ? '1.5px solid #FDE68A' : '1px solid rgba(255, 255, 255, 0.6)',
-        boxShadow: isFirst ? '0 16px 40px rgba(245,158,11,0.15)' : '0 8px 24px rgba(15,23,42,0.04)',
+        border: isFirst ? '1.8px solid #FDE68A' : '1px solid var(--border-medium)',
+        boxShadow: isFirst ? '0 16px 40px rgba(245,158,11,0.1)' : '0 8px 32px rgba(15,23,42,0.05)',
         borderTopLeftRadius: 24, borderTopRightRadius: 24,
         borderBottomLeftRadius: isFirst ? 24 : 16, borderBottomRightRadius: isFirst ? 24 : 16,
         padding: isFirst ? '18px 8px' : '12px 6px',
@@ -115,12 +115,11 @@ function LeaderRow({ user, rank, isSelf, tab }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '12px 16px', borderRadius: 20,
-        background: isSelf ? 'rgba(52, 97, 255, 0.1)' : 'rgba(255, 255, 255, 0.5)',
-        backdropFilter: 'blur(20px) saturate(2)',
-        WebkitBackdropFilter: 'blur(20px) saturate(2)',
-        border: '1px solid',
-        borderColor: isSelf ? 'rgba(52, 97, 255, 0.2)' : 'rgba(255, 255, 255, 0.6)',
-        boxShadow: isSelf ? '0 8px 32px rgba(52,97,255,0.1)' : '0 4px 12px rgba(15,23,42,0.02)',
+        background: 'rgba(255, 255, 255, 0.78)',
+        backdropFilter: 'blur(24px) saturate(2)',
+        WebkitBackdropFilter: 'blur(24px) saturate(2)',
+        border: '1px solid var(--border-medium)',
+        boxShadow: '0 4px 12px rgba(15,23,42,0.04)',
         marginBottom: 8,
         position: 'relative', cursor: 'pointer'
       }}
@@ -128,7 +127,7 @@ function LeaderRow({ user, rank, isSelf, tab }) {
       <span style={{
         width: 24, textAlign: 'center', fontWeight: 800,
         fontSize: '0.9375rem', flexShrink: 0,
-        color: rank < 10 ? '#3461FF' : '#94A3B8',
+        color: '#94A3B8',
       }}>
         {rank + 1}
       </span>
@@ -138,7 +137,7 @@ function LeaderRow({ user, rank, isSelf, tab }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <p className="outfit-font" style={{
           margin: '0 0 2px', fontWeight: 700, fontSize: '0.9375rem',
-          color: isSelf ? '#1E3A8A' : '#0F172A',
+          color: '#0F172A',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {user.full_name || 'O\'quvchi'}
@@ -244,10 +243,10 @@ export default function LeaderboardPage() {
           {myRank >= 0 && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(24px) saturate(2)',
-              border: '1px solid rgba(52,97,255,0.15)',
+              background: 'rgba(255, 255, 255, 0.78)', backdropFilter: 'blur(24px) saturate(2)',
+              border: '1px solid var(--border-medium)',
               borderRadius: 100, padding: '10px 24px',
-              boxShadow: '0 12px 32px rgba(52,97,255,0.08)',
+              boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
             }}>
               <span style={{ color: '#475569', fontSize: '0.9375rem', fontWeight: 600 }}>Sizning o'rningiz:</span>
               <span style={{ color: '#3461FF', fontWeight: 900, fontSize: '1.25rem' }}>#{myRank + 1}</span>
@@ -323,12 +322,12 @@ export default function LeaderboardPage() {
 
       {/* List */}
       <div style={{
-        background: 'rgba(255, 255, 255, 0.3)', 
-        backdropFilter: 'blur(40px) saturate(2.5)',
-        WebkitBackdropFilter: 'blur(40px) saturate(2.5)',
+        background: 'rgba(255, 255, 255, 0.78)', 
+        backdropFilter: 'blur(32px) saturate(2)',
+        WebkitBackdropFilter: 'blur(32px) saturate(2)',
         borderRadius: 32, padding: '20px',
-        border: '1px solid rgba(255, 255, 255, 0.6)',
-        boxShadow: '0 16px 40px rgba(15,23,42,0.05)',
+        border: '1px solid var(--border-medium)',
+        boxShadow: '0 12px 40px rgba(15, 23, 42, 0.05)',
       }}>
         {loading ? (
           <SkeletonRows />

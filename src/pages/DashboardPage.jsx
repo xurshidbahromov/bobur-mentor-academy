@@ -36,8 +36,7 @@ function CoinBadge({ coins }) {
 function CourseCard({ course, index, onNavigate }) {
   // Placeholder progress (can be replaced with real user progress calculation)
   const progressPct = 0 
-  const glowClasses = ['', 'glow-purple', 'glow-green', 'glow-amber', 'glow-sky']
-  const glowClass = glowClasses[(index || 0) % glowClasses.length]
+  const glowClass = '' // Standardized look for all cards as requested
 
   return (
     <motion.button
@@ -48,14 +47,14 @@ function CourseCard({ course, index, onNavigate }) {
       onClick={() => onNavigate(`/courses/${course.id}`)}
       style={{
         position: 'relative', width: '100%', 
-        background: 'rgba(255, 255, 255, 0.75)', 
-        backdropFilter: 'blur(20px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-        border: '1px solid rgba(255, 255, 255, 0.5)', 
+        background: 'rgba(255, 255, 255, 0.78)', 
+        backdropFilter: 'blur(24px) saturate(2)',
+        WebkitBackdropFilter: 'blur(24px) saturate(2)',
+        border: '1px solid var(--border-medium)', 
         cursor: 'pointer',
         padding: '24px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
         display: 'flex', flexDirection: 'column', gap: 16,
-        borderRadius: 28, boxShadow: '0 8px 32px rgba(15,23,42,0.04)',
+        borderRadius: 28, boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
         overflow: 'hidden'
       }}
     >
@@ -424,12 +423,12 @@ export default function DashboardPage() {
             >
               <div className="card-glow-hover" style={{
                 display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
-                background: 'rgba(255, 255, 255, 0.5)', 
-                backdropFilter: 'blur(24px) saturate(2)',
-                WebkitBackdropFilter: 'blur(24px) saturate(2)',
-                border: '1px solid rgba(52,97,255,0.14)',
+                background: 'rgba(255, 255, 255, 0.78)', 
+                backdropFilter: 'blur(32px) saturate(2)',
+                WebkitBackdropFilter: 'blur(32px) saturate(2)',
+                border: '1px solid var(--border-medium)',
                 borderRadius: 24, padding: '20px 24px',
-                boxShadow: '0 12px 32px rgba(52,97,255,0.06)',
+                boxShadow: '0 12px 32px rgba(15,23,42,0.05)',
                 flexWrap: 'wrap',
                 position: 'relative', overflow: 'hidden'
               }}>
