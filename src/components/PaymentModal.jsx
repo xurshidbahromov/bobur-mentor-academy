@@ -1,8 +1,8 @@
 // src/components/PaymentModal.jsx
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShieldCheck, ChevronRight, Zap, Star, Rocket, Crown, Gift } from 'lucide-react'
-import { useState } from 'react'
-
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 const PAYMENT_METHODS = [
   {
     id: 'click',
@@ -50,7 +50,12 @@ export default function PaymentModal({ pkg, onClose }) {
     }
   }
 
-  return (
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) return null
+
+  return createPortal(
     <AnimatePresence>
       {pkg && (
         <>
@@ -259,6 +264,7 @@ export default function PaymentModal({ pkg, onClose }) {
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
