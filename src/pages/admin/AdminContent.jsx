@@ -1,390 +1,361 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, Eye, EyeOff, Search, ChevronDown, ChevronRight, Video, HelpCircle, BookOpen, Clock } from 'lucide-react'
+import {
+  Plus, Edit2, Trash2, ChevronRight, ChevronLeft,
+  Video, HelpCircle, BookOpen, Clock, Search, Eye, EyeOff
+} from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
+
+// ── Shared input style ──────────────────────────────────
+const inp = {
+  width: '100%', padding: '14px 16px', borderRadius: 12,
+  background: '#0F172A', border: '1px solid rgba(255,255,255,0.1)',
+  color: 'white', fontSize: '1rem', outline: 'none', boxSizing: 'border-box'
+}
+
+// ── Skeleton for dark admin bg ──────────────────────────
+function DarkSkeleton({ h = 60, r = 16, mb = 12 }) {
+  return <div className="skeleton-loader" style={{ height: h, borderRadius: r, marginBottom: mb, background: '#334155' }} />
+}
+
+// ── Slide page animation ────────────────────────────────
+const slideVariants = {
+  enter: dir => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: dir => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+}
 
 export default function AdminContent() {
   const [courses, setCourses] = useState([])
   const [lessons, setLessons] = useState({})
   const [quizzes, setQuizzes] = useState({})
   const [loading, setLoading] = useState(true)
+
+  // drilldown state
+  const [view, setView] = useState('courses')   // 'courses' | 'lessons' | 'quizzes'
+  const [direction, setDirection] = useState(1) // 1 = forward, -1 = back
+  const [selCourse, setSelCourse] = useState(null)
+  const [selLesson, setSelLesson] = useState(null)
+
+  // search
   const [searchTerm, setSearchTerm] = useState('')
-  
-  // UI State
-  const [expandedCourse, setExpandedCourse] = useState(null)
-  const [expandedLesson, setExpandedLesson] = useState(null)
 
-  // Modals
-  const [modalType, setModalType] = useState(null) // 'course', 'lesson', 'quiz'
+  // modal
+  const [modalType, setModalType] = useState(null)
   const [editingItem, setEditingItem] = useState(null)
-  const [parentId, setParentId] = useState(null) // For lessons (courseId) and quizzes (lessonId)
 
-  // Form states
+  // forms
   const [courseForm, setCourseForm] = useState({ title: '', description: '', is_published: false })
   const [lessonForm, setLessonForm] = useState({ title: '', description: '', youtube_video_id: '', is_free: false, is_published: false })
-  const [quizForm, setQuizForm] = useState({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 600 })
+  const [quizForm, setQuizForm] = useState({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60 })
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  useEffect(() => { fetchData() }, [])
 
   async function fetchData() {
     setLoading(true)
-    // Fetch courses
-    const { data: cData, error: cErr } = await supabase.from('courses').select('*').order('created_at', { ascending: false })
-    if (cErr) { toast.error("Xatolik: " + cErr.message); setLoading(false); return }
-    
-    // Fetch lessons
-    const { data: lData, error: lErr } = await supabase.from('lessons').select('*').order('order_index', { ascending: true })
-    if (lErr) { toast.error("Xatolik: " + lErr.message); setLoading(false); return }
-    
-    // Fetch quizzes
-    const { data: qData, error: qErr } = await supabase.from('quizzes').select('*').order('order_index', { ascending: true })
-    if (qErr) { toast.error("Xatolik: " + qErr.message); setLoading(false); return }
-
+    const [{ data: cData }, { data: lData }, { data: qData }] = await Promise.all([
+      supabase.from('courses').select('*').order('created_at', { ascending: false }),
+      supabase.from('lessons').select('*').order('order_index', { ascending: true }),
+      supabase.from('quizzes').select('*').order('order_index', { ascending: true }),
+    ])
     setCourses(cData || [])
-
-    // Map lessons to courses
-    const lessonsMap = {}
-    lData?.forEach(l => {
-      if (!lessonsMap[l.course_id]) lessonsMap[l.course_id] = []
-      lessonsMap[l.course_id].push(l)
-    })
-    setLessons(lessonsMap)
-
-    // Map quizzes to lessons
-    const quizzesMap = {}
-    qData?.forEach(q => {
-      if (!quizzesMap[q.lesson_id]) quizzesMap[q.lesson_id] = []
-      quizzesMap[q.lesson_id].push(q)
-    })
-    setQuizzes(quizzesMap)
-
+    const lm = {}; lData?.forEach(l => { if (!lm[l.course_id]) lm[l.course_id] = []; lm[l.course_id].push(l) })
+    setLessons(lm)
+    const qm = {}; qData?.forEach(q => { if (!qm[q.lesson_id]) qm[q.lesson_id] = []; qm[q.lesson_id].push(q) })
+    setQuizzes(qm)
     setLoading(false)
   }
 
-  // ── COURSES ─────────────────────────────────────────────────────────────
-  const openCourseModal = (course = null) => {
-    if (course) {
-      setEditingItem(course)
-      setCourseForm({ title: course.title, description: course.description || '', is_published: course.is_published })
-    } else {
-      setEditingItem(null)
-      setCourseForm({ title: '', description: '', is_published: false })
-    }
-    setModalType('course')
+  // ── navigation helpers ──
+  function enterLessons(course) {
+    setSelCourse(course); setDirection(1); setView('lessons'); setSearchTerm('')
+  }
+  function enterQuizzes(lesson) {
+    setSelLesson(lesson); setDirection(1); setView('quizzes'); setSearchTerm('')
+  }
+  function goBack() {
+    setDirection(-1)
+    if (view === 'quizzes') setView('lessons')
+    else { setView('courses'); setSelCourse(null) }
+    setSearchTerm('')
   }
 
-  const saveCourse = async (e) => {
+  // ── CRUD ────────────────────────────────────────────
+  async function saveCourse(e) {
     e.preventDefault()
-    if (editingItem) {
-      const { error } = await supabase.from('courses').update(courseForm).eq('id', editingItem.id)
-      if (error) toast.error(error.message)
-      else { toast.success("Mavzu yangilandi"); setModalType(null); fetchData() }
-    } else {
-      const { error } = await supabase.from('courses').insert([courseForm])
-      if (error) toast.error(error.message)
-      else { toast.success("Yangi mavzu yaratildi"); setModalType(null); fetchData() }
-    }
+    const op = editingItem
+      ? supabase.from('courses').update(courseForm).eq('id', editingItem.id)
+      : supabase.from('courses').insert([courseForm])
+    const { error } = await op
+    if (error) toast.error(error.message)
+    else { toast.success(editingItem ? 'Mavzu yangilandi' : 'Mavzu yaratildi'); closeModal(); fetchData() }
   }
-
-  const deleteCourse = async (id) => {
+  async function deleteCourse(id) {
     if (!confirm("O'chiramanmi? Barcha darslar o'chib ketadi!")) return
     const { error } = await supabase.from('courses').delete().eq('id', id)
     if (error) toast.error(error.message)
     else { toast.success("Mavzu o'chirildi"); fetchData() }
   }
-
-  // ── LESSONS ─────────────────────────────────────────────────────────────
-  const openLessonModal = (courseId, lesson = null) => {
-    setParentId(courseId)
-    if (lesson) {
-      setEditingItem(lesson)
-      setLessonForm({ 
-        title: lesson.title, description: lesson.description || '', 
-        youtube_video_id: lesson.youtube_video_id || '', is_free: lesson.is_free, is_published: lesson.is_published 
-      })
-    } else {
-      setEditingItem(null)
-      setLessonForm({ title: '', description: '', youtube_video_id: '', is_free: false, is_published: false })
-    }
-    setModalType('lesson')
-  }
-
-  const saveLesson = async (e) => {
+  async function saveLesson(e) {
     e.preventDefault()
-    if (editingItem) {
-      const { error } = await supabase.from('lessons').update(lessonForm).eq('id', editingItem.id)
-      if (error) toast.error(error.message)
-      else { toast.success("Dars yangilandi"); setModalType(null); fetchData() }
-    } else {
-      const { error } = await supabase.from('lessons').insert([{ ...lessonForm, course_id: parentId }])
-      if (error) toast.error(error.message)
-      else { toast.success("Yangi dars yaratildi"); setModalType(null); fetchData() }
-    }
+    const op = editingItem
+      ? supabase.from('lessons').update(lessonForm).eq('id', editingItem.id)
+      : supabase.from('lessons').insert([{ ...lessonForm, course_id: selCourse.id }])
+    const { error } = await op
+    if (error) toast.error(error.message)
+    else { toast.success(editingItem ? 'Dars yangilandi' : 'Dars yaratildi'); closeModal(); fetchData() }
   }
-
-  const deleteLesson = async (id) => {
+  async function deleteLesson(id) {
     if (!confirm("O'chiramanmi? Barcha testlar o'chib ketadi!")) return
     const { error } = await supabase.from('lessons').delete().eq('id', id)
     if (error) toast.error(error.message)
     else { toast.success("Dars o'chirildi"); fetchData() }
   }
-
-  // ── QUIZZES ─────────────────────────────────────────────────────────────
-  const openQuizModal = (lessonId, quiz = null) => {
-    setParentId(lessonId)
-    if (quiz) {
-      setEditingItem(quiz)
-      setQuizForm({ 
-        question: quiz.question, option_a: quiz.option_a, option_b: quiz.option_b, 
-        option_c: quiz.option_c || '', option_d: quiz.option_d || '', 
-        correct_option: quiz.correct_option, explanation: quiz.explanation || '',
-        time_limit: quiz.time_limit || 600
-      })
-    } else {
-      setEditingItem(null)
-      setQuizForm({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 600 })
-    }
-    setModalType('quiz')
-  }
-
-  const saveQuiz = async (e) => {
+  async function saveQuiz(e) {
     e.preventDefault()
-    // Agar time_limit DB da xatolik bersa (chunki columns yo'q bo'lishi mumkin), vaqtinchalik ignor qilishimiz kerak bo'ladi.
-    // Xurshid akaga SQL da ALTER table qildirtirish kerak
-    const payload = { ...quizForm }
-    
-    if (editingItem) {
-      const { error } = await supabase.from('quizzes').update(payload).eq('id', editingItem.id)
-      if (error) toast.error("Xatolik (Agar column haqida xato bo'lsa, SQL ni yurgizing): " + error.message)
-      else { toast.success("Savol yangilandi"); setModalType(null); fetchData() }
-    } else {
-      const { error } = await supabase.from('quizzes').insert([{ ...payload, lesson_id: parentId }])
-      if (error) toast.error("Xatolik (Agar column haqida xato bo'lsa, SQL ni yurgizing): " + error.message)
-      else { toast.success("Yangi savol yaratildi"); setModalType(null); fetchData() }
-    }
+    const op = editingItem
+      ? supabase.from('quizzes').update(quizForm).eq('id', editingItem.id)
+      : supabase.from('quizzes').insert([{ ...quizForm, lesson_id: selLesson.id }])
+    const { error } = await op
+    if (error) toast.error(error.message)
+    else { toast.success(editingItem ? 'Savol yangilandi' : 'Savol yaratildi'); closeModal(); fetchData() }
   }
-
-  const deleteQuiz = async (id) => {
-    if (!confirm("Ushbu savolni o'chirmoqchimisiz?")) return
+  async function deleteQuiz(id) {
+    if (!confirm("Savolni o'chirmoqchimisiz?")) return
     const { error } = await supabase.from('quizzes').delete().eq('id', id)
     if (error) toast.error(error.message)
     else { toast.success("Savol o'chirildi"); fetchData() }
   }
 
+  // ── modal openers ──
+  function openCourseModal(c = null) {
+    setEditingItem(c)
+    setCourseForm(c ? { title: c.title, description: c.description || '', is_published: c.is_published } : { title: '', description: '', is_published: false })
+    setModalType('course')
+  }
+  function openLessonModal(l = null) {
+    setEditingItem(l)
+    setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false })
+    setModalType('lesson')
+  }
+  function openQuizModal(q = null) {
+    setEditingItem(q)
+    setQuizForm(q ? { question: q.question, option_a: q.option_a, option_b: q.option_b, option_c: q.option_c || '', option_d: q.option_d || '', correct_option: q.correct_option, explanation: q.explanation || '', time_limit: q.time_limit || 60 } : { question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60 })
+    setModalType('quiz')
+  }
+  function closeModal() { setModalType(null); setEditingItem(null) }
+
+  // ── filtered data ──
   const filteredCourses = courses.filter(c => c.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredLessons = (selCourse ? lessons[selCourse.id] || [] : []).filter(l => l.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredQuizzes = (selLesson ? quizzes[selLesson.id] || [] : []).filter(q => q.question.toLowerCase().includes(searchTerm.toLowerCase()))
+
+  // ── breadcrumb ──
+  const breadcrumb = [
+    { label: 'Mavzular', action: view !== 'courses' ? () => { setDirection(-1); setView('courses'); setSelCourse(null); setSelLesson(null); setSearchTerm('') } : null },
+    ...(selCourse ? [{ label: selCourse.title, action: view === 'quizzes' ? () => { setDirection(-1); setView('lessons'); setSelLesson(null); setSearchTerm('') } : null }] : []),
+    ...(selLesson ? [{ label: selLesson.title, action: null }] : []),
+  ]
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 800 }}>Dars Boshqaruvi</h1>
-          <p style={{ margin: '4px 0 0', color: '#94A3B8' }}>Mavzular, Darslar va Quizzes ni bir joydan boshqaring.</p>
+    <div>
+
+      {/* ── Page header with breadcrumb ── */}
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+          {breadcrumb.map((b, i) => (
+            <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {i > 0 && <ChevronRight size={14} color="#475569" />}
+              <button
+                onClick={b.action || undefined}
+                style={{ background: 'none', border: 'none', padding: 0, cursor: b.action ? 'pointer' : 'default', fontWeight: b.action ? 600 : 800, fontSize: '0.875rem', color: b.action ? '#64748B' : 'white', transition: 'color 0.2s', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              >
+                {b.label}
+              </button>
+            </span>
+          ))}
         </div>
-        <button 
-          onClick={() => openCourseModal()}
-          style={{ background: '#3461FF', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
-        >
-          <Plus size={20} /> Yangi Mavzu (Kurs)
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 800 }}>
+              {view === 'courses' ? 'Dars Boshqaruvi' : view === 'lessons' ? selCourse?.title : selLesson?.title}
+            </h1>
+            <p style={{ margin: '4px 0 0', color: '#94A3B8', fontSize: '0.875rem' }}>
+              {view === 'courses' ? 'Mavzularni va darslarni boshqaring.' : view === 'lessons' ? `${filteredLessons.length} ta dars` : `${filteredQuizzes.length} ta savol`}
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            {view !== 'courses' && (
+              <button onClick={goBack} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)', padding: '10px 18px', borderRadius: 12, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
+                <ChevronLeft size={16} /> Orqaga
+              </button>
+            )}
+            <button
+              onClick={() => view === 'courses' ? openCourseModal() : view === 'lessons' ? openLessonModal() : openQuizModal()}
+              style={{ background: view === 'quizzes' ? '#10B981' : '#3461FF', color: 'white', border: 'none', padding: '10px 20px', borderRadius: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.9375rem' }}
+            >
+              <Plus size={18} />
+              {view === 'courses' ? 'Yangi Mavzu' : view === 'lessons' ? 'Yangi Dars' : 'Yangi Savol'}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div style={{ position: 'relative', marginBottom: '24px' }}>
-        <Search size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#64748B' }} />
-        <input 
-          type="text" placeholder="Mavzular bo'yicha qidirish..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: '16px', background: '#1E293B', border: '1px solid rgba(255,255,255,0.05)', color: 'white', outline: 'none', fontSize: '1rem' }}
+      {/* ── Search ── */}
+      <div style={{ position: 'relative', marginBottom: 24 }}>
+        <Search size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#64748B' }} />
+        <input
+          type="text"
+          placeholder={view === 'courses' ? "Mavzu qidirish..." : view === 'lessons' ? "Dars qidirish..." : "Savol qidirish..."}
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{ ...inp, paddingLeft: 44, borderRadius: 16, background: '#1E293B', border: '1px solid rgba(255,255,255,0.05)' }}
         />
       </div>
 
-      {loading ? (
-        <div style={{ color: '#64748B', textAlign: 'center', padding: 40 }}>Yuklanmoqda...</div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {filteredCourses.map(course => (
-            <div key={course.id} style={{ background: '#1E293B', borderRadius: 20, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-              {/* COURSE HEADER */}
-              <div 
-                onClick={() => setExpandedCourse(expandedCourse === course.id ? null : course.id)}
-                style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: expandedCourse === course.id ? 'rgba(255,255,255,0.02)' : 'transparent' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(52,97,255,0.1)', color: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <BookOpen size={20} />
-                  </div>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      {course.title}
-                      {!course.is_published && <span style={{ fontSize: '0.75rem', padding: '2px 8px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, color: '#94A3B8', fontWeight: 600 }}>Draft</span>}
-                    </h3>
-                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748B' }}>{(lessons[course.id] || []).length} ta dars</p>
-                  </div>
+      {/* ── Animated view area ── */}
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <AnimatePresence mode="wait" custom={direction}>
+          {loading ? (
+            <motion.div key="skeleton" initial="enter" animate="center" exit="exit" variants={slideVariants} custom={direction} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+              {[1, 2, 3, 4].map(i => <DarkSkeleton key={i} h={72} />)}
+            </motion.div>
+          ) : view === 'courses' ? (
+            <motion.div key="courses" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+              {filteredCourses.length === 0 ? (
+                <EmptyState text="Mavzular topilmadi" sub="Yangi mavzu yarating." />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {filteredCourses.map(course => (
+                    <CourseRow
+                      key={course.id}
+                      course={course}
+                      lessonCount={(lessons[course.id] || []).length}
+                      onEnter={() => enterLessons(course)}
+                      onEdit={e => { e.stopPropagation(); openCourseModal(course) }}
+                      onDelete={e => { e.stopPropagation(); deleteCourse(course.id) }}
+                    />
+                  ))}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <button onClick={(e) => { e.stopPropagation(); openCourseModal(course) }} style={{ padding: 8, background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8, color: '#3461FF', cursor: 'pointer' }}><Edit2 size={16} /></button>
-                  <button onClick={(e) => { e.stopPropagation(); deleteCourse(course.id) }} style={{ padding: 8, background: 'rgba(239, 68, 68, 0.1)', border: 'none', borderRadius: 8, color: '#EF4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
-                  {expandedCourse === course.id ? <ChevronDown color="#94A3B8" /> : <ChevronRight color="#94A3B8" />}
+              )}
+            </motion.div>
+          ) : view === 'lessons' ? (
+            <motion.div key="lessons" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+              {filteredLessons.length === 0 ? (
+                <EmptyState text="Darslar topilmadi" sub="Yangi dars qo'shish uchun yuqoridagi tugmani bosing." />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {filteredLessons.map(lesson => (
+                    <LessonRow
+                      key={lesson.id}
+                      lesson={lesson}
+                      quizCount={(quizzes[lesson.id] || []).length}
+                      onEnter={() => enterQuizzes(lesson)}
+                      onEdit={e => { e.stopPropagation(); openLessonModal(lesson) }}
+                      onDelete={e => { e.stopPropagation(); deleteLesson(lesson.id) }}
+                    />
+                  ))}
                 </div>
-              </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div key="quizzes" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+              {filteredQuizzes.length === 0 ? (
+                <EmptyState text="Savollar topilmadi" sub="Yangi savol qo'shing." />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {filteredQuizzes.map((quiz, idx) => (
+                    <QuizRow
+                      key={quiz.id}
+                      quiz={quiz}
+                      idx={idx}
+                      onEdit={() => openQuizModal(quiz)}
+                      onDelete={() => deleteQuiz(quiz.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-              {/* COURSE LESSONS BODY */}
-              <AnimatePresence>
-                {expandedCourse === course.id && (
-                  <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} style={{ overflow: 'hidden' }}>
-                    <div style={{ padding: '0 24px 24px 72px' }}>
-                      <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.05)', margin: '0 0 16px' }} />
-                      
-                      {(lessons[course.id] || []).map(lesson => (
-                        <div key={lesson.id} style={{ background: '#0F172A', borderRadius: 16, padding: '16px', marginBottom: 16, border: '1px solid rgba(255,255,255,0.03)' }}>
-                          <div 
-                            onClick={() => setExpandedLesson(expandedLesson === lesson.id ? null : lesson.id)}
-                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                              <Video size={18} color="#8B5CF6" />
-                              <div>
-                                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>{lesson.title}</h4>
-                                <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B' }}>
-                                  {lesson.youtube_video_id ? 'Video biriktirilgan' : 'Video yoq'} • {(quizzes[lesson.id] || []).length} ta savol
-                                </p>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <button onClick={(e) => { e.stopPropagation(); openLessonModal(course.id, lesson) }} style={{ padding: 6, background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, color: '#94A3B8', cursor: 'pointer' }}><Edit2 size={14} /></button>
-                              <button onClick={(e) => { e.stopPropagation(); deleteLesson(lesson.id) }} style={{ padding: 6, background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 6, color: '#EF4444', cursor: 'pointer' }}><Trash2 size={14} /></button>
-                            </div>
-                          </div>
-
-                          {/* QUIZZES ACCORDION */}
-                          <AnimatePresence>
-                            {expandedLesson === lesson.id && (
-                              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} style={{ overflow: 'hidden' }}>
-                                <div style={{ marginTop: 16, padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: 12 }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                    <h5 style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem' }}>Dars Savollari (Quizzes)</h5>
-                                    <button onClick={() => openQuizModal(lesson.id)} style={{ background: '#10B981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', fontSize: '0.8125rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                      <Plus size={14} /> Savol
-                                    </button>
-                                  </div>
-                                  
-                                  {(quizzes[lesson.id] || []).length === 0 ? (
-                                    <p style={{ color: '#64748B', fontSize: '0.8125rem', margin: 0 }}>Ushbu dars uchun hali savollar kiritilmagan.</p>
-                                  ) : (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                      {(quizzes[lesson.id] || []).map((quiz, idx) => (
-                                        <div key={quiz.id} style={{ padding: '12px', background: '#1E293B', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                          <div style={{ WebkitLineClamp: 1, textOverflow: 'ellipsis', overflow: 'hidden', fontSize: '0.875rem', paddingRight: 16 }}>
-                                            <span style={{ color: '#3461FF', fontWeight: 700, marginRight: 6 }}>{idx + 1}.</span> {quiz.question}
-                                            {quiz.time_limit && <span style={{ marginLeft: 10, color: '#F59E0B', fontSize: '0.75rem' }}><Clock size={10} style={{display:'inline', marginRight:2}}/> {quiz.time_limit}s</span>}
-                                          </div>
-                                          <div style={{ display: 'flex', gap: 8 }}>
-                                            <button onClick={() => openQuizModal(lesson.id, quiz)} style={{ background:'transparent', border:'none', color:'#94A3B8', cursor:'pointer' }}><Edit2 size={14}/></button>
-                                            <button onClick={() => deleteQuiz(quiz.id)} style={{ background:'transparent', border:'none', color:'#EF4444', cursor:'pointer' }}><Trash2 size={14}/></button>
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-
-                        </div>
-                      ))}
-
-                      <button 
-                        onClick={() => openLessonModal(course.id)}
-                        style={{ width: '100%', background: 'rgba(52,97,255,0.1)', color: '#3461FF', border: '1px dashed rgba(52,97,255,0.3)', padding: '12px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                      >
-                        <Plus size={18} /> Yangi Dars Qo'shish
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ── MODALS ── */}
+      {/* ── MODAL ── */}
       <AnimatePresence>
         {modalType && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} style={{ background: '#1E293B', width: '100%', maxWidth: modalType === 'quiz' ? 600 : 500, borderRadius: 24, padding: 32, border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
-              <h2 style={{ margin: '0 0 24px', fontSize: '1.5rem', fontWeight: 800 }}>
-                {modalType === 'course' ? (editingItem ? "Mavzuni Tahrirlash" : "Yangi Mavzu Qo'shish") :
-                 modalType === 'lesson' ? (editingItem ? "Darsni Tahrirlash" : "Yangi Dars Qo'shish") :
-                 (editingItem ? "Savolni Tahrirlash" : "Yangi Savol Qo'shish")}
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.22 }}
+              style={{ background: '#1E293B', width: '100%', maxWidth: modalType === 'quiz' ? 600 : 500, borderRadius: 24, padding: 32, border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}
+            >
+              <h2 style={{ margin: '0 0 24px', fontSize: '1.375rem', fontWeight: 800 }}>
+                {modalType === 'course' ? (editingItem ? 'Mavzuni Tahrirlash' : "Yangi Mavzu Qo'shish") :
+                 modalType === 'lesson' ? (editingItem ? 'Darsni Tahrirlash' : "Yangi Dars Qo'shish") :
+                 (editingItem ? 'Savolni Tahrirlash' : "Yangi Savol Qo'shish")}
               </h2>
-              
-              <form onSubmit={modalType === 'course' ? saveCourse : modalType === 'lesson' ? saveLesson : saveQuiz} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                
+
+              <form
+                onSubmit={modalType === 'course' ? saveCourse : modalType === 'lesson' ? saveLesson : saveQuiz}
+                style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+              >
                 {/* COURSE FORM */}
-                {modalType === 'course' && (
-                  <>
-                    <input required placeholder="Mavzu Nomi" value={courseForm.title} onChange={e => setCourseForm({...courseForm, title: e.target.value})} style={modalInputStyle} />
-                    <textarea placeholder="Mavzu haqida ma'lumot (ixtiyoriy)" value={courseForm.description} onChange={e => setCourseForm({...courseForm, description: e.target.value})} rows={3} style={modalInputStyle} />
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.875rem' }}>
-                      <input type="checkbox" checked={courseForm.is_published} onChange={e => setCourseForm({...courseForm, is_published: e.target.checked})} style={{ width: 18, height: 18 }} />
-                      Chop etish (Online)
-                    </label>
-                  </>
-                )}
+                {modalType === 'course' && <>
+                  <input required placeholder="Mavzu Nomi *" value={courseForm.title} onChange={e => setCourseForm({ ...courseForm, title: e.target.value })} style={inp} />
+                  <textarea placeholder="Tavsif (ixtiyoriy)" value={courseForm.description} onChange={e => setCourseForm({ ...courseForm, description: e.target.value })} rows={3} style={inp} />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
+                    <input type="checkbox" checked={courseForm.is_published} onChange={e => setCourseForm({ ...courseForm, is_published: e.target.checked })} style={{ width: 18, height: 18 }} />
+                    Chop etish (Online)
+                  </label>
+                </>}
 
                 {/* LESSON FORM */}
-                {modalType === 'lesson' && (
-                  <>
-                    <input required placeholder="Dars Nomi" value={lessonForm.title} onChange={e => setLessonForm({...lessonForm, title: e.target.value})} style={modalInputStyle} />
-                    <input placeholder="YouTube Video ID (masalan: dQw4w9WgXcQ)" value={lessonForm.youtube_video_id} onChange={e => setLessonForm({...lessonForm, youtube_video_id: e.target.value})} style={modalInputStyle} />
-                    <textarea placeholder="Dars ta'rifi" value={lessonForm.description} onChange={e => setLessonForm({...lessonForm, description: e.target.value})} rows={3} style={modalInputStyle} />
-                    <div style={{ display: 'flex', gap: 20 }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.875rem' }}>
-                        <input type="checkbox" checked={lessonForm.is_free} onChange={e => setLessonForm({...lessonForm, is_free: e.target.checked})} style={{ width: 18, height: 18 }} />
-                        Bepul Dars
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.875rem' }}>
-                        <input type="checkbox" checked={lessonForm.is_published} onChange={e => setLessonForm({...lessonForm, is_published: e.target.checked})} style={{ width: 18, height: 18 }} />
-                        Chop etish (Online)
-                      </label>
-                    </div>
-                  </>
-                )}
+                {modalType === 'lesson' && <>
+                  <input required placeholder="Dars Nomi *" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })} style={inp} />
+                  <input placeholder="YouTube Video ID (masalan: dQw4w9WgXcQ)" value={lessonForm.youtube_video_id} onChange={e => setLessonForm({ ...lessonForm, youtube_video_id: e.target.value })} style={inp} />
+                  <textarea placeholder="Dars ta'rifi" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })} rows={3} style={inp} />
+                  <div style={{ display: 'flex', gap: 24 }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
+                      <input type="checkbox" checked={lessonForm.is_free} onChange={e => setLessonForm({ ...lessonForm, is_free: e.target.checked })} style={{ width: 18, height: 18 }} />
+                      Bepul Dars
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
+                      <input type="checkbox" checked={lessonForm.is_published} onChange={e => setLessonForm({ ...lessonForm, is_published: e.target.checked })} style={{ width: 18, height: 18 }} />
+                      Chop etish
+                    </label>
+                  </div>
+                </>}
 
                 {/* QUIZ FORM */}
-                {modalType === 'quiz' && (
-                  <>
-                    <textarea required placeholder="Savol matni" value={quizForm.question} onChange={e => setQuizForm({...quizForm, question: e.target.value})} rows={2} style={modalInputStyle} />
-                    
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                      <div>
-                        <label style={{ fontSize: '0.75rem', color: '#94A3B8' }}>Vaqti (sekund)</label>
-                        <input required type="number" placeholder="Vaqti (sekund)" value={quizForm.time_limit} onChange={e => setQuizForm({...quizForm, time_limit: e.target.value})} style={modalInputStyle} />
-                      </div>
-                      <div />
-                      <input required placeholder="Variant A" value={quizForm.option_a} onChange={e => setQuizForm({...quizForm, option_a: e.target.value})} style={modalInputStyle} />
-                      <input required placeholder="Variant B" value={quizForm.option_b} onChange={e => setQuizForm({...quizForm, option_b: e.target.value})} style={modalInputStyle} />
-                      <input placeholder="Variant C (ixtiyoriy)" value={quizForm.option_c} onChange={e => setQuizForm({...quizForm, option_c: e.target.value})} style={modalInputStyle} />
-                      <input placeholder="Variant D (ixtiyoriy)" value={quizForm.option_d} onChange={e => setQuizForm({...quizForm, option_d: e.target.value})} style={modalInputStyle} />
-                    </div>
-
+                {modalType === 'quiz' && <>
+                  <textarea required placeholder="Savol matni *" value={quizForm.question} onChange={e => setQuizForm({ ...quizForm, question: e.target.value })} rows={2} style={inp} />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <input required placeholder="Variant A *" value={quizForm.option_a} onChange={e => setQuizForm({ ...quizForm, option_a: e.target.value })} style={inp} />
+                    <input required placeholder="Variant B *" value={quizForm.option_b} onChange={e => setQuizForm({ ...quizForm, option_b: e.target.value })} style={inp} />
+                    <input placeholder="Variant C" value={quizForm.option_c} onChange={e => setQuizForm({ ...quizForm, option_c: e.target.value })} style={inp} />
+                    <input placeholder="Variant D" value={quizForm.option_d} onChange={e => setQuizForm({ ...quizForm, option_d: e.target.value })} style={inp} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
-                      <label style={{ fontSize: '0.875rem', marginBottom: 8, display: 'block', color: '#94A3B8' }}>To'g'ri javobni belgilang</label>
-                      <select value={quizForm.correct_option} onChange={e => setQuizForm({...quizForm, correct_option: e.target.value})} style={{...modalInputStyle, WebkitAppearance: 'none'}}>
+                      <label style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'block', marginBottom: 6 }}>To'g'ri javob</label>
+                      <select value={quizForm.correct_option} onChange={e => setQuizForm({ ...quizForm, correct_option: e.target.value })} style={{ ...inp, WebkitAppearance: 'none' }}>
                         <option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option>
                       </select>
                     </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'block', marginBottom: 6 }}>Vaqt (sekund)</label>
+                      <input type="number" value={quizForm.time_limit} onChange={e => setQuizForm({ ...quizForm, time_limit: Number(e.target.value) })} style={inp} />
+                    </div>
+                  </div>
+                  <textarea placeholder="Izoh (ixtiyoriy)" value={quizForm.explanation} onChange={e => setQuizForm({ ...quizForm, explanation: e.target.value })} rows={2} style={inp} />
+                </>}
 
-                    <textarea placeholder="Tushuntirish (ixtiyoriy)" value={quizForm.explanation} onChange={e => setQuizForm({...quizForm, explanation: e.target.value})} rows={2} style={modalInputStyle} />
-                  </>
-                )}
-
-                <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-                  <button type="button" onClick={() => setModalType(null)} style={{ flex: 1, padding: 14, borderRadius: 12, background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', fontWeight: 600, cursor: 'pointer' }}>Bekor qilish</button>
-                  <button type="submit" style={{ flex: 1, padding: 14, borderRadius: 12, background: '#3461FF', border: 'none', color: 'white', fontWeight: 700, cursor: 'pointer' }}>Saqlash</button>
+                <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                  <button type="button" onClick={closeModal} style={{ flex: 1, padding: 14, borderRadius: 12, background: 'rgba(255,255,255,0.06)', border: 'none', color: 'white', fontWeight: 600, cursor: 'pointer' }}>Bekor</button>
+                  <button type="submit" style={{ flex: 1, padding: 14, borderRadius: 12, background: modalType === 'quiz' ? '#10B981' : '#3461FF', border: 'none', color: 'white', fontWeight: 700, cursor: 'pointer' }}>Saqlash</button>
                 </div>
               </form>
             </motion.div>
@@ -395,4 +366,87 @@ export default function AdminContent() {
   )
 }
 
-const modalInputStyle = { width: '100%', padding: '14px 16px', borderRadius: '12px', background: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '1rem', outline: 'none' }
+// ── Row components ──────────────────────────────────────
+function CourseRow({ course, lessonCount, onEnter, onEdit, onDelete }) {
+  return (
+    <motion.div
+      whileHover={{ x: 2 }}
+      onClick={onEnter}
+      style={{ background: '#1E293B', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer', transition: 'box-shadow 0.2s' }}
+    >
+      <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(52,97,255,0.12)', color: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <BookOpen size={20} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</h3>
+          {!course.is_published && <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(255,255,255,0.08)', borderRadius: 100, color: '#94A3B8', fontWeight: 600, flexShrink: 0 }}>Draft</span>}
+        </div>
+        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B' }}>{lessonCount} ta dars</p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button onClick={onEdit} style={{ padding: 8, background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8, color: '#3461FF', cursor: 'pointer' }}><Edit2 size={15} /></button>
+        <button onClick={onDelete} style={{ padding: 8, background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: 8, color: '#EF4444', cursor: 'pointer' }}><Trash2 size={15} /></button>
+        <ChevronRight size={18} color="#475569" />
+      </div>
+    </motion.div>
+  )
+}
+
+function LessonRow({ lesson, quizCount, onEnter, onEdit, onDelete }) {
+  return (
+    <motion.div
+      whileHover={{ x: 2 }}
+      onClick={onEnter}
+      style={{ background: '#1E293B', borderRadius: 18, border: '1px solid rgba(255,255,255,0.05)', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
+    >
+      <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(139,92,246,0.12)', color: '#8B5CF6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Video size={20} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lesson.title}</h3>
+          {lesson.is_free && <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(16,185,129,0.15)', borderRadius: 100, color: '#10B981', fontWeight: 700, flexShrink: 0 }}>Bepul</span>}
+          {!lesson.is_published && <span style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(255,255,255,0.08)', borderRadius: 100, color: '#94A3B8', fontWeight: 600, flexShrink: 0 }}>Draft</span>}
+        </div>
+        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B' }}>
+          {lesson.youtube_video_id ? '▶ Video bor' : '— Video yo\'q'} · {quizCount} ta savol
+        </p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button onClick={onEdit} style={{ padding: 8, background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8, color: '#8B5CF6', cursor: 'pointer' }}><Edit2 size={15} /></button>
+        <button onClick={onDelete} style={{ padding: 8, background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: 8, color: '#EF4444', cursor: 'pointer' }}><Trash2 size={15} /></button>
+        <ChevronRight size={18} color="#475569" />
+      </div>
+    </motion.div>
+  )
+}
+
+function QuizRow({ quiz, idx, onEdit, onDelete }) {
+  return (
+    <div style={{ background: '#1E293B', borderRadius: 16, border: '1px solid rgba(255,255,255,0.04)', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(16,185,129,0.12)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.875rem', flexShrink: 0 }}>{idx + 1}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ margin: '0 0 3px', fontSize: '0.9375rem', fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{quiz.question}</p>
+        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ color: '#10B981', fontWeight: 700 }}>✓ {quiz.correct_option?.toUpperCase()}</span>
+          {quiz.time_limit && <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Clock size={11} /> {quiz.time_limit}s</span>}
+        </p>
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+        <button onClick={onEdit} style={{ padding: 8, background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8, color: '#94A3B8', cursor: 'pointer' }}><Edit2 size={15} /></button>
+        <button onClick={onDelete} style={{ padding: 8, background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: 8, color: '#EF4444', cursor: 'pointer' }}><Trash2 size={15} /></button>
+      </div>
+    </div>
+  )
+}
+
+function EmptyState({ text, sub }) {
+  return (
+    <div style={{ padding: '60px 20px', textAlign: 'center', color: '#94A3B8' }}>
+      <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📂</div>
+      <p style={{ fontWeight: 700, fontSize: '1rem', color: 'white', margin: '0 0 6px' }}>{text}</p>
+      <p style={{ margin: 0, fontSize: '0.875rem' }}>{sub}</p>
+    </div>
+  )
+}

@@ -18,7 +18,34 @@ export default function AdminDashboard() {
     fetchStats()
   }, [])
 
-  if (loading) return <div style={{ color: '#94A3B8' }}>Yuklanmoqda...</div>
+  if (loading) return (
+    <div>
+      <div style={{ marginBottom: 40 }}>
+        <div className="skeleton-loader" style={{ height: 36, width: 280, borderRadius: 10, marginBottom: 10 }} />
+        <div className="skeleton-loader" style={{ height: 20, width: 380, borderRadius: 8 }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, marginBottom: 48 }}>
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} style={{ background: '#1E293B', padding: 24, borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div className="skeleton-loader" style={{ width: 48, height: 48, borderRadius: 12, background: '#334155' }} />
+              <div className="skeleton-loader" style={{ width: 60, height: 24, borderRadius: 100, background: '#334155' }} />
+            </div>
+            <div className="skeleton-loader" style={{ height: 14, width: '60%', borderRadius: 6, marginBottom: 10, background: '#334155' }} />
+            <div className="skeleton-loader" style={{ height: 32, width: '40%', borderRadius: 8, background: '#334155' }} />
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <div style={{ background: '#1E293B', padding: 32, borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="skeleton-loader" style={{ height: 24, width: 180, borderRadius: 8, marginBottom: 16, background: '#334155' }} />
+          <div className="skeleton-loader" style={{ height: 48, width: 120, borderRadius: 10, marginBottom: 12, background: '#334155' }} />
+          <div className="skeleton-loader" style={{ height: 16, width: '70%', borderRadius: 6, background: '#334155' }} />
+        </div>
+        <div className="skeleton-loader" style={{ height: 180, borderRadius: 24, background: '#334155' }} />
+      </div>
+    </div>
+  )
 
   const statCards = [
     { label: 'Jami Foydalanuvchilar', value: stats?.total_users || 0, icon: Users, color: '#3461FF', trend: '+12%' },
@@ -66,7 +93,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Secondary Stats Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
         <div style={{ background: '#1E293B', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '24px' }}>
             <Flame color="#F59E0B" />

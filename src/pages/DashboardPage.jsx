@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useTelegram } from '../context/TelegramProvider'
 import { supabase } from '../lib/supabase'
-import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X } from 'lucide-react'
+import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target } from 'lucide-react'
 import { toast } from 'sonner'
 
 // ─────────────────────────────────────────────────────
@@ -465,6 +465,48 @@ export default function DashboardPage() {
           )}
         </AnimatePresence>
       </motion.div>
+
+      {/* ── Quiz Hub Banner ── */}
+      <AnimatePresence>
+        {!isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            style={{ marginBottom: 32 }}
+          >
+            <div 
+              onClick={() => navigate('/quizzes')}
+              style={{
+                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                borderRadius: 28, padding: '24px 28px', color: 'white', position: 'relative', overflow: 'hidden',
+                boxShadow: '0 16px 32px rgba(16, 185, 129, 0.25)', cursor: 'pointer',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+              }}
+            >
+              {/* Decorative Background */}
+              <div style={{ position: 'absolute', top: -30, right: -10, opacity: 0.15, transform: 'rotate(15deg)' }}><Target size={180} /></div>
+              
+              <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <div style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.2)', borderRadius: 100, fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Yangi</div>
+                  <h3 className="outfit-font" style={{ margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>Testlar Markazi</h3>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.9375rem', opacity: 0.9, lineHeight: 1.4, maxWidth: '85%' }}>
+                  Darslarga va Umumiy mavzularga oid random qiziqarli savollarni yechib bilimingizni charxlang!
+                </p>
+              </div>
+
+              <div style={{ 
+                width: 48, height: 48, borderRadius: '50%', background: 'white', color: '#059669', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, zIndex: 1,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+              }}>
+                <Play size={20} fill="currentColor" style={{ marginLeft: 3 }} />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Courses Grid ── */}
       <div style={{

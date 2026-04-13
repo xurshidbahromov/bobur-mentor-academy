@@ -20,7 +20,7 @@ import AppRoutes from './routes'
 // ── Route zones ──────────────────────────────────────
 const PUBLIC_ROUTES = ['/']  // only '/' auto-redirects logged-in users
 const AUTH_ROUTES = ['/login', '/signup']
-const AUTH_APP_PREFIXES = ['/dashboard', '/courses', '/lessons', '/shop', '/profile', '/leaderboard', '/quiz']
+const AUTH_APP_PREFIXES = ['/dashboard', '/courses', '/lessons', '/shop', '/profile', '/leaderboard', '/quiz', '/quizzes']
 
 function isAuthAppRoute(pathname) {
   return AUTH_APP_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/'))
@@ -203,7 +203,7 @@ function AppShell() {
   const isAuthPage = AUTH_ROUTES.includes(path)
   const isAuthAppPage = isAuthAppRoute(path)
   const isAdminPage = path.startsWith('/admin')
-  const isQuizPage = path.startsWith('/quiz')  // fullscreen — no sidebar
+  const isQuizPage = path === '/quiz' || path.startsWith('/quiz/')  // fullscreen — no sidebar
 
   // ── Auth / Login / Signup pages — fullscreen no shell ──
   if (isAuthPage) {

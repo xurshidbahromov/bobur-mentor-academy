@@ -155,18 +155,33 @@ export default function QuizPage() {
   const startTimeRef  = useRef(null)
   const savedRef      = useRef(false)
 
+  const isGeneral = lessonId === 'general'
+
   useEffect(() => {
     async function load() {
-      const [{ data: l }, { data: q }] = await Promise.all([
-        supabase.from('lessons').select('id, title').eq('id', lessonId).single(),
-        supabase.from('quizzes').select('*').eq('lesson_id', lessonId).order('order_index'),
-      ])
-      setLesson(l)
-      setQuizzes(q || [])
+      if (isGeneral) {
+        // Umumiy quizlar: is_general = true
+        const { data: q } = await supabase
+          .from('quizzes')
+          .select('*')
+          .eq('is_general', true)
+          .order('created_at')
+        // Random tartib
+        const shuffled = (q || []).sort(() => Math.random() - 0.5)
+        setLesson({ title: 'Umumiy Test (Random)' })
+        setQuizzes(shuffled)
+      } else {
+        const [{ data: l }, { data: q }] = await Promise.all([
+          supabase.from('lessons').select('id, title').eq('id', lessonId).single(),
+          supabase.from('quizzes').select('*').eq('lesson_id', lessonId).order('order_index'),
+        ])
+        setLesson(l)
+        setQuizzes(q || [])
+      }
       setLoading(false)
     }
     load()
-  }, [lessonId])
+  }, [lessonId, isGeneral])
 
   const saveAttempt = useCallback(async (finAnswers, finScore, spent, completed = true) => {
     if (savedRef.current || !user) return
@@ -221,17 +236,33 @@ export default function QuizPage() {
     setAnswers(newAnswers)
   }
 
-  if (loading) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
-    <div style={{ width: 32, height: 32, border: '3px solid #E2E8F0', borderTopColor: '#2563EB', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-    <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-  </div>
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+      {/* Header skeleton */}
+      <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid #F1F5F9' }}>
+        <div className="skeleton-loader" style={{ width: 28, height: 28, borderRadius: 8 }} />
+        <div style={{ flex: 1 }}>
+          <div className="skeleton-loader" style={{ height: 11, width: 40, borderRadius: 6, marginBottom: 6 }} />
+          <div className="skeleton-loader" style={{ height: 16, width: 200, borderRadius: 8 }} />
+        </div>
+      </div>
+      {/* Body skeleton */}
+      <div style={{ padding: '40px 20px', maxWidth: 640, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+        <div className="skeleton-loader" style={{ width: 88, height: 88, borderRadius: 28 }} />
+        <div className="skeleton-loader" style={{ height: 32, width: '70%', borderRadius: 12 }} />
+        <div className="skeleton-loader" style={{ height: 18, width: '90%', borderRadius: 8 }} />
+        <div className="skeleton-loader" style={{ height: 18, width: '60%', borderRadius: 8 }} />
+        <div className="skeleton-loader" style={{ height: 56, width: '100%', borderRadius: 18, marginTop: 16 }} />
+      </div>
+    </div>
+  )
 
   return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC', color: '#1E293B', display: 'flex', flexDirection: 'column' }}>
       
       {/* ── Top Header ── */}
       <header style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, background: 'rgba(248,250,252,0.8)', backdropFilter: 'blur(12px)', zIndex: 10 }}>
-        <button onClick={() => navigate(`/lessons/${lessonId}`)} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: 4 }}>
+        <button onClick={() => isGeneral ? navigate('/quizzes') : navigate(`/lessons/${lessonId}`)} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: 4 }}>
           <ArrowLeft size={20} />
         </button>
         <div style={{ flex: 1 }}>
@@ -323,7 +354,7 @@ export default function QuizPage() {
             <ResultCard 
               score={score} total={quizzes.length} timeSpent={timeSpent}
               onRetry={() => { savedRef.current = false; setPhase('intro'); setScore(0); setCurrent(0); setSelected(null); setSubmitted(false) }}
-              onBack={() => navigate(`/lessons/${lessonId}`)}
+              onBack={() => isGeneral ? navigate('/quizzes') : navigate(`/lessons/${lessonId}`)}
             />
           )}
 

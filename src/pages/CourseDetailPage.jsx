@@ -98,9 +98,16 @@ export default function CourseDetailPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 32, height: 32, border: '3px solid #E2E8F0', borderTopColor: '#3461FF', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div style={{ padding: '20px 24px 80px', maxWidth: 1040, margin: '0 auto' }}>
+        {/* Back button skeleton */}
+        <div className="skeleton-loader" style={{ height: 36, width: 120, borderRadius: 100, marginBottom: 32 }} />
+        {/* Hero banner skeleton */}
+        <div className="skeleton-loader" style={{ height: 240, borderRadius: 28, marginBottom: 32 }} />
+        {/* Lessons list skeleton */}
+        <div className="skeleton-loader" style={{ height: 24, width: 180, borderRadius: 8, marginBottom: 20 }} />
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="skeleton-loader" style={{ height: 72, borderRadius: 20, marginBottom: 12 }} />
+        ))}
       </div>
     )
   }

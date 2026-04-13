@@ -168,21 +168,28 @@ function LeaderRow({ user, rank, isSelf, tab }) {
 function SkeletonRows() {
   return (
     <>
-      <style>{`@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
       {Array.from({ length: 7 }).map((_, i) => (
-        <div key={i} style={{
-          height: 64, borderRadius: 16, background: '#F8FAFC',
-          margin: '0 0 12px', border: '1px solid rgba(15,23,42,0.03)',
-          position: 'relative', overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%)',
-            backgroundSize: '200% 100%', animation: 'shimmer 2s infinite linear'
-          }} />
-        </div>
+        <div key={i} className="skeleton-loader" style={{
+          height: 64, borderRadius: 16, marginBottom: 12,
+          border: '1px solid rgba(15,23,42,0.03)',
+        }} />
       ))}
     </>
+  )
+}
+
+function PodiumSkeleton() {
+  const heights = [140, 180, 120]
+  const order = [1, 0, 2]
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, justifyContent: 'center', marginBottom: 20, paddingTop: 20 }}>
+      {order.map((rank, i) => (
+        <div key={rank} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div className="skeleton-loader" style={{ width: 52, height: 52, borderRadius: '50%' }} />
+          <div className="skeleton-loader" style={{ height: heights[i], width: '100%', borderRadius: '16px 16px 0 0' }} />
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -291,7 +298,9 @@ export default function LeaderboardPage() {
       </motion.div>
 
       {/* Podium — only if at least 3 users */}
-      {!loading && top3.length === 3 && (
+      {loading ? (
+        <PodiumSkeleton />
+      ) : !loading && top3.length === 3 && (
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           style={{

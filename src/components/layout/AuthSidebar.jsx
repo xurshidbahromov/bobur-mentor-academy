@@ -3,7 +3,7 @@
 
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Coins } from 'lucide-react'
+import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Coins, Target } from 'lucide-react'
 
 export default function AuthSidebar() {
   const { user, profile, isAdmin, signOut } = useAuth()
@@ -18,10 +18,11 @@ export default function AuthSidebar() {
   const name = profile?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'O\'quvchi'
 
   const links = [
-    { to: '/dashboard', label: 'Darslar', icon: <BookOpen size={20} /> },
-    { to: '/leaderboard', label: 'Reyting', icon: <Trophy size={20} /> },
-    { to: '/shop', label: "Do'kon", icon: <ShoppingBag size={20} /> },
-    { to: '/profile', label: 'Profil', icon: <User size={20} /> },
+    { to: '/dashboard',   label: 'Darslar',  icon: <BookOpen size={20} /> },
+    { to: '/quizzes',     label: 'Testlar',  icon: <Target size={20} /> },
+    { to: '/leaderboard', label: 'Reyting',  icon: <Trophy size={20} /> },
+    { to: '/shop',        label: "Do'kon",   icon: <ShoppingBag size={20} /> },
+    { to: '/profile',     label: 'Profil',   icon: <User size={20} /> },
   ]
   if (isAdmin) {
     links.push({ to: '/admin', label: 'Admin Panel', icon: <ShieldCheck size={20} /> })

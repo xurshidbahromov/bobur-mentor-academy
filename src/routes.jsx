@@ -22,11 +22,13 @@ const ShopPage = lazy(() => import('./pages/ShopPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const QuizPage = lazy(() => import('./pages/QuizPage'))
 const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
+const QuizzesHubPage = lazy(() => import('./pages/QuizzesHubPage'))
 
 // ── Admin pages ───────────────────────────────────────
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminContent = lazy(() => import('./pages/admin/AdminContent'))
+const AdminGeneralQuizzes = lazy(() => import('./pages/admin/AdminGeneralQuizzes'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 
 // ── Page transition ───────────────────────────────────
@@ -63,6 +65,7 @@ export default function AppRoutes() {
           <Route path="/shop"              element={<PW><ShopPage /></PW>} />
           <Route path="/profile"           element={<PW><ProfilePage /></PW>} />
           <Route path="/leaderboard"       element={<PW><LeaderboardPage /></PW>} />
+          <Route path="/quizzes"           element={<PW><QuizzesHubPage /></PW>} />
           <Route path="/quiz/:lessonId"    element={<PW><QuizPage /></PW>} />
 
           {/* ── Admin ── */}
@@ -70,6 +73,7 @@ export default function AppRoutes() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="content" element={<AdminContent />} />
+            <Route path="general-quizzes" element={<AdminGeneralQuizzes />} />
             <Route path="users" element={<AdminUsers />} />
           </Route>
 

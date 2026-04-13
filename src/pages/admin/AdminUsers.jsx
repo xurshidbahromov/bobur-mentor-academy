@@ -70,6 +70,7 @@ export default function AdminUsers() {
       </div>
 
       <div style={{ background: '#1E293B', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94A3B8', fontSize: '0.875rem' }}>
@@ -82,7 +83,25 @@ export default function AdminUsers() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#64748B' }}>Yuklanmoqda...</td></tr>
+              <>
+                {[1,2,3,4,5].map(i => (
+                  <tr key={i}>
+                    <td style={{ padding: '16px 20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div className="skeleton-loader" style={{ width: 40, height: 40, borderRadius: '50%', background: '#334155', flexShrink: 0 }} />
+                        <div>
+                          <div className="skeleton-loader" style={{ height: 14, width: 120, borderRadius: 6, marginBottom: 6, background: '#334155' }} />
+                          <div className="skeleton-loader" style={{ height: 12, width: 70, borderRadius: 6, background: '#334155' }} />
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 60, borderRadius: 6, background: '#334155' }} /></td>
+                    <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 50, borderRadius: 6, background: '#334155' }} /></td>
+                    <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 90, borderRadius: 6, background: '#334155' }} /></td>
+                    <td style={{ padding: '16px 20px', textAlign: 'right' }}><div className="skeleton-loader" style={{ height: 32, width: 36, borderRadius: 10, background: '#334155', marginLeft: 'auto' }} /></td>
+                  </tr>
+                ))}
+              </>
             ) : filteredUsers.length === 0 ? (
               <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#64748B' }}>Foydalanuvchilar topilmadi.</td></tr>
             ) : filteredUsers.map((p) => (
@@ -126,6 +145,7 @@ export default function AdminUsers() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

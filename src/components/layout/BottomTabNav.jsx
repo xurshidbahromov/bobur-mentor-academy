@@ -39,9 +39,18 @@ const IcoTrophy = ({ active }) => (
   </svg>
 )
 
+const IcoTarget = ({ active }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.7} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+)
+
 const TABS = [
   { to: '/dashboard',   label: "Darslar",  Icon: IcoHome    },
   { to: '/shop',        label: "Do'kon",   Icon: IcoShop    },
+  { to: '/quizzes',     label: "Testlar",  Icon: IcoTarget  },
   { to: '/leaderboard', label: "Reyting",  Icon: IcoTrophy  },
   { to: '/profile',     label: "Profil",   Icon: IcoProfile },
 ]
@@ -63,7 +72,7 @@ export default function BottomTabNav() {
         WebkitBackdropFilter: 'blur(24px)',
         border: '1.5px solid rgba(255,255,255,0.8)',
         borderRadius: 28,
-        padding: '6px 8px',
+        padding: '4px 4px',
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
@@ -78,8 +87,8 @@ export default function BottomTabNav() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: 4,
-                padding: '8px 4px',
-                minHeight: 56,
+                padding: '6px 2px',
+                minHeight: 52,
                 justifyContent: 'center',
                 // Touch feedback via CSS active state
                 WebkitTapHighlightColor: 'transparent',
