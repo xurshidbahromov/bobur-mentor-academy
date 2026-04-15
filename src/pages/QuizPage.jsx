@@ -148,6 +148,7 @@ export default function QuizPage() {
   const [submitted, setSubmitted] = useState(false)
   const [answers,   setAnswers]   = useState({})
   const [score,     setScore]     = useState(0)
+  const [zoomedImage, setZoomedImage] = useState(null)
 
   const [timeLeft,    setTimeLeft]  = useState(SECONDS_PER_QUESTION)
   const [timeSpent,   setTimeSpent] = useState(0)
@@ -313,8 +314,14 @@ export default function QuizPage() {
             <motion.div key={current} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               
               {quizzes[current].image_url && (
-                <div style={{ marginBottom: 20, borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', background: 'white' }}>
+                <div 
+                  onClick={() => setZoomedImage(quizzes[current].image_url)}
+                  style={{ marginBottom: 20, borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', background: 'white', cursor: 'zoom-in', position: 'relative' }}
+                >
                   <img src={quizzes[current].image_url} alt="Question diagram" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(0,0,0,0.6)', color: 'white', padding: '6px 10px', borderRadius: 12, fontSize: '0.75rem', fontWeight: 600, backdropFilter: 'blur(4px)' }}>
+                    Kattalashtirish
+                  </div>
                 </div>
               )}
 
@@ -367,6 +374,43 @@ export default function QuizPage() {
 
         </AnimatePresence>
       </main>
+
+      {/* ── Image Lightbox Overlay ── */}
+      <AnimatePresence>
+        {zoomedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setZoomedImage(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(15, 23, 42, 0.9)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 24, cursor: 'zoom-out'
+            }}
+          >
+            <button 
+              onClick={() => setZoomedImage(null)}
+              style={{ position: 'absolute', top: 24, right: 24, background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            >
+              <XCircle size={24} />
+            </button>
+            <motion.img 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              src={zoomedImage} 
+              alt="Zoomed" 
+              style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: 16, objectFit: 'contain', boxShadow: '0 24px 64px rgba(0,0,0,0.4)' }}
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
     </div>
   )
 }
