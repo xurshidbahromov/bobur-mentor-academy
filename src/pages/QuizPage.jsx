@@ -311,6 +311,13 @@ export default function QuizPage() {
           {/* QUIZ */}
           {phase === 'quiz' && (
             <motion.div key={current} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              
+              {quizzes[current].image_url && (
+                <div style={{ marginBottom: 20, borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', background: 'white' }}>
+                  <img src={quizzes[current].image_url} alt="Question diagram" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                </div>
+              )}
+
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.45, marginBottom: 24 }}>{quizzes[current].question}</h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>

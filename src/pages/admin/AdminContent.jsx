@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Edit2, Trash2, ChevronRight, ChevronLeft,
-  Video, HelpCircle, BookOpen, Clock, Search, Eye, EyeOff
+  Video, HelpCircle, BookOpen, Clock, Search, Eye, EyeOff, Loader2, Image as ImageIcon
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
@@ -48,7 +48,8 @@ export default function AdminContent() {
   // forms
   const [courseForm, setCourseForm] = useState({ title: '', description: '', is_published: false })
   const [lessonForm, setLessonForm] = useState({ title: '', description: '', youtube_video_id: '', is_free: false, is_published: false })
-  const [quizForm, setQuizForm] = useState({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60 })
+  const [quizForm, setQuizForm] = useState({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60, image_url: '' })
+  const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => { fetchData() }, [])
 
@@ -99,9 +100,19 @@ export default function AdminContent() {
   }
   async function saveLesson(e) {
     e.preventDefault()
+    
+    // YouTube ID extraction logic
+    let vid = lessonForm.youtube_video_id
+    if (vid && (vid.includes('youtube.com') || vid.includes('youtu.be'))) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+      const match = vid.match(regExp)
+      if (match && match[2].length === 11) vid = match[2]
+    }
+
+    const payload = { ...lessonForm, youtube_video_id: vid }
     const op = editingItem
-      ? supabase.from('lessons').update(lessonForm).eq('id', editingItem.id)
-      : supabase.from('lessons').insert([{ ...lessonForm, course_id: selCourse.id }])
+      ? supabase.from('lessons').update(payload).eq('id', editingItem.id)
+      : supabase.from('lessons').insert([{ ...payload, course_id: selCourse.id }])
     const { error } = await op
     if (error) toast.error(error.message)
     else { toast.success(editingItem ? 'Dars yangilandi' : 'Dars yaratildi'); closeModal(); fetchData() }
@@ -139,9 +150,43 @@ export default function AdminContent() {
     setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false })
     setModalType('lesson')
   }
+  const handleImageUpload = async (e) => {
+    try {
+      const file = e.target.files[0]
+      if (!file) return
+      
+      setIsUploading(true)
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
+      const filePath = `question-images/${fileName}`
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('quizzes')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false })
+
+      if (uploadError) {
+        console.error("Supabase Storage Error:", uploadError)
+        toast.error("Rasm yuklashda xatolik: " + uploadError.message)
+      } else {
+        const { data: { publicUrl } } = supabase.storage
+          .from('quizzes')
+          .getPublicUrl(filePath)
+        
+        setQuizForm(prev => ({ ...prev, image_url: publicUrl }))
+        toast.success("Rasm muvaffaqiyatli yuklandi")
+      }
+    } catch (err) {
+      console.error("Upload Catch Error:", err)
+      toast.error("Xatolik yuz berdi: " + err.message)
+    } finally {
+      setIsUploading(false)
+      if (e.target) e.target.value = '' // Allow selecting the same file again
+    }
+  }
+
   function openQuizModal(q = null) {
     setEditingItem(q)
-    setQuizForm(q ? { question: q.question, option_a: q.option_a, option_b: q.option_b, option_c: q.option_c || '', option_d: q.option_d || '', correct_option: q.correct_option, explanation: q.explanation || '', time_limit: q.time_limit || 60 } : { question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60 })
+    setQuizForm(q ? { question: q.question, option_a: q.option_a, option_b: q.option_b, option_c: q.option_c || '', option_d: q.option_d || '', correct_option: q.correct_option, explanation: q.explanation || '', time_limit: q.time_limit || 60, image_url: q.image_url || '' } : { question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60, image_url: '' })
     setModalType('quiz')
   }
   function closeModal() { setModalType(null); setEditingItem(null) }
@@ -315,7 +360,7 @@ export default function AdminContent() {
                 {/* LESSON FORM */}
                 {modalType === 'lesson' && <>
                   <input required placeholder="Dars Nomi *" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })} style={inp} />
-                  <input placeholder="YouTube Video ID (masalan: dQw4w9WgXcQ)" value={lessonForm.youtube_video_id} onChange={e => setLessonForm({ ...lessonForm, youtube_video_id: e.target.value })} style={inp} />
+                  <input placeholder="YouTube Link yoki ID (masalan: dQw4w9WgXcQ)" value={lessonForm.youtube_video_id} onChange={e => setLessonForm({ ...lessonForm, youtube_video_id: e.target.value })} style={inp} />
                   <textarea placeholder="Dars ta'rifi" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })} rows={3} style={inp} />
                   <div style={{ display: 'flex', gap: 24 }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
@@ -349,6 +394,31 @@ export default function AdminContent() {
                       <label style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'block', marginBottom: 6 }}>Vaqt (sekund)</label>
                       <input type="number" value={quizForm.time_limit} onChange={e => setQuizForm({ ...quizForm, time_limit: Number(e.target.value) })} style={inp} />
                     </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <input placeholder="Savol rasmi URL (ixtiyoriy, chizmalar uchun)" value={quizForm.image_url} onChange={e => setQuizForm({ ...quizForm, image_url: e.target.value })} style={{ ...inp, flex: 1 }} />
+                      <label style={{ 
+                        background: '#334155', color: 'white', padding: '0 16px', borderRadius: 12, 
+                        display: 'flex', alignItems: 'center', gap: 8, cursor: isUploading ? 'not-allowed' : 'pointer',
+                        fontSize: '0.875rem', fontWeight: 600, border: '1px solid rgba(255,255,255,0.05)'
+                      }}>
+                        {isUploading ? <Loader2 size={18} className="animate-spin" /> : <ImageIcon size={18} />}
+                        {isUploading ? "Yuklanmoqda..." : "Rasm yuklash"}
+                        <input type="file" onChange={handleImageUpload} disabled={isUploading} hidden accept="image/*" />
+                      </label>
+                    </div>
+                    {quizForm.image_url && (
+                      <div style={{ position: 'relative', width: 'fit-content' }}>
+                        <img src={quizForm.image_url} alt="Preview" style={{ height: 100, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }} />
+                        <button 
+                          onClick={() => setQuizForm({ ...quizForm, image_url: '' })}
+                          style={{ position: 'absolute', top: -10, right: -10, background: '#EF4444', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <textarea placeholder="Izoh (ixtiyoriy)" value={quizForm.explanation} onChange={e => setQuizForm({ ...quizForm, explanation: e.target.value })} rows={2} style={inp} />
                 </>}

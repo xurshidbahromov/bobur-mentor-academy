@@ -177,7 +177,7 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
           <div style={{ width: 32, height: 32, borderRadius: 8, background: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <span style={{ color: 'white', fontWeight: 900, fontSize: '0.875rem' }}>BM</span>
           </div>
-          <span style={{ ...tStyle, fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', maxWidth: open ? 180 : 0 }}>BMA Admin</span>
+          <span style={{ ...tStyle, fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', maxWidth: open ? 180 : 0 }}>Bobur Mentor Admin</span>
         </div>
         {onClose && (
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: 4, flexShrink: 0 }}>

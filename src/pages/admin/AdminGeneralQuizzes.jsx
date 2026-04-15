@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, Search, Clock, Target } from 'lucide-react'
+import { Plus, Edit2, Trash2, Search, Clock, Target, Loader2, Image as ImageIcon } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
 
@@ -14,8 +14,9 @@ export default function AdminGeneralQuizzes() {
   
   const [quizForm, setQuizForm] = useState({ 
     question: '', option_a: '', option_b: '', option_c: '', option_d: '', 
-    correct_option: 'a', explanation: '', time_limit: 600 
+    correct_option: 'a', explanation: '', time_limit: 600, image_url: ''
   })
+  const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
     fetchQuizzes()
@@ -41,6 +42,40 @@ export default function AdminGeneralQuizzes() {
     setLoading(false)
   }
 
+  const handleImageUpload = async (e) => {
+    try {
+      const file = e.target.files[0]
+      if (!file) return
+      
+      setIsUploading(true)
+      const fileExt = file.name.split('.').pop()
+      const fileName = `general-${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
+      const filePath = `question-images/${fileName}`
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('quizzes')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false })
+
+      if (uploadError) {
+        console.error("Supabase Storage Error:", uploadError)
+        toast.error("Rasm yuklashda xatolik: " + uploadError.message)
+      } else {
+        const { data: { publicUrl } } = supabase.storage
+          .from('quizzes')
+          .getPublicUrl(filePath)
+        
+        setQuizForm(prev => ({ ...prev, image_url: publicUrl }))
+        toast.success("Rasm muvaffaqiyatli yuklandi")
+      }
+    } catch (err) {
+      console.error("Upload Catch Error:", err)
+      toast.error("Xatolik yuz berdi: " + err.message)
+    } finally {
+      setIsUploading(false)
+      if (e.target) e.target.value = '' // Allow selecting the same file again
+    }
+  }
+
   const openModal = (quiz = null) => {
     if (quiz) {
       setEditingItem(quiz)
@@ -48,11 +83,11 @@ export default function AdminGeneralQuizzes() {
         question: quiz.question, option_a: quiz.option_a, option_b: quiz.option_b, 
         option_c: quiz.option_c || '', option_d: quiz.option_d || '', 
         correct_option: quiz.correct_option, explanation: quiz.explanation || '',
-        time_limit: quiz.time_limit || 600
+        time_limit: quiz.time_limit || 600, image_url: quiz.image_url || ''
       })
     } else {
       setEditingItem(null)
-      setQuizForm({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 600 })
+      setQuizForm({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 600, image_url: '' })
     }
     setIsModalOpen(true)
   }
@@ -217,6 +252,32 @@ export default function AdminGeneralQuizzes() {
                   </select>
                 </div>
 
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <input placeholder="Savol rasmi URL (ixtiyoriy, chizmalar uchun)" value={quizForm.image_url} onChange={e => setQuizForm({...quizForm, image_url: e.target.value})} style={{ ...modalInputStyle, flex: 1 }} />
+                    <label style={{ 
+                      background: '#334155', color: 'white', padding: '0 16px', borderRadius: 12, 
+                      display: 'flex', alignItems: 'center', gap: 8, cursor: isUploading ? 'not-allowed' : 'pointer',
+                      fontSize: '0.875rem', fontWeight: 600, border: '1px solid rgba(255,255,255,0.05)'
+                    }}>
+                      {isUploading ? <Loader2 size={18} className="animate-spin" /> : <ImageIcon size={18} />}
+                      {isUploading ? "Yuklanmoqda..." : "Rasm yuklash"}
+                      <input type="file" onChange={handleImageUpload} disabled={isUploading} hidden accept="image/*" />
+                    </label>
+                  </div>
+                  {quizForm.image_url && (
+                    <div style={{ position: 'relative', width: 'fit-content' }}>
+                      <img src={quizForm.image_url} alt="Preview" style={{ height: 100, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }} />
+                      <button 
+                        type="button"
+                        onClick={() => setQuizForm({ ...quizForm, image_url: '' })}
+                        style={{ position: 'absolute', top: -10, right: -10, background: '#EF4444', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <textarea placeholder="Tushuntirish (ixtiyoriy)" value={quizForm.explanation} onChange={e => setQuizForm({...quizForm, explanation: e.target.value})} rows={2} style={modalInputStyle} />
 
                 <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
