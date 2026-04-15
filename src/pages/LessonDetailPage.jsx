@@ -88,7 +88,8 @@ export default function LessonDetailPage() {
 
   const handleUnlock = async () => {
     if (!user) { navigate('/login'); return }
-    if (!profile || profile.coins < lesson.price) {
+    const unlockCost = lesson.coin_price ?? 5
+    if (!profile || profile.coins < unlockCost) {
       toast.error("Coin yetarli emas! Do'konga o'ting.")
       navigate('/shop')
       return
@@ -96,7 +97,7 @@ export default function LessonDetailPage() {
     const { success, error } = await unlockWithCoins()
     if (success) {
       toast.success("Dars ochildi!")
-      if (setProfile) setProfile(prev => ({ ...prev, coins: prev.coins - lesson.price }))
+      if (setProfile) setProfile(prev => ({ ...prev, coins: prev.coins - unlockCost }))
     } else {
       toast.error("Xatolik: " + error)
     }
@@ -192,7 +193,7 @@ export default function LessonDetailPage() {
                         background: lesson.is_free ? 'rgba(16,185,129,0.08)' : 'rgba(52,97,255,0.08)',
                         padding: '4px 12px', borderRadius: 100, border: '1px solid rgba(0,0,0,0.03)'
                       }}>
-                        {lesson.is_free ? 'BEPUL' : `${lesson.price} COIN`}
+                        {lesson.is_free ? 'BEPUL' : `${lesson.coin_price ?? 5} COIN`}
                       </span>
                       <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 700 }}>DARS #{lesson.order_index}</span>
                     </div>
@@ -274,7 +275,8 @@ export default function LessonDetailPage() {
 
 // ── Lock Screen ──────────────────────────────────────
 function LockScreen({ lesson, profile, onUnlock, onShop }) {
-  const hasEnough = profile && profile.coins >= lesson.price
+  const unlockCost = lesson.coin_price ?? 5
+  const hasEnough = profile && profile.coins >= unlockCost
 
   return (
     <div style={{
@@ -288,7 +290,7 @@ function LockScreen({ lesson, profile, onUnlock, onShop }) {
       </div>
       <div style={{ textAlign: 'center' }}>
         <p style={{ margin: '0 0 6px', color: 'white', fontWeight: 700, fontSize: '1.125rem' }}>Bu dars qulflangan</p>
-        <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem' }}>{lesson.price} coin sarflab oching</p>
+        <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem' }}>{unlockCost} coin sarflab oching</p>
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
         {hasEnough ? (
@@ -297,7 +299,7 @@ function LockScreen({ lesson, profile, onUnlock, onShop }) {
             border: 'none', borderRadius: 14, padding: '13px 28px', fontWeight: 700,
             fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
           }}>
-            <Coins size={18} /> {lesson.price} coin bilan ochish
+            <Coins size={18} /> {unlockCost} coin bilan ochish
           </button>
         ) : (
           <>
@@ -313,7 +315,7 @@ function LockScreen({ lesson, profile, onUnlock, onShop }) {
       </div>
       {!hasEnough && profile && (
         <p style={{ color: '#64748B', fontSize: '0.8125rem', margin: 0 }}>
-          Balansingiz: {profile.coins} coin ({lesson.price - profile.coins} coin yetmaydi)
+          Balansingiz: {profile.coins} coin ({unlockCost - profile.coins} coin yetmaydi)
         </p>
       )}
     </div>

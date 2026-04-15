@@ -89,6 +89,10 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--bg-base);
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 body {
@@ -101,6 +105,15 @@ body {
   min-height: 100vh;
   /* Basic iOS TMA scrolling improvements */
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+#root {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 h1, h2, h3, h4, h5, h6, .outfit-font {

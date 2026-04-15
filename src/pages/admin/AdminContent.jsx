@@ -47,7 +47,7 @@ export default function AdminContent() {
 
   // forms
   const [courseForm, setCourseForm] = useState({ title: '', description: '', is_published: false })
-  const [lessonForm, setLessonForm] = useState({ title: '', description: '', youtube_video_id: '', is_free: false, is_published: false })
+  const [lessonForm, setLessonForm] = useState({ title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5 })
   const [quizForm, setQuizForm] = useState({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60, image_url: '' })
   const [isUploading, setIsUploading] = useState(false)
 
@@ -147,7 +147,7 @@ export default function AdminContent() {
   }
   function openLessonModal(l = null) {
     setEditingItem(l)
-    setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false })
+    setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published, coin_price: l.coin_price ?? 5 } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5 })
     setModalType('lesson')
   }
   const handleImageUpload = async (e) => {
@@ -362,15 +362,28 @@ export default function AdminContent() {
                   <input required placeholder="Dars Nomi *" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })} style={inp} />
                   <input placeholder="YouTube Link yoki ID (masalan: dQw4w9WgXcQ)" value={lessonForm.youtube_video_id} onChange={e => setLessonForm({ ...lessonForm, youtube_video_id: e.target.value })} style={inp} />
                   <textarea placeholder="Dars ta'rifi" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })} rows={3} style={inp} />
-                  <div style={{ display: 'flex', gap: 24 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
-                      <input type="checkbox" checked={lessonForm.is_free} onChange={e => setLessonForm({ ...lessonForm, is_free: e.target.checked })} style={{ width: 18, height: 18 }} />
-                      Bepul Dars
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
-                      <input type="checkbox" checked={lessonForm.is_published} onChange={e => setLessonForm({ ...lessonForm, is_published: e.target.checked })} style={{ width: 18, height: 18 }} />
-                      Chop etish
-                    </label>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
+                        <input type="checkbox" checked={lessonForm.is_free} onChange={e => setLessonForm({ ...lessonForm, is_free: e.target.checked })} style={{ width: 18, height: 18 }} />
+                        Bepul Dars (Ochiq)
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
+                        <input type="checkbox" checked={lessonForm.is_published} onChange={e => setLessonForm({ ...lessonForm, is_published: e.target.checked })} style={{ width: 18, height: 18 }} />
+                        Chop etish (Online)
+                      </label>
+                    </div>
+                    
+                    {/* Coin Price Field */}
+                    <AnimatePresence>
+                      {!lessonForm.is_free && (
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} style={{ background: 'rgba(255,193,7,0.1)', padding: 12, borderRadius: 12, border: '1px solid rgba(255,193,7,0.3)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FBC02D' }}>Ochish narxi (Coin)</label>
+                          <input type="number" required min="1" placeholder="Masalan: 5" value={lessonForm.coin_price} onChange={e => setLessonForm({ ...lessonForm, coin_price: Number(e.target.value) })} style={{ ...inp, background: 'rgba(0,0,0,0.2)', border: 'none', padding: '10px 14px' }} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </>}
 

@@ -16,9 +16,18 @@ export default function LandingPage() {
   const ctaLink = user ? '/dashboard' : '/signup'
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+    <>
+      {/* ── FULL BLEED HERO BACKGROUND ORBS ── */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '90vh', pointerEvents: 'none', overflow: 'hidden',
+        borderRadius: '0 0 80px 80px', zIndex: 0
+      }}>
+        <div style={{ position: 'absolute', top: '10%', left: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.25) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrb 15s ease-in-out infinite' }} />
+        <div style={{ position: 'absolute', top: '30%', right: '-5%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrbReverse 20s ease-in-out infinite' }} />
+        <div style={{ position: 'absolute', bottom: '-10%', left: '30%', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrb 18s ease-in-out infinite' }} />
+      </div>
 
-      {/* ── HERO ─────────────────────────────────── */}
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
       <section style={{
         minHeight: '88vh',
         display: 'flex',
@@ -30,15 +39,6 @@ export default function LandingPage() {
         padding: '120px 0 80px',
         position: 'relative'
       }}>
-        {/* Decorative orbs */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden',
-          borderRadius: '0 0 80px 80px'
-        }}>
-          <div style={{ position: 'absolute', top: '10%', left: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.25) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrb 15s ease-in-out infinite' }} />
-          <div style={{ position: 'absolute', top: '30%', right: '5%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrbReverse 20s ease-in-out infinite' }} />
-          <div style={{ position: 'absolute', bottom: '-10%', left: '30%', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 60%)', filter: 'blur(60px)', animation: 'floatOrb 18s ease-in-out infinite' }} />
-        </div>
 
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px',
@@ -57,9 +57,10 @@ export default function LandingPage() {
 
         <h1 className="outfit-font text-gradient-premium" style={{
           maxWidth: '780px', margin: '0 auto',
-          fontSize: 'clamp(2.8rem, 8vw, 5rem)',
+          fontSize: 'clamp(2.5rem, 8vw, 5rem)',
           letterSpacing: '-0.04em', fontWeight: 900, lineHeight: 1.08,
-          position: 'relative', zIndex: 1
+          position: 'relative', zIndex: 1,
+          wordBreak: 'break-word', overflowWrap: 'break-word'
         }}>
           Matematikani chuqur va oson o'rganing
         </h1>
@@ -309,5 +310,6 @@ export default function LandingPage() {
         </Card>
       </section>
     </div>
+    </>
   )
 }

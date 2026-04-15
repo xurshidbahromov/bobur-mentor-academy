@@ -35,8 +35,16 @@ export function TelegramProvider({ children }) {
 
     // 2. Expand to full screen
     tg.expand()
+    
+    // 3. Set native app background colors to match app branding to prevent layout issues
+    try {
+      tg.setHeaderColor('#F8FAFC')
+      tg.setBackgroundColor('#F8FAFC')
+    } catch(e) {
+      console.warn("Could not set TG colors", e)
+    }
 
-    // 3. Extract user from initDataUnsafe (always available)
+    // 4. Extract user from initDataUnsafe (always available)
     const u = tg.initDataUnsafe?.user
     const param = tg.initDataUnsafe?.start_param
     if (param) setStartParam(param)
