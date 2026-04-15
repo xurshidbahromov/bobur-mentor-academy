@@ -12,6 +12,16 @@ export default function VideoPlayer({ videoId, lessonId }) {
   const [isReady, setIsReady] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
+  // Manage body class for hiding bottom nav
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.classList.add('hide-ui-for-video')
+    } else {
+      document.body.classList.remove('hide-ui-for-video')
+    }
+    return () => document.body.classList.remove('hide-ui-for-video')
+  }, [isFullscreen])
+
   // 1. YT IFrame API
   useEffect(() => {
     if (!window.YT) {
@@ -111,10 +121,9 @@ export default function VideoPlayer({ videoId, lessonId }) {
         borderRadius: isFullscreen ? 0 : 'var(--radius-card)', 
         overflow: 'hidden',
         background: '#000',
-        border: '1px solid var(--border-soft)',
-        boxShadow: 'var(--shadow-elevated)',
-        position: isFullscreen ? 'fixed' : 'relative',
-        inset: isFullscreen ? 0 : 'auto',
+        border: 'none',
+        boxShadow: isFullscreen ? 'none' : 'var(--shadow-elevated)',
+        transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
         zIndex: isFullscreen ? 99999 : 1
       }}
     >
@@ -139,11 +148,11 @@ export default function VideoPlayer({ videoId, lessonId }) {
           onClick={() => setIsFullscreen(!isFullscreen)}
           title="Katta ekran"
           style={{
-            position: 'absolute', top: 12, right: 12, zIndex: 20,
-            background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)', 
-            borderRadius: 8, padding: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', cursor: 'pointer', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-            transition: 'all 0.2s'
+            position: 'absolute', bottom: 8, right: 12, zIndex: 20,
+            background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', 
+            borderRadius: 6, padding: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', cursor: 'pointer', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
+            transition: 'all 0.2s', width: 34, height: 34
           }}
         >
           {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
@@ -152,12 +161,27 @@ export default function VideoPlayer({ videoId, lessonId }) {
 
       <style>{`
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .bma-fullscreen {
           position: fixed !important;
           top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
           width: 100vw !important; height: 100vh !important;
           z-index: 99999 !important;
-          border-radius: 0 !important;
+        }
+
+        @media (max-width: 768px) {
+          .bma-fullscreen {
+            top: 50% !important; left: 50% !important;
+            width: 100vh !important; height: 100vw !important;
+            transform: translate(-50%, -50%) rotate(90deg) !important;
+          }
+        }
+
+        body.hide-ui-for-video .mobile-bottom-nav,
+        body.hide-ui-for-video .auth-desktop-sidebar {
+          display: none !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
         }
       `}</style>
     </div>
