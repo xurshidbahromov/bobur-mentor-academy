@@ -109,10 +109,24 @@ export default function AdminContent() {
       if (match && match[2].length === 11) vid = match[2]
     }
 
-    const payload = { ...lessonForm, youtube_video_id: vid }
-    const op = editingItem
-      ? supabase.from('lessons').update(payload).eq('id', editingItem.id)
-      : supabase.from('lessons').insert([{ ...payload, course_id: selCourse.id }])
+    let payload = { ...lessonForm, youtube_video_id: vid }
+    
+    let op;
+    if (editingItem) {
+      op = supabase.from('lessons').update(payload).eq('id', editingItem.id)
+    } else {
+      // Find next order_index
+      const { data } = await supabase
+        .from('lessons')
+        .select('order_index')
+        .eq('course_id', selCourse.id)
+        .order('order_index', { ascending: false })
+        .limit(1)
+      const nextIndex = data && data.length > 0 ? (data[0].order_index || 0) + 1 : 1
+      
+      op = supabase.from('lessons').insert([{ ...payload, course_id: selCourse.id, order_index: nextIndex }])
+    }
+    
     const { error } = await op
     if (error) toast.error(error.message)
     else { toast.success(editingItem ? 'Dars yangilandi' : 'Dars yaratildi'); closeModal(); fetchData() }
@@ -147,7 +161,7 @@ export default function AdminContent() {
   }
   function openLessonModal(l = null) {
     setEditingItem(l)
-    setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published, coin_price: l.coin_price ?? 5 } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5 })
+    setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published, coin_price: l.coin_price ?? 5, order_index: l.order_index ?? 0 } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5, order_index: '' })
     setModalType('lesson')
   }
   const handleImageUpload = async (e) => {
@@ -359,7 +373,10 @@ export default function AdminContent() {
 
                 {/* LESSON FORM */}
                 {modalType === 'lesson' && <>
-                  <input required placeholder="Dars Nomi *" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })} style={inp} />
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <input type="number" placeholder="Tartib" value={lessonForm.order_index} onChange={e => setLessonForm({ ...lessonForm, order_index: Number(e.target.value) })} style={{ ...inp, width: 80 }} />
+                    <input required placeholder="Dars Nomi *" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })} style={{ ...inp, flex: 1 }} />
+                  </div>
                   <input placeholder="YouTube Link yoki ID (masalan: dQw4w9WgXcQ)" value={lessonForm.youtube_video_id} onChange={e => setLessonForm({ ...lessonForm, youtube_video_id: e.target.value })} style={inp} />
                   <textarea placeholder="Dars ta'rifi" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })} rows={3} style={inp} />
                   

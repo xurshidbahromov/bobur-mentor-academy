@@ -124,7 +124,7 @@ export default function LessonDetailPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ borderRadius: 32, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', background: '#000' }}>
               {canWatch ? (
-                <VideoPlayer videoId={lesson.youtube_video_id} lessonId={lesson.id} />
+                <VideoPlayer videoId={lesson.youtube_video_id} lessonId={lesson.id} lessonTitle={lesson.title} />
               ) : (
                 <LockScreen lesson={lesson} profile={profile} onUnlock={handleUnlock} onShop={() => navigate('/shop')} />
               )}
