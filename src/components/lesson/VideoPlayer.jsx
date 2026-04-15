@@ -135,29 +135,20 @@ export default function VideoPlayer({ videoId, lessonId }) {
         allowFullScreen
       />
 
-      {/* Loading */}
-      {!isReady && (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', zIndex: 10 }}>
-          <div style={{ border: '4px solid rgba(255,255,255,0.1)', borderTop: '4px solid #3461FF', borderRadius: '50%', width: 40, height: 40, animation: 'spin 1s linear infinite' }} />
-        </div>
-      )}
-
       {/* Custom Fullscreen Toggle for TMA iOS constraints */}
-      {isReady && (
-        <button 
-          onClick={() => setIsFullscreen(!isFullscreen)}
-          title="Katta ekran"
-          style={{
-            position: 'absolute', bottom: 12, right: 16, zIndex: 20,
-            background: '#3461FF', border: '2px solid rgba(255,255,255,0.8)', 
-            borderRadius: 8, padding: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', cursor: 'pointer', boxShadow: '0 4px 12px rgba(52, 97, 255, 0.4)',
-            transition: 'all 0.2s', width: 36, height: 36
-          }}
-        >
-          {isFullscreen ? <Minimize size={20} strokeWidth={2.5} /> : <Maximize size={20} strokeWidth={2.5} />}
-        </button>
-      )}
+      <button 
+        onClick={() => setIsFullscreen(!isFullscreen)}
+        title="Katta ekran"
+        style={{
+          position: 'absolute', bottom: 12, right: 16, zIndex: 20,
+          background: '#3461FF', border: '2px solid rgba(255,255,255,0.8)', 
+          borderRadius: 8, padding: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'white', cursor: 'pointer', boxShadow: '0 4px 12px rgba(52, 97, 255, 0.4)',
+          transition: 'all 0.2s', width: 36, height: 36
+        }}
+      >
+        {isFullscreen ? <Minimize size={20} strokeWidth={2.5} /> : <Maximize size={20} strokeWidth={2.5} />}
+      </button>
 
       <style>{`
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
