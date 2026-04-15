@@ -22,7 +22,7 @@ function LessonCard({ lesson, userCoins, onNavigate }) {
       whileTap={{ scale: 0.98 }}
       style={{
         display: 'flex', alignItems: 'center', gap: 14,
-        padding: '16px', borderRadius: 20,
+        width: '100%', maxWidth: '100%', padding: '16px', borderRadius: 20,
         background: canAccess ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
@@ -42,7 +42,7 @@ function LessonCard({ lesson, userCoins, onNavigate }) {
         {canAccess ? <Play size={18} color="#3461FF" fill="#3461FF" /> : <Lock size={18} color="#94A3B8" />}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p className="outfit-font" style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: canAccess ? '#0F172A' : '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>
+        <p className="outfit-font" style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: canAccess ? '#0F172A' : '#64748B', wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4, letterSpacing: '-0.01em' }}>
           {lesson.order_index}. {lesson.title}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
@@ -122,7 +122,7 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: 100 }}>
+    <div style={{ minHeight: '100vh', paddingBottom: 140 }}>
       {/* ── Header (Sticky, Pill back button) ── */}
       <header style={{ 
         position: 'sticky', top: 0, zIndex: 10,
@@ -148,7 +148,7 @@ export default function CourseDetailPage() {
       </header>
 
       {/* ── Main Content Container ── */}
-      <main style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px' }}>
+      <main style={{ maxWidth: 1040, margin: '0 auto', padding: 'clamp(24px, 6vw, 32px) clamp(16px, 4vw, 24px)' }}>
         
         {/* Course Info */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 32 }}>
@@ -199,7 +199,7 @@ export default function CourseDetailPage() {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             {activeTab === 'videos' ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 16 }}>
                 {lessons.length === 0 ? (
                   <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '64px 24px', color: '#94A3B8', background: 'rgba(255,255,255,0.5)', borderRadius: 32, border: '1px dashed #CBD5E1' }}>
                     <Info size={40} style={{ opacity: 0.5, marginBottom: 16 }} />

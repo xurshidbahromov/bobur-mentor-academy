@@ -227,7 +227,7 @@ function AppShell() {
       <div className="auth-layout" style={{ 
         minHeight: '100vh', 
         background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)', 
-        position: 'relative', 
+        position: 'relative'
       }}>
         {/* Subtle Light Aura Orbs for the Dashboard */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>

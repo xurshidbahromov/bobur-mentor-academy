@@ -226,20 +226,20 @@ export default function LandingPage() {
         </div>
 
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '24px' }}>
             {[1, 2, 3].map(i => (
               <div key={i} className="skeleton-loader" style={{ aspectRatio: '4/5', borderRadius: 'var(--radius-card)' }} />
             ))}
           </div>
         ) : featuredCourses.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '24px' }}>
             {featuredCourses.map(course => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>
         ) : (
           /* Fallback placeholder cards when no published courses yet */
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '24px' }}>
             {[
               { title: 'Imtihonga Tayyorlov', desc: 'DTM va Milliy Sertifikat testlariga professional tayyorgarlik.', color: '#3461FF' },
               { title: 'Sertifikat Kursi', desc: "Matematik bilimingizni rasmiy sertifikat bilan tasdiqlang.", color: '#3461FF' },

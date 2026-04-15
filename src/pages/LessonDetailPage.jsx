@@ -65,7 +65,7 @@ export default function LessonDetailPage() {
         <div style={{ height: 38, width: 200, borderRadius: 100, background: '#FFFFFF', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 0%, rgba(241,245,249,0.8) 50%, transparent 100%)', animation: 'shimmer 1.5s infinite linear' }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: 24 }}>
+        <div className="lesson-grid" style={{ gap: 24 }}>
           <div style={{ height: 500, borderRadius: 24, background: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 0%, rgba(241,245,249,0.8) 50%, transparent 100%)', animation: 'shimmer 1.5s infinite linear' }} />
           </div>
@@ -104,7 +104,7 @@ export default function LessonDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 20px 80px' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 20px 140px' }}>
 
       {/* ── Breadcrumbs ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24, fontSize: '0.875rem', fontWeight: 600, color: '#94A3B8' }}>
@@ -182,7 +182,7 @@ export default function LessonDetailPage() {
                   <div style={{ 
                     background: 'rgba(255, 255, 255, 0.7)', 
                     backdropFilter: 'blur(16px)',
-                    borderRadius: 32, padding: '32px',
+                    borderRadius: 32, padding: 'clamp(20px, 5vw, 32px)',
                     border: '1px solid rgba(255, 255, 255, 0.5)',
                     boxShadow: '0 8px 32px rgba(15,23,42,0.03)'
                   }}>
@@ -197,7 +197,10 @@ export default function LessonDetailPage() {
                       </span>
                       <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 700 }}>DARS #{lesson.order_index}</span>
                     </div>
-                    <h1 className="outfit-font" style={{ margin: '0 0 16px', fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
+                    <h1 className="outfit-font" style={{ 
+                      margin: '0 0 16px', fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 900, color: '#0F172A', 
+                      letterSpacing: '-0.03em', lineHeight: 1.15, wordBreak: 'break-word', overflowWrap: 'anywhere' 
+                    }}>
                       {lesson.title}
                     </h1>
                     {lesson.description && (
@@ -225,7 +228,7 @@ export default function LessonDetailPage() {
           <aside className="lesson-sidebar" style={{ 
             background: 'rgba(255, 255, 255, 0.7)', 
             backdropFilter: 'blur(20px)',
-            borderRadius: 32, padding: '24px',
+            borderRadius: 32, padding: 'clamp(20px, 5vw, 24px)',
             border: '1px solid rgba(255, 255, 255, 0.5)',
             boxShadow: '0 12px 40px rgba(15,23,42,0.04)'
           }}>
@@ -243,7 +246,7 @@ export default function LessonDetailPage() {
                     onClick={() => navigate(`/lessons/${item.id}`)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
-                      width: '100%', padding: '12px', borderRadius: 16, border: 'none',
+                      width: '100%', maxWidth: '100%', padding: '12px', borderRadius: 16, border: 'none',
                       background: isActive ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
                       color: isActive ? 'white' : '#475569',
                       cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left',
@@ -258,7 +261,7 @@ export default function LessonDetailPage() {
                     }}>
                       {item.order_index}
                     </div>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 700, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, flex: 1, wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4 }}>
                       {item.title}
                     </span>
                     {!item.is_free && !isActive && <Lock size={14} style={{ opacity: 0.5 }} />}
@@ -281,9 +284,10 @@ function LockScreen({ lesson, profile, onUnlock, onShop }) {
   return (
     <div style={{
       aspectRatio: '16/9',
+      minHeight: 260,
       background: 'linear-gradient(135deg, #0F172A, #1E293B)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      gap: 16, padding: 24,
+      gap: 16, padding: 'clamp(16px, 4vw, 24px)',
     }}>
       <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Lock size={28} color="white" />
@@ -333,7 +337,7 @@ function QuizStartCard({ quizzes, bestScore, onStart }) {
         background: 'rgba(255, 255, 255, 0.75)', 
         backdropFilter: 'blur(20px) saturate(1.8)',
         WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-        borderRadius: 32, padding: '32px',
+        borderRadius: 32, padding: 'clamp(24px, 6vw, 32px)',
         border: '1px solid rgba(255, 255, 255, 0.5)',
         boxShadow: '0 12px 40px rgba(15,23,42,0.06)',
         position: 'relative', overflow: 'hidden',
