@@ -148,14 +148,14 @@ export default function VideoPlayer({ videoId, lessonId }) {
           onClick={() => setIsFullscreen(!isFullscreen)}
           title="Katta ekran"
           style={{
-            position: 'absolute', bottom: 8, right: 12, zIndex: 20,
-            background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', 
-            borderRadius: 6, padding: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', cursor: 'pointer', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
-            transition: 'all 0.2s', width: 34, height: 34
+            position: 'absolute', bottom: 12, right: 16, zIndex: 20,
+            background: '#3461FF', border: '2px solid rgba(255,255,255,0.8)', 
+            borderRadius: 8, padding: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', cursor: 'pointer', boxShadow: '0 4px 12px rgba(52, 97, 255, 0.4)',
+            transition: 'all 0.2s', width: 36, height: 36
           }}
         >
-          {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+          {isFullscreen ? <Minimize size={20} strokeWidth={2.5} /> : <Maximize size={20} strokeWidth={2.5} />}
         </button>
       )}
 
