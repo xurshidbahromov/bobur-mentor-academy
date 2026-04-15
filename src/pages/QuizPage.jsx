@@ -314,15 +314,16 @@ export default function QuizPage() {
             <motion.div key={current} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               
               {quizzes[current].image_url && (
-                <div 
+                <motion.button 
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setZoomedImage(quizzes[current].image_url)}
-                  style={{ marginBottom: 20, borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', background: 'white', cursor: 'zoom-in', position: 'relative' }}
+                  style={{ display: 'block', width: '100%', padding: 0, marginBottom: 20, borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', background: 'white', cursor: 'pointer', position: 'relative', outline: 'none' }}
                 >
                   <img src={quizzes[current].image_url} alt="Question diagram" style={{ width: '100%', height: 'auto', display: 'block' }} />
                   <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(0,0,0,0.6)', color: 'white', padding: '6px 10px', borderRadius: 12, fontSize: '0.75rem', fontWeight: 600, backdropFilter: 'blur(4px)' }}>
                     Kattalashtirish
                   </div>
-                </div>
+                </motion.button>
               )}
 
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.45, marginBottom: 24 }}>{quizzes[current].question}</h3>
@@ -384,7 +385,7 @@ export default function QuizPage() {
             exit={{ opacity: 0 }}
             onClick={() => setZoomedImage(null)}
             style={{
-              position: 'fixed', inset: 0, zIndex: 9999,
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
               background: 'rgba(15, 23, 42, 0.9)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
