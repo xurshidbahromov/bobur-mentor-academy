@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { toast } from 'sonner'
-import { Maximize, Minimize } from 'lucide-react'
+import { Maximize, X } from 'lucide-react'
 
 export default function VideoPlayer({ videoId, lessonId }) {
   const { user } = useAuth()
@@ -112,43 +112,59 @@ export default function VideoPlayer({ videoId, lessonId }) {
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className={isFullscreen ? 'bma-fullscreen' : ''}
-      style={{ 
-        width: '100%', 
-        aspectRatio: isFullscreen ? 'auto' : '16/9', 
-        borderRadius: isFullscreen ? 0 : 'var(--radius-card)', 
-        overflow: 'hidden',
-        background: '#000',
-        border: 'none',
-        boxShadow: isFullscreen ? 'none' : 'var(--shadow-elevated)',
-        transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-        zIndex: isFullscreen ? 99999 : 1
-      }}
-    >
-      <iframe 
-        id={`yt-${videoId}`}
-        style={{ width: '100%', height: '100%', border: 'none' }}
-        src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&fs=1&modestbranding=1&rel=0&iv_load_policy=3&showinfo=0`}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-        allowFullScreen
-      />
-
-      {/* Custom Fullscreen Toggle for TMA iOS constraints */}
-      <button 
-        onClick={() => setIsFullscreen(!isFullscreen)}
-        title="Katta ekran"
-        style={{
-          position: 'absolute', bottom: 12, right: 16, zIndex: 20,
-          background: '#3461FF', border: '2px solid rgba(255,255,255,0.8)', 
-          borderRadius: 8, padding: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'white', cursor: 'pointer', boxShadow: '0 4px 12px rgba(52, 97, 255, 0.4)',
-          transition: 'all 0.2s', width: 36, height: 36
+    <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* VIDEO CONTAINER */}
+      <div 
+        ref={containerRef}
+        className={isFullscreen ? 'bma-fullscreen' : ''}
+        style={{ 
+          width: '100%', 
+          aspectRatio: isFullscreen ? 'auto' : '16/9', 
+          borderRadius: isFullscreen ? 0 : 'var(--radius-card)', 
+          overflow: 'hidden',
+          background: '#000',
+          border: 'none',
+          boxShadow: isFullscreen ? 'none' : 'var(--shadow-elevated)',
+          transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+          position: 'relative',
+          zIndex: isFullscreen ? 99999 : 1
         }}
       >
-        {isFullscreen ? <Minimize size={20} strokeWidth={2.5} /> : <Maximize size={20} strokeWidth={2.5} />}
-      </button>
+        <iframe 
+          id={`yt-${videoId}`}
+          style={{ width: '100%', height: '100%', border: 'none' }}
+          src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&playsinline=1&controls=1&fs=1&modestbranding=1&rel=0&iv_load_policy=3&showinfo=0`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+        />
+
+        {/* Premium Floating Fullscreen Pill (Apple TV / Netflix style) */}
+        <button 
+          onClick={() => setIsFullscreen(!isFullscreen)}
+          className={isFullscreen ? "premium-pill-btn is-active" : "premium-pill-btn"}
+          style={{
+            position: 'absolute', top: 16, right: 16, zIndex: 200000,
+            background: 'rgba(15, 23, 42, 0.6)', 
+            backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255,255,255,0.12)', 
+            borderRadius: 30, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 8,
+            color: 'white', cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+          }}
+        >
+          {isFullscreen ? (
+            <>
+              <X size={16} strokeWidth={2.5} style={{ color: '#FF4757' }} />
+              <span style={{ fontSize: '0.875rem', fontWeight: 600, letterSpacing: '-0.01em' }}>Ekrandan chiqish</span>
+            </>
+          ) : (
+            <>
+              <Maximize size={16} strokeWidth={2.5} style={{ color: '#3461FF' }} />
+              <span style={{ fontSize: '0.875rem', fontWeight: 600, letterSpacing: '-0.01em' }}>Keng ekran</span>
+            </>
+          )}
+        </button>
+      </div>
 
       <style>{`
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -173,6 +189,13 @@ export default function VideoPlayer({ videoId, lessonId }) {
           display: none !important;
           opacity: 0 !important;
           pointer-events: none !important;
+        }
+        .premium-pill-btn:hover {
+          background: rgba(30, 41, 59, 0.8) !important;
+          transform: scale(1.02);
+        }
+        .premium-pill-btn:active {
+          transform: scale(0.96);
         }
       `}</style>
     </div>
