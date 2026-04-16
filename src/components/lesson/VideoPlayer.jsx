@@ -143,11 +143,11 @@ export default function VideoPlayer({ videoId, lessonId }) {
           onClick={() => setIsFullscreen(!isFullscreen)}
           className={isFullscreen ? "premium-pill-btn is-active" : "premium-pill-btn"}
           style={{
-            position: 'absolute', top: 16, right: 16, zIndex: 200000,
-            background: 'rgba(15, 23, 42, 0.6)', 
+            position: 'absolute', zIndex: 200000,
+            background: 'rgba(15, 23, 42, 0.7)', 
             backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
             border: '1px solid rgba(255,255,255,0.12)', 
-            borderRadius: 30, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 8,
+            borderRadius: 30, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6,
             color: 'white', cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
             boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
           }}
@@ -190,8 +190,24 @@ export default function VideoPlayer({ videoId, lessonId }) {
           opacity: 0 !important;
           pointer-events: none !important;
         }
+
+        /* Share tugmasini ustini to'liq yopish uchun joylashuv (Pastki chap burchak) */
+        .premium-pill-btn {
+          top: auto !important;
+          right: auto !important;
+          bottom: 6px;
+          left: 10px; 
+        }
+
+        .premium-pill-btn.is-active {
+          top: 16px !important;
+          right: 16px !important;
+          bottom: auto !important;
+          left: auto !important;
+        }
+
         .premium-pill-btn:hover {
-          background: rgba(30, 41, 59, 0.8) !important;
+          background: rgba(30, 41, 59, 0.9) !important;
           transform: scale(1.02);
         }
         .premium-pill-btn:active {
