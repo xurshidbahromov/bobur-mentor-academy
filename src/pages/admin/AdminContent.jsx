@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Edit2, Trash2, ChevronRight, ChevronLeft,
-  Video, HelpCircle, BookOpen, Clock, Search, Eye, EyeOff, Loader2, Image as ImageIcon
+  Video, HelpCircle, BookOpen, Clock, Search, Eye, EyeOff, Loader2, Image as ImageIcon, FileText, Upload
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
@@ -47,9 +47,10 @@ export default function AdminContent() {
 
   // forms
   const [courseForm, setCourseForm] = useState({ title: '', description: '', is_published: false })
-  const [lessonForm, setLessonForm] = useState({ title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5 })
+  const [lessonForm, setLessonForm] = useState({ title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5, materials: [] })
   const [quizForm, setQuizForm] = useState({ question: '', option_a: '', option_b: '', option_c: '', option_d: '', correct_option: 'a', explanation: '', time_limit: 60, image_url: '' })
   const [isUploading, setIsUploading] = useState(false)
+  const [isUploadingFile, setIsUploadingFile] = useState(false)
 
   useEffect(() => { fetchData() }, [])
 
@@ -161,9 +162,53 @@ export default function AdminContent() {
   }
   function openLessonModal(l = null) {
     setEditingItem(l)
-    setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published, coin_price: l.coin_price ?? 5, order_index: l.order_index ?? 0 } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5, order_index: '' })
+    setLessonForm(l ? { title: l.title, description: l.description || '', youtube_video_id: l.youtube_video_id || '', is_free: l.is_free, is_published: l.is_published, coin_price: l.coin_price ?? 5, order_index: l.order_index ?? 0, materials: l.materials || [] } : { title: '', description: '', youtube_video_id: '', is_free: false, is_published: false, coin_price: 5, order_index: '', materials: [] })
     setModalType('lesson')
   }
+
+  const handleFileUpload = async (e) => {
+    try {
+      const file = e.target.files[0]
+      if (!file) return
+      if (file.size > 50 * 1024 * 1024) throw new Error("Fayl hajmi 50MB dan oshmasligi kerak!")
+      
+      setIsUploadingFile(true)
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')
+      const fileName = `${Date.now()}_${safeName}`
+      const filePath = `materials/${fileName}`
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('lesson_materials')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('lesson_materials')
+        .getPublicUrl(filePath)
+        
+      setLessonForm(prev => ({ 
+        ...prev, 
+        materials: [...(prev.materials || []), { title: file.name, url: publicUrl }] 
+      }))
+      toast.success("Fayl yuklandi!")
+    } catch (err) {
+      console.error("Upload Error:", err)
+      toast.error("Xatolik: " + err.message)
+    } finally {
+      setIsUploadingFile(false)
+      if (e.target) e.target.value = ''
+    }
+  }
+
+  const removeMaterial = (index) => {
+    setLessonForm(prev => {
+      const newMat = [...(prev.materials || [])]
+      newMat.splice(index, 1)
+      return { ...prev, materials: newMat }
+    })
+  }
+
   const handleImageUpload = async (e) => {
     try {
       const file = e.target.files[0]
@@ -401,6 +446,46 @@ export default function AdminContent() {
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  </div>
+
+                  {/* Materials Section */}
+                  <div style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: 700, color: 'white', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <FileText size={16} color="#3461FF" /> Dars materiallari
+                      </label>
+                      <label style={{ 
+                        background: 'rgba(52, 97, 255, 0.1)', color: '#3461FF', padding: '6px 12px', borderRadius: 8, 
+                        display: 'flex', alignItems: 'center', gap: 6, cursor: isUploadingFile ? 'not-allowed' : 'pointer',
+                        fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.2s'
+                      }}>
+                        {isUploadingFile ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                        {isUploadingFile ? "Yuklanmoqda..." : "Fayl qo'shish"}
+                        <input type="file" onChange={handleFileUpload} disabled={isUploadingFile} hidden accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar" />
+                      </label>
+                    </div>
+
+                    {(lessonForm.materials || []).length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {lessonForm.materials.map((mat, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#1E293B', padding: '8px 12px', borderRadius: 10 }}>
+                            <FileText size={16} color="#94A3B8" flexShrink={0} />
+                            <input 
+                              value={mat.title} 
+                              onChange={e => {
+                                const newMat = [...lessonForm.materials];
+                                newMat[i].title = e.target.value;
+                                setLessonForm({ ...lessonForm, materials: newMat });
+                              }}
+                              style={{ ...inp, padding: '4px 8px', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, flex: 1, fontSize: '0.8125rem' }}
+                            />
+                            <button type="button" onClick={() => removeMaterial(i)} style={{ padding: 6, background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: 6, color: '#EF4444', cursor: 'pointer' }}><Trash2 size={14} /></button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B' }}>Fayl yuklanmagan (PDF, ZIP, PPT).</p>
+                    )}
                   </div>
                 </>}
 

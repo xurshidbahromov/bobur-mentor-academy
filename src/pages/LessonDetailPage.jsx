@@ -5,7 +5,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight, FileText, Download } from 'lucide-react'
 import { useLesson, useQuizzes } from '../hooks/useLessons'
 import { useAccess } from '../hooks/useAccess'
 import { useAuth } from '../context/AuthContext'
@@ -142,11 +142,13 @@ export default function LessonDetailPage() {
               {[
                 { id: 'info', label: 'Ma\'lumot' },
                 { id: 'comments', label: 'Izohlar' },
-                { id: 'quiz', label: 'Quiz' }
+                { id: 'quiz', label: 'Quiz' },
+                { id: 'materials', label: 'Materiallar' }
               ].map((tab) => {
                 const isActive = activeTab === tab.id
-                // Don't show quiz tab if no quizzes
+                // Logic based hiding
                 if (tab.id === 'quiz' && (!canWatch || quizzes.length === 0)) return null
+                if (tab.id === 'materials' && (!canWatch || !lesson.materials || lesson.materials.length === 0)) return null
 
                 return (
                   <button
@@ -219,6 +221,53 @@ export default function LessonDetailPage() {
                     bestScore={bestScore}
                     onStart={() => navigate(`/quiz/${lessonId}`)}
                   />
+                )}
+
+                {activeTab === 'materials' && canWatch && lesson.materials?.length > 0 && (
+                  <div style={{ 
+                    background: 'rgba(255, 255, 255, 0.7)', 
+                    backdropFilter: 'blur(16px)',
+                    borderRadius: 32, padding: 'clamp(20px, 5vw, 32px)',
+                    border: '1px solid rgba(255, 255, 255, 0.5)',
+                    boxShadow: '0 8px 32px rgba(15,23,42,0.03)'
+                  }}>
+                    <h2 className="outfit-font" style={{ margin: '0 0 20px', fontSize: '1.5rem', fontWeight: 900, color: '#0F172A' }}>
+                      Yuklab olish uchun fayllar
+                    </h2>
+                    <div style={{ display: 'grid', gap: 16 }}>
+                      {lesson.materials.map((mat, i) => (
+                        <a 
+                          key={i} 
+                          href={mat.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 16,
+                            background: 'rgba(255,255,255,0.9)', padding: '16px 20px', 
+                            borderRadius: 20, border: '1px solid rgba(15,23,42,0.05)',
+                            textDecoration: 'none', color: 'inherit',
+                            boxShadow: '0 4px 12px rgba(15,23,42,0.03)',
+                            transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)'
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(15,23,42,0.08)' }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,23,42,0.03)' }}
+                        >
+                          <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(52,97,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3461FF', flexShrink: 0 }}>
+                            <FileText size={22} strokeWidth={2.5} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <h3 style={{ margin: '0 0 4px', fontSize: '1.0625rem', fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {mat.title}
+                            </h3>
+                            <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', fontWeight: 600 }}>Dars materiali</p>
+                          </div>
+                          <div style={{ padding: 10, background: '#1E293B', color: 'white', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Download size={18} strokeWidth={2.5} />
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </motion.div>
             </AnimatePresence>

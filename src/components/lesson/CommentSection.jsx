@@ -22,8 +22,8 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
       .from('comments')
       .select(`
         *,
-        profiles:user_id (full_name, avatar_url),
-        lessons:lesson_id (title)
+        profiles (full_name, avatar_url),
+        lessons (title)
       `)
       .eq('course_id', courseId)
       .order('created_at', { ascending: false })
@@ -61,8 +61,8 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
       })
       .select(`
         *,
-        profiles:user_id (full_name, avatar_url),
-        lessons:lesson_id (title)
+        profiles (full_name, avatar_url),
+        lessons (title)
       `)
       .single()
 
@@ -92,14 +92,48 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
     }
   }
 
-  const formatDate = (dateStr) => {
+  const getRelativeTime = (dateStr) => {
+    if (!dateStr) return ''
     const date = new Date(dateStr)
-    return date.toLocaleString('uz-UZ', { 
-      month: 'short', 
-      day: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    })
+    const now = new Date()
+    const diff = Math.floor((now - date) / 1000)
+    
+    if (diff < 60) return "Hozirgina"
+    if (diff < 3600) return `${Math.floor(diff / 60)} daqiqa oldin`
+    if (diff < 86400) return `${Math.floor(diff / 3600)} soat oldin`
+    if (diff < 604800) return `${Math.floor(diff / 86400)} kun oldin`
+    
+    return date.toLocaleString('uz-UZ', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+  }
+
+  const getAvatar = (userUrl, name) => {
+    if (userUrl) return userUrl;
+    let fallback = 'Talaba';
+    if (name) fallback = name;
+    
+    const safeName = encodeURIComponent(fallback);
+    return `https://ui-avatars.com/api/?name=${safeName}&background=3461FF&color=fff&rounded=true&bold=true`;
+  }
+
+  const getDisplayName = (prof, currentUserId, commentUserId) => {
+    // Agar prof massiv kelsa (PostgREST ba'zan shunday qaytaradi)
+    const p = Array.isArray(prof) ? prof[0] : prof;
+    if (p && p.full_name) return p.full_name;
+    
+    // Agar o'zimizning izoh bo'lsa va ism yo'q bo'lsa (Auth dagi Google Meta-dan olamiz)
+    if (currentUserId === commentUserId) {
+      return user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : 'Talaba');
+    }
+    
+    return 'Talaba';
+  }
+
+  const getCommentAvatarUrl = (profUrl, currentUserId, commentUserId) => {
+    if (profUrl) return profUrl;
+    if (currentUserId === commentUserId) {
+      return profile?.avatar_url || user?.user_metadata?.avatar_url;
+    }
+    return null;
   }
 
   return (
@@ -127,7 +161,7 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
         >
           <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#F1F5F9', overflow: 'hidden', flexShrink: 0 }}>
             <img 
-              src={profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
+              src={getAvatar(profile?.avatar_url || user?.user_metadata?.avatar_url, profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : 'Talaba'))} 
               alt="Avatar" 
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
@@ -224,7 +258,7 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
               >
                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#F1F5F9', overflow: 'hidden', flexShrink: 0 }}>
                   <img 
-                    src={comment.profiles?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user_id}`} 
+                    src={getAvatar(getCommentAvatarUrl(Array.isArray(comment.profiles) ? comment.profiles[0]?.avatar_url : comment.profiles?.avatar_url, user?.id, comment.user_id), getDisplayName(comment.profiles, user?.id, comment.user_id))} 
                     alt="Avatar" 
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
@@ -232,7 +266,9 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                      <span style={{ fontWeight: 800, color: '#0F172A', fontSize: '0.9375rem' }}>{comment.profiles?.full_name || 'Talaba'}</span>
+                      <span style={{ fontWeight: 800, color: '#0F172A', fontSize: '0.9375rem' }}>
+                        {getDisplayName(comment.profiles, user?.id, comment.user_id)}
+                      </span>
                       {showLessonTag && comment.lessons?.title && (
                         <span style={{ 
                           fontSize: '0.6875rem', fontWeight: 800, color: 'var(--color-primary)', 
@@ -245,7 +281,7 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94A3B8' }}>
                       <Clock size={12} />
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{formatDate(comment.created_at)}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{getRelativeTime(comment.created_at)}</span>
                       {user?.id === comment.user_id && (
                         <button 
                           onClick={() => handleDelete(comment.id)}
