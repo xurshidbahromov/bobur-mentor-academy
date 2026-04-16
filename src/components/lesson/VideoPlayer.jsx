@@ -138,7 +138,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
         />
 
-        {/* Premium Floating Fullscreen Pill (Apple TV / Netflix style) */}
+        {/* Premium Floating Fullscreen Compact Pill (Always shields Share button) */}
         <button 
           onClick={() => setIsFullscreen(!isFullscreen)}
           className={isFullscreen ? "premium-pill-btn is-active" : "premium-pill-btn"}
@@ -147,20 +147,24 @@ export default function VideoPlayer({ videoId, lessonId }) {
             background: 'rgba(15, 23, 42, 0.7)', 
             backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
             border: '1px solid rgba(255,255,255,0.12)', 
-            borderRadius: 30, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6,
+            borderRadius: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            gap: isFullscreen ? 8 : 6,
             color: 'white', cursor: 'pointer', transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+            boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
+            padding: isFullscreen ? '0 16px' : '0 6px',
+            width: 'auto',
+            height: isFullscreen ? 40 : 28
           }}
         >
           {isFullscreen ? (
             <>
-              <X size={16} strokeWidth={2.5} style={{ color: '#FF4757' }} />
-              <span style={{ fontSize: '0.875rem', fontWeight: 600, letterSpacing: '-0.01em' }}>Ekrandan chiqish</span>
+              <X size={18} strokeWidth={2.5} style={{ color: '#FF4757' }} />
+              <span style={{ fontSize: '0.9rem', fontWeight: 600, letterSpacing: '-0.01em', color: '#F1F5F9' }}>Ekrandan chiqish</span>
             </>
           ) : (
             <>
-              <Maximize size={16} strokeWidth={2.5} style={{ color: '#3461FF' }} />
-              <span style={{ fontSize: '0.875rem', fontWeight: 600, letterSpacing: '-0.01em' }}>Keng ekran</span>
+              <Maximize size={13} strokeWidth={2.5} style={{ color: '#3461FF' }} />
+              <span style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.01em', color: '#E2E8F0' }}>Keng ekran</span>
             </>
           )}
         </button>
@@ -195,15 +199,13 @@ export default function VideoPlayer({ videoId, lessonId }) {
         .premium-pill-btn {
           top: auto !important;
           right: auto !important;
-          bottom: 6px;
-          left: 10px; 
+          bottom: 10px !important;
+          left: 10px !important; 
         }
 
         .premium-pill-btn.is-active {
-          top: 16px !important;
-          right: 16px !important;
-          bottom: auto !important;
-          left: auto !important;
+          bottom: 10px !important;
+          left: 10px !important; 
         }
 
         .premium-pill-btn:hover {
