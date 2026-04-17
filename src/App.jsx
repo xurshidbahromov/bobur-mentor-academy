@@ -17,6 +17,8 @@ import PublicBottomNav from './components/layout/PublicBottomNav'
 import Footer from './components/layout/Footer'
 import AppRoutes from './routes'
 import NotificationListener from './components/NotificationListener'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 // ── Route zones ──────────────────────────────────────
 const PUBLIC_ROUTES = ['/']  // only '/' auto-redirects logged-in users
@@ -273,6 +275,8 @@ export default function App() {
           <TelegramAutoLogin />
           <SmartRedirect />
           <NotificationListener />
+          <Analytics />
+          <SpeedInsights />
           <Toaster
             position="top-center"
             richColors
