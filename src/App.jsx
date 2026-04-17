@@ -82,122 +82,21 @@ function AppShell() {
   const { user, loading } = useAuth()
   const path = location.pathname
 
-  // ── Global Initial Loading State (Premium Education Splash Screen) ──
+  // ── Minimal loading (reduces LCP blocking time) ──
   if (loading) {
     return (
       <div style={{
-        minHeight: '100vh', width: '100%',
+        minHeight: '100dvh', width: '100%',
         background: '#ffffff',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        position: 'relative', overflow: 'hidden'
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        {/* Minimalist soft glow from center */}
         <div style={{
-          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          width: '50vw', height: '50vw', borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(52,97,255,0.04) 0%, transparent 70%)',
-          pointerEvents: 'none',
+          width: 36, height: 36, borderRadius: '50%',
+          border: '3px solid rgba(52,97,255,0.15)',
+          borderTopColor: '#3461FF',
+          animation: 'spin 0.7s linear infinite',
         }} />
-
-        {/* Elegant Book Animation Loop */}
-        <div style={{ position: 'relative', width: 90, height: 70, perspective: 1000, marginBottom: 24 }}>
-          {/* Main Book Cover Background */}
-          <div style={{
-            position: 'absolute', left: '50%', top: 10, transform: 'translateX(-50%)',
-            width: 80, height: 50, background: '#F8FAFC',
-            borderRadius: 6, border: '2px solid rgba(52,97,255,0.1)',
-            boxShadow: '0 8px 24px rgba(52,97,255,0.08)'
-          }} />
-
-          {/* Left Solid Pages */}
-          <div style={{
-            position: 'absolute', right: '50%', top: 14,
-            width: 36, height: 42, background: 'white',
-            borderRadius: '4px 0 0 4px', border: '1px solid #E2E8F0',
-            borderRight: 'none',
-            boxShadow: 'inset 2px 0 4px rgba(0,0,0,0.02)'
-          }} />
-
-          {/* Right Solid Pages */}
-          <div style={{
-            position: 'absolute', left: '50%', top: 14,
-            width: 36, height: 42, background: 'white',
-            borderRadius: '0 4px 4px 0', border: '1px solid #E2E8F0',
-            borderLeft: 'none',
-            boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.02)'
-          }} />
-
-          {/* Center Spine Crease */}
-          <div style={{
-            position: 'absolute', left: '50%', top: 10, transform: 'translateX(-50%)',
-            width: 4, height: 50, background: 'rgba(52,97,255,0.1)',
-            borderRadius: 2
-          }} />
-
-          {/* Flipping Pages */}
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute', left: '50%', top: 14,
-                width: 36, height: 42, background: 'none',
-                transformOrigin: '0% 50%',
-                transformStyle: 'preserve-3d',
-                animation: `flipPage 2.4s ease-in-out infinite`,
-                animationDelay: `${i * 0.3}s`,
-                zIndex: 10 - i
-              }}
-            >
-              {/* Front of the flipping page */}
-              <div style={{
-                position: 'absolute', inset: 0, background: 'white',
-                borderRadius: '0 4px 4px 0', border: '1px solid #E2E8F0',
-                borderLeft: '1px solid #CBD5E1',
-                backfaceVisibility: 'hidden',
-                // Page line details
-                backgroundImage: 'linear-gradient(transparent 90%, #F1F5F9 10%)',
-                backgroundSize: '100% 8px',
-              }} />
-              {/* Back of the flipping page */}
-              <div style={{
-                position: 'absolute', inset: 0, background: '#F8FAFC',
-                borderRadius: '4px 0 0 4px', border: '1px solid #E2E8F0',
-                borderRight: '1px solid #CBD5E1',
-                backfaceVisibility: 'hidden',
-                transform: 'rotateY(180deg)'
-              }} />
-            </div>
-          ))}
-        </div>
-
-        {/* Text Area */}
-        <h2 className="outfit-font" style={{
-          fontSize: '1.25rem', fontWeight: 800, color: '#0F172A',
-          margin: '0 0 4px', letterSpacing: '-0.02em',
-        }}>
-          Bobur Mentor
-        </h2>
-        <p style={{
-          margin: 0, color: '#64748B', fontSize: '0.875rem', fontWeight: 500,
-          display: 'flex', alignItems: 'center', gap: 2
-        }}>
-          Darslar ochilmoqda
-          <span style={{ animation: 'blinkDot 1.4s infinite 0s' }}>.</span>
-          <span style={{ animation: 'blinkDot 1.4s infinite 0.2s' }}>.</span>
-          <span style={{ animation: 'blinkDot 1.4s infinite 0.4s' }}>.</span>
-        </p>
-
-        <style>{`
-          @keyframes flipPage {
-            0% { transform: rotateY(0deg); }
-            50% { transform: rotateY(-180deg); }
-            100% { transform: rotateY(0deg); }
-          }
-          @keyframes blinkDot {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-          }
-        `}</style>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     )
   }
