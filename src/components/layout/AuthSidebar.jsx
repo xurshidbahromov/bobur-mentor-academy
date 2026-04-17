@@ -33,15 +33,17 @@ export default function AuthSidebar() {
       <aside className="auth-desktop-sidebar" style={{
         width: 280,
         height: '100vh',
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
+        left: 0,
         background: 'white',
         borderRight: '1.5px solid rgba(100,120,255,0.08)',
         display: 'flex',
         flexDirection: 'column',
         padding: '28px 24px',
         zIndex: 100,
-        boxShadow: '4px 0 24px rgba(0,0,0,0.02)'
+        boxShadow: '4px 0 24px rgba(0,0,0,0.02)',
+        overflowY: 'auto',
       }}>
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', marginBottom: 40 }}>

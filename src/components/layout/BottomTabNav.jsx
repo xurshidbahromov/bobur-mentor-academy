@@ -48,11 +48,11 @@ const IcoTarget = ({ active }) => (
 )
 
 const TABS = [
-  { to: '/dashboard',   label: "Darslar",  Icon: IcoHome    },
-  { to: '/shop',        label: "Do'kon",   Icon: IcoShop    },
-  { to: '/quizzes',     label: "Testlar",  Icon: IcoTarget  },
-  { to: '/leaderboard', label: "Reyting",  Icon: IcoTrophy  },
-  { to: '/profile',     label: "Profil",   Icon: IcoProfile },
+  { to: '/dashboard', label: "Darslar", Icon: IcoHome },
+  { to: '/shop', label: "Do'kon", Icon: IcoShop },
+  { to: '/quizzes', label: "Testlar", Icon: IcoTarget },
+  { to: '/leaderboard', label: "Reyting", Icon: IcoTrophy },
+  { to: '/profile', label: "Profil", Icon: IcoProfile },
 ]
 
 export default function BottomTabNav() {

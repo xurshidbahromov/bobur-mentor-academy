@@ -96,7 +96,7 @@ html {
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-base);
   color: var(--text-primary);
   line-height: 1.6;
@@ -116,8 +116,45 @@ body {
   max-width: 100vw;
 }
 
+/* CLS Fix: Reserve dimensions for images before they load */
+img, video {
+  height: auto;
+  max-width: 100%;
+  /* Prevent layout shift while loading */
+  content-visibility: auto;
+}
+
+/* CLS Fix: Prevent font-swap layout shift with size-adjust fallback */
+@font-face {
+  font-family: 'Outfit Fallback';
+  src: local('Arial');
+  ascent-override: 94%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+  size-adjust: 103%;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans Fallback';
+  src: local('Arial');
+  ascent-override: 96%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  size-adjust: 100%;
+}
+
+/* INP Fix: Reduce paint work on interactive elements */
+button, a, [role="button"] {
+  touch-action: manipulation; /* removes 300ms tap delay on mobile */
+}
+
+/* Performance: GPU-accelerate fixed/animated elements */
+.mobile-bottom-nav {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
 h1, h2, h3, h4, h5, h6, .outfit-font {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Outfit Fallback', sans-serif;
   letter-spacing: -0.02em;
 }
 
@@ -177,6 +214,17 @@ input, textarea {
   );
   background-size: 800px 100%;
   animation: shimmer 2s infinite linear;
+}
+
+/* === Auth Layout — Fixed Sidebar Offset === */
+/* Mobile: sidebar hidden, no offset */
+.auth-desktop-sidebar { display: none; }
+.auth-main-content    { padding-left: 0; }
+
+/* Desktop (≥ 768px): show fixed sidebar, offset content */
+@media (min-width: 768px) {
+  .auth-desktop-sidebar { display: flex; }
+  .auth-main-content    { padding-left: 280px; }
 }
 
 /* === Glass Card Utility === */
