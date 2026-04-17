@@ -3,7 +3,7 @@
 
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Coins, Target } from 'lucide-react'
+import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Target } from 'lucide-react'
 
 export default function AuthSidebar() {
   const { user, profile, isAdmin, signOut } = useAuth()

@@ -16,6 +16,7 @@ import BottomTabNav from './components/layout/BottomTabNav'
 import PublicBottomNav from './components/layout/PublicBottomNav'
 import Footer from './components/layout/Footer'
 import AppRoutes from './routes'
+import NotificationListener from './components/NotificationListener'
 
 // ── Route zones ──────────────────────────────────────
 const PUBLIC_ROUTES = ['/']  // only '/' auto-redirects logged-in users
@@ -271,6 +272,7 @@ export default function App() {
         <AuthProvider>
           <TelegramAutoLogin />
           <SmartRedirect />
+          <NotificationListener />
           <Toaster
             position="top-center"
             richColors

@@ -8,8 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useTelegram } from '../context/TelegramProvider'
 import { supabase } from '../lib/supabase'
-import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target } from 'lucide-react'
+import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target, Info } from 'lucide-react'
 import { toast } from 'sonner'
+import { useUnreadNotifications } from '../context/useUnreadNotifications'
 
 // ─────────────────────────────────────────────────────
 // Sub-components
@@ -118,6 +119,8 @@ export default function DashboardPage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [claimedDaily, setClaimedDaily] = useState(false)
+  const [dbNotifications, setDbNotifications] = useState([])
+  const unreadCount = useUnreadNotifications()
 
   useEffect(() => {
     if (user) {
@@ -138,6 +141,20 @@ export default function DashboardPage() {
     }
     fetchCourses()
   }, [user])
+
+  useEffect(() => {
+    if (isNotificationsOpen && user?.id) {
+      supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(6)
+        .then(({ data }) => {
+          setDbNotifications(data || [])
+          if (data?.some(n => !n.is_read)) {
+            supabase.rpc('mark_notifications_read').then(() => {
+              window.dispatchEvent(new CustomEvent('bma:new-notification'))
+            })
+          }
+        })
+    }
+  }, [isNotificationsOpen, user?.id])
 
   const handleClaimReward = async () => {
     if (claimedDaily || !user) return
@@ -276,7 +293,9 @@ export default function DashboardPage() {
                   >
                     <Bell size={20} color="#0F172A" />
                     {/* Unread Indicator */}
-                    <div style={{ position: 'absolute', top: 12, right: 12, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid white' }} />
+                    {unreadCount > 0 && (
+                      <div style={{ position: 'absolute', top: 12, right: 12, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid white' }} />
+                    )}
                   </button>
 
                   <AnimatePresence>
@@ -293,37 +312,43 @@ export default function DashboardPage() {
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           style={{
-                            position: 'absolute', top: 54, right: 0, width: 280,
+                            position: 'absolute', top: 54, right: 0, width: 300,
                             background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(24px) saturate(2.5)',
                             WebkitBackdropFilter: 'blur(24px) saturate(2.5)',
                             border: '1px solid rgba(52,97,255,0.15)', borderRadius: 24, padding: '20px 16px',
-                            boxShadow: '0 12px 40px rgba(15,23,42,0.08)', zIndex: 100
+                            boxShadow: '0 12px 40px rgba(15,23,42,0.08)', zIndex: 100,
+                            maxHeight: 400, overflowY: 'auto'
                           }}
                         >
                         <h4 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 800, color: '#0F172A', paddingLeft: 4 }}>Bildirishnomalar</h4>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                          {/* Notification 1 */}
-                          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '0 4px' }}>
-                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(52,97,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <Gift size={16} color="#3461FF" />
-                            </div>
-                            <div>
-                              <p style={{ margin: '0 0 2px', fontSize: '0.875rem', fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>Xush kelibsiz!</p>
-                              <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4, fontWeight: 500 }}>Har kunlik tangalaringizni yig'ishni unutmang.</p>
-                            </div>
-                          </div>
-                          
-                          {/* Notification 2 */}
-                          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '0 4px' }}>
-                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <CheckCircle2 size={16} color="#10B981" />
-                            </div>
-                            <div>
-                              <p style={{ margin: '0 0 2px', fontSize: '0.875rem', fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>Tizim yangilandi</p>
-                              <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4, fontWeight: 500 }}>Aura Glassmorphism dizayni to'liq ishga tushdi.</p>
-                            </div>
-                          </div>
+                          {dbNotifications.length === 0 ? (
+                            <p style={{ margin: '10px 0', fontSize: '0.875rem', color: '#64748B', textAlign: 'center' }}>Hozircha xabarlar yo'q.</p>
+                          ) : (
+                            dbNotifications.map(n => {
+                              let IconNode = <Info size={16} color="#3461FF" />;
+                              let bgNode = 'rgba(52,97,255,0.1)';
+                              if (n.type === 'success') { IconNode = <CheckCircle2 size={16} color="#10B981" />; bgNode = 'rgba(16,185,129,0.1)'; }
+                              if (n.type === 'warning') { IconNode = <AlertCircle size={16} color="#F59E0B" />; bgNode = 'rgba(245,158,11,0.1)'; }
+                              if (n.type === 'error') { IconNode = <AlertCircle size={16} color="#EF4444" />; bgNode = 'rgba(239,68,68,0.1)'; }
+                              
+                              return (
+                                <div key={n.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '0 4px', opacity: n.is_read ? 0.7 : 1 }}>
+                                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: bgNode, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                    {IconNode}
+                                  </div>
+                                  <div>
+                                    <p style={{ margin: '0 0 2px', fontSize: '0.875rem', fontWeight: n.is_read ? 600 : 700, color: '#0F172A', lineHeight: 1.3 }}>{n.title}</p>
+                                    <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4, fontWeight: 500 }}>{n.message}</p>
+                                    <span style={{ fontSize: '0.65rem', color: '#94A3B8', fontWeight: 500, marginTop: 4, display: 'block' }}>
+                                      {new Date(n.created_at).toLocaleString('uz-UZ', { hour: '2-digit', minute:'2-digit', day: 'numeric', month: 'short' })}
+                                    </span>
+                                  </div>
+                                </div>
+                              )
+                            })
+                          )}
                         </div>
                       </motion.div>
                     </>
