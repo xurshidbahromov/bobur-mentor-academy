@@ -224,7 +224,16 @@ input, textarea {
 /* Desktop (≥ 768px): show fixed sidebar, offset content */
 @media (min-width: 768px) {
   .auth-desktop-sidebar { display: flex; }
-  .auth-main-content    { padding-left: 280px; }
+  .auth-main-content    { 
+    padding-left: 280px; 
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .auth-main-content {
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 16px));
+  }
 }
 
 /* === Glass Card Utility === */

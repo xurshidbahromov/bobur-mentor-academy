@@ -153,7 +153,7 @@ export default function AdminLayout() {
         </header>
 
         {/* Page content */}
-        <div style={{ flex: 1, padding: isMobile ? '20px 16px 40px' : '32px 40px' }}>
+        <div style={{ flex: 1, padding: isMobile ? '20px 16px 40px' : '32px 40px 24px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <Outlet />
           </div>

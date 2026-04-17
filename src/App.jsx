@@ -239,7 +239,7 @@ function AppShell() {
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', width: '100%', minHeight: '100vh' }}>
             <AuthSidebar />
             {/* Main content area — naturally scrolls with body */}
-            <div className="auth-main-content" style={{ flex: 1, minWidth: 0, paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 16px))' }}>
+            <div className="auth-main-content" style={{ flex: 1, minWidth: 0 }}>
               <main>
                 <AppRoutes />
               </main>
