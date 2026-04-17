@@ -5,7 +5,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight, FileText, Download } from 'lucide-react'
+import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight, FileText, Download, Info, MessageCircle, Target, Paperclip } from 'lucide-react'
 import { useLesson, useQuizzes } from '../hooks/useLessons'
 import { useAccess } from '../hooks/useAccess'
 import { useAuth } from '../context/AuthContext'
@@ -130,20 +130,24 @@ export default function LessonDetailPage() {
               )}
             </div>
 
-            {/* Glassy Tab Bar */}
+            {/* Glassy Tab Bar — always 1 row, no wrap */}
             <div style={{ 
-              display: 'flex', flexWrap: 'wrap', background: 'rgba(255, 255, 255, 0.7)', 
+              display: 'flex',
+              overflowX: 'auto',
+              background: 'rgba(255, 255, 255, 0.7)', 
               backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
               borderRadius: 24, padding: 4, 
               border: '1px solid rgba(255, 255, 255, 0.5)',
               boxShadow: '0 8px 32px rgba(15,23,42,0.03)',
-              maxWidth: 480
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch',
             }}>
               {[
-                { id: 'info', label: 'Ma\'lumot' },
-                { id: 'comments', label: 'Izohlar' },
-                { id: 'quiz', label: 'Quiz' },
-                { id: 'materials', label: 'Materiallar' }
+                { id: 'info',      label: "Ma'lumot",    icon: <Info size={15} strokeWidth={2.5} /> },
+                { id: 'comments',  label: 'Izohlar',     icon: <MessageCircle size={15} strokeWidth={2.5} /> },
+                { id: 'quiz',      label: 'Quiz',        icon: <Target size={15} strokeWidth={2.5} /> },
+                { id: 'materials', label: 'Materiallar', icon: <Paperclip size={15} strokeWidth={2.5} /> }
               ].map((tab) => {
                 const isActive = activeTab === tab.id
                 // Logic based hiding
@@ -155,16 +159,19 @@ export default function LessonDetailPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     style={{
-                      flex: '1 1 auto', minWidth: 100, padding: '10px', borderRadius: 20, border: 'none',
+                      flex: '1 0 auto',
+                      padding: '10px 16px', borderRadius: 20, border: 'none',
                       background: isActive ? '#FFFFFF' : 'transparent',
                       color: isActive ? '#0F172A' : '#64748B',
-                      fontWeight: 800, fontSize: '0.875rem',
+                      fontWeight: 800, fontSize: '0.8125rem',
                       boxShadow: isActive ? '0 4px 12px rgba(15,23,42,0.08)' : 'none',
                       cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
                       WebkitTapHighlightColor: 'transparent',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      gap: 6, whiteSpace: 'nowrap',
                     }}
                   >
+                    <span style={{ opacity: isActive ? 1 : 0.6, transition: 'opacity 0.2s' }}>{tab.icon}</span>
                     {tab.label}
                   </button>
                 )

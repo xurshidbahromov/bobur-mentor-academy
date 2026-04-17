@@ -18,10 +18,17 @@ export default function PaymentModal({ pkg, onClose }) {
   const IconComp = PACKAGE_ICONS[pkg?.id] || Zap
   const CARD_NUMBER = "8600 9999 9999 9999" // Sizning real kartangiz (uzbek/humo)
   const CARD_NAME = "BOBURBEK"
-  const ADMIN_TG = "@BoburMentor_Admin"
-  const ADMIN_PHONE = "+998 90 123 45 67"
+  const ADMIN_TG = "@Bobur_mentor"
+  const ADMIN_PHONE = "+998888787969"
 
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    setMounted(true)
+    // Lock body scroll when modal is open
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
 
   const handleCopy = () => {
     navigator.clipboard.writeText(CARD_NUMBER.replace(/\s/g, ''))
@@ -75,6 +82,8 @@ export default function PaymentModal({ pkg, onClose }) {
           <motion.div
              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
              transition={{ duration: 0.25 }} onClick={!isSubmitting ? onClose : undefined}
+             onTouchMove={(e) => e.preventDefault()}
+             onWheel={(e) => e.preventDefault()}
              style={{
                position: 'fixed', inset: 0, zIndex: 20000,
                background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)'
@@ -90,7 +99,7 @@ export default function PaymentModal({ pkg, onClose }) {
                maxWidth: 540, margin: '0 auto', background: '#FFFFFF',
                borderTopLeftRadius: 32, borderTopRightRadius: 32,
                boxShadow: '0 -24px 80px rgba(15,23,42,0.15)',
-               padding: '0 0 32px', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '90vh'
+               padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '90vh'
              }}
           >
              {/* Handle */}
@@ -114,7 +123,7 @@ export default function PaymentModal({ pkg, onClose }) {
                </button>
              </div>
 
-             <div style={{ overflowY: 'auto', padding: '24px', flex: 1 }}>
+             <div style={{ overflowY: 'auto', padding: '24px', flex: 1, overscrollBehavior: 'contain' }}>
                 
                 {/* 1. Package Info */}
                 <div style={{ padding: '16px 20px', borderRadius: 20, background: 'rgba(241, 245, 249, 0.7)', border: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
@@ -201,23 +210,24 @@ export default function PaymentModal({ pkg, onClose }) {
 
              </div>
 
-             {/* Footer Actions */}
-             <div style={{ padding: '0 24px', flexShrink: 0 }}>
-               <button
-                 onClick={handleSubmit}
-                 disabled={isSubmitting}
-                 style={{
-                   width: '100%', height: 54, borderRadius: 16, border: 'none',
-                   background: isSubmitting ? '#94A3B8' : '#3461FF',
-                   color: 'white', fontWeight: 800, fontSize: '1rem', cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                   boxShadow: isSubmitting ? 'none' : '0 8px 24px rgba(52,97,255,0.3)',
-                   transition: 'all 0.2s', padding: 0
-                 }}
-               >
-                 {isSubmitting ? "Yuborilmoqda..." : "To'lov qildim (Chekni Adminga yubordim)"}
-               </button>
-             </div>
+              {/* Footer Actions */}
+              <div style={{ padding: '8px 24px 24px', flexShrink: 0 }}>
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  style={{
+                    width: '100%', height: 52, borderRadius: 14, border: 'none',
+                    background: isSubmitting ? '#94A3B8' : '#3461FF',
+                    color: 'white', fontWeight: 800, fontSize: '1rem', cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    boxShadow: isSubmitting ? 'none' : '0 6px 20px rgba(52,97,255,0.4)',
+                    transition: 'all 0.2s', padding: 0,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {isSubmitting ? "Yuborilmoqda..." : "To'lov qildim — Chekni yubordim"}
+                </button>
+              </div>
 
           </motion.div>
         </>
