@@ -42,18 +42,18 @@ const STEPS = [
   },
   { 
     icon: CreditCard, color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)',
-    title: "To'lov usulini tanlang",
-    text: "Click yoki Payme orqali qulay va xavfsiz to'lov amalga oshiring"
+    title: "Karta orqali to'lang",
+    text: "Ekranda ko'rsatilgan Karta raqamiga yozilgan summani o'tkazing"
   },
   { 
     icon: CheckCircle2, color: '#10B981', bg: 'rgba(16,185,129,0.1)',
-    title: 'Tasdiqlang',
-    text: "To'lov ma'lumotlarini tekshirib, tasdiqlash tugmasini bosing"
+    title: 'Kvitansiya yuboring',
+    text: "To'lov qilinganligini isboti sifatida skrinshotni Adminga yuboring"
   },
   { 
     icon: Zap, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
     title: 'Coinlar tushadi',
-    text: "To'lov tasdiqlangandan so'ng coinlar darhol hisobingizga qo'shiladi"
+    text: "Admin sizning so'rovingizni tasdiqlashi bilan coinlar hisobingizga qo'shiladi"
   },
 ]
 

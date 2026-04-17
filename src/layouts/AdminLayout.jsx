@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, BookOpen, HelpCircle, Users,
-  LogOut, ChevronRight, Menu, X, Target,
+  LogOut, ChevronRight, Menu, X, Target, Coins,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
@@ -17,6 +17,7 @@ const MENU = [
   { name: 'Dars Boshqaruvi',  path: '/admin/content',          icon: BookOpen        },
   { name: 'Umumiy Testlar',   path: '/admin/general-quizzes',  icon: Target          },
   { name: 'Foydalanuvchilar', path: '/admin/users',            icon: Users           },
+  { name: 'To\'lovlar',       path: '/admin/payments',         icon: Coins           },
 ]
 
 function useIsMobile() {

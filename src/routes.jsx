@@ -30,6 +30,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminContent = lazy(() => import('./pages/admin/AdminContent'))
 const AdminGeneralQuizzes = lazy(() => import('./pages/admin/AdminGeneralQuizzes'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminPayments = lazy(() => import('./pages/admin/AdminPayments'))
 
 // ── Page transition ───────────────────────────────────
 const pageVariants = {
@@ -75,6 +76,7 @@ export default function AppRoutes() {
             <Route path="content" element={<AdminContent />} />
             <Route path="general-quizzes" element={<AdminGeneralQuizzes />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="payments" element={<AdminPayments />} />
           </Route>
 
           {/* ── 404 ── */}
