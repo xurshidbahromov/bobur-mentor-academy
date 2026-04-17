@@ -7,6 +7,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const [timeframe, setTimeframe] = useState('weekly') // 'weekly', 'monthly', 'yearly'
+
   useEffect(() => {
     async function fetchStats() {
       const { data, error } = await supabase.rpc('get_admin_stats')
@@ -92,26 +94,80 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Secondary Stats Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-        <div style={{ background: '#1E293B', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '24px' }}>
-            <Flame color="#F59E0B" />
-            <h2 style={{ fontSize: '1.125rem', margin: 0 }}>Faol O'quvchilar</h2>
+      {/* Revenue Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '24px', marginBottom: '48px' }}>
+        <div style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0 0 4px' }}>Daromad Dinamikasi</h2>
+              <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem' }}>Barcha kurslardan tushgan jami daromad</p>
+            </div>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '12px' }}>
+              {['weekly', 'monthly', 'yearly'].map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTimeframe(t)}
+                  style={{
+                    padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+                    background: timeframe === t ? '#3461FF' : 'transparent',
+                    color: timeframe === t ? 'white' : '#64748B',
+                    fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.2s'
+                  }}
+                >
+                  {t === 'weekly' ? 'Hafta' : t === 'monthly' ? 'Oy' : 'Yil'}
+                </button>
+              ))}
+            </div>
           </div>
-          <p style={{ fontSize: '2.5rem', fontWeight: 800, margin: '0 0 8px' }}>{stats?.active_streaks || 0}</p>
-          <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem' }}>Hozirda kamida 1 kunlik olovga (streak) ega o'quvchilar soni.</p>
+
+          {/* Simple SVG Chart */}
+          <div style={{ height: '240px', width: '100%', position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
+            {(stats?.[`revenue_${timeframe}`] || []).map((val, i, arr) => {
+              const max = Math.max(...arr, 1000)
+              const height = (val / max) * 100
+              return (
+                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '100%', height: `${height}%`, background: 'linear-gradient(to top, #3461FF, #8B5CF6)', borderRadius: '6px 6px 2px 2px', minHeight: '4px', opacity: 0.8 + (height/500) }} />
+                  <span style={{ fontSize: '10px', color: '#475569', fontWeight: 600 }}>{i + 1}</span>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
-        <div style={{ background: 'linear-gradient(135deg, #3461FF, #8B5CF6)', padding: '32px', borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
-          <TrendingUp size={140} color="rgba(255,255,255,0.1)" style={{ position: 'absolute', right: -20, bottom: -20 }} />
-          <h2 style={{ fontSize: '1.25rem', margin: '0 0 16px', fontWeight: 700 }}>Yangi Kurs qo'shish</h2>
-          <p style={{ margin: '0 0 24px', color: 'rgba(255,255,255,0.8)', maxWidth: '280px' }}>Platformaga yangi darslar va video kontentlarni joylashtirishni boshlang.</p>
-          <button style={{ 
-            background: 'white', color: '#3461FF', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' 
-          }}>
-            Kurs Yaratish
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', flex: 1 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(16,185,129,0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+              <TrendingUp size={24} />
+            </div>
+            <h3 style={{ margin: '0 0 4px', fontSize: '0.875rem', color: '#94A3B8', fontWeight: 500 }}>Jami Tushum</h3>
+            <p style={{ margin: 0, fontSize: '2rem', fontWeight: 800 }}>{stats?.total_revenue?.toLocaleString() || 0} UZS</p>
+            <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: 6, color: '#10B981', fontSize: '0.8125rem', fontWeight: 700 }}>
+              <ArrowUpRight size={16} /> +24% o'tgan oyga nisbatan
+            </div>
+          </div>
+
+          <div style={{ background: 'linear-gradient(135deg, #3461FF, #8B5CF6)', padding: '32px', borderRadius: '32px', position: 'relative', overflow: 'hidden' }}>
+             <h3 style={{ margin: '0 0 8px', fontSize: '1.125rem', fontWeight: 800 }}>Tezkor Harakat</h3>
+             <p style={{ margin: '0 0 20px', color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem' }}>Yangi kurs yoki dars qo'shish.</p>
+             <button style={{ background: 'white', color: '#3461FF', border: 'none', padding: '12px 24px', borderRadius: '14px', fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem' }}>
+               Boshlash
+             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary Stats Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+        <div style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '24px' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Flame color="#F59E0B" size={20} />
+            </div>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Faol O'quvchilar</h2>
+          </div>
+          <p style={{ fontSize: '2.5rem', fontWeight: 800, margin: '0 0 8px' }}>{stats?.active_streaks || 0}</p>
+          <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem', lineHeight: 1.5 }}>Hozirda kamida 1 kunlik olovga (streak) ega o'quvchilar soni.</p>
         </div>
       </div>
     </div>

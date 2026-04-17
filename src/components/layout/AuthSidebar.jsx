@@ -3,7 +3,7 @@
 
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Target } from 'lucide-react'
+import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Target, Bell, Coins } from 'lucide-react'
 
 export default function AuthSidebar() {
   const { user, profile, isAdmin, signOut } = useAuth()
@@ -24,9 +24,10 @@ export default function AuthSidebar() {
     { to: '/shop',        label: "Do'kon",   icon: <ShoppingBag size={20} /> },
     { to: '/profile',     label: 'Profil',   icon: <User size={20} /> },
   ]
-  if (isAdmin) {
-    links.push({ to: '/admin', label: 'Admin Panel', icon: <ShieldCheck size={20} /> })
-  }
+
+  const adminLinks = [
+    { to: '/admin/dashboard', label: 'Admin Panel', icon: <ShieldCheck size={20} /> },
+  ]
 
   return (
     <>
@@ -83,6 +84,39 @@ export default function AuthSidebar() {
               )}
             </NavLink>
           ))}
+
+          {isAdmin && (
+            <div style={{ marginTop: 24 }}>
+              <p style={{ margin: '0 0 8px', fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: 12 }}>
+                Admin
+              </p>
+              {adminLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  style={({ isActive }) => ({
+                    display: 'flex', alignItems: 'center', gap: 14,
+                    padding: '12px 14px', borderRadius: 12,
+                    textDecoration: 'none',
+                    color: isActive ? '#3461FF' : '#475569',
+                    background: isActive ? 'rgba(52,97,255,0.08)' : 'transparent',
+                    fontWeight: isActive ? 700 : 600,
+                    fontSize: '0.9375rem',
+                    transition: 'all 0.2s',
+                  })}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <div style={{ color: isActive ? '#3461FF' : '#94A3B8', transition: 'color 0.2s' }}>
+                        {link.icon}
+                      </div>
+                      {link.label}
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          )}
         </nav>
 
         {/* Footer actions */}

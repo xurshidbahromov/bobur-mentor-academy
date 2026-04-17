@@ -7,17 +7,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, BookOpen, HelpCircle, Users,
-  LogOut, ChevronRight, Menu, X, Target, Coins,
+  LogOut, ChevronRight, Menu, X, Target, Coins, Bell,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 
 const MENU = [
-  { name: 'Statistika',       path: '/admin/dashboard',        icon: LayoutDashboard },
-  { name: 'Dars Boshqaruvi',  path: '/admin/content',          icon: BookOpen        },
-  { name: 'Umumiy Testlar',   path: '/admin/general-quizzes',  icon: Target          },
-  { name: 'Foydalanuvchilar', path: '/admin/users',            icon: Users           },
-  { name: 'To\'lovlar',       path: '/admin/payments',         icon: Coins           },
+  { name: 'Statistika', path: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'Dars Boshqaruvi', path: '/admin/content', icon: BookOpen },
+  { name: 'Umumiy Testlar', path: '/admin/general-quizzes', icon: Target },
+  { name: 'Foydalanuvchilar', path: '/admin/users', icon: Users },
+  { name: 'To\'lovlar', path: '/admin/payments', icon: Coins },
+  { name: 'Xabarnomalar', path: '/admin/notifications', icon: Bell },
 ]
 
 function useIsMobile() {
@@ -143,10 +144,12 @@ export default function AdminLayout() {
             </span>
           )}
 
-          {/* Right: go to site */}
-          <Link to="/" style={{ color: '#64748B', textDecoration: 'none', fontSize: '0.8125rem', fontWeight: 600 }}>
-            ← Saytga
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Right: go to site */}
+            <Link to="/" style={{ color: '#64748B', textDecoration: 'none', fontSize: '0.8125rem', fontWeight: 600 }}>
+              ← Saytga
+            </Link>
+          </div>
         </header>
 
         {/* Page content */}
@@ -162,12 +165,12 @@ export default function AdminLayout() {
 
 // ── Reusable sidebar body ────────────────────────────────
 function SidebarContents({ open, location, profile, onSignOut, onClose }) {
-  const tStyle = { 
-    opacity: open ? 1 : 0, 
-    maxWidth: open ? 200 : 0, 
-    overflow: 'hidden', 
+  const tStyle = {
+    opacity: open ? 1 : 0,
+    maxWidth: open ? 200 : 0,
+    overflow: 'hidden',
     whiteSpace: 'nowrap',
-    transition: 'opacity 0.2s, max-width 0.3s cubic-bezier(0.23, 1, 0.32, 1)' 
+    transition: 'opacity 0.2s, max-width 0.3s cubic-bezier(0.23, 1, 0.32, 1)'
   }
 
   return (
@@ -190,7 +193,7 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
       {/* Nav links */}
       <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto', overflowX: 'hidden' }}>
         <p style={{ ...tStyle, margin: '0 0 8px 4px', fontSize: '0.7rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Menyu</p>
-        
+
         {MENU.map(item => {
           const isActive = location.pathname === item.path
           return (
@@ -223,8 +226,8 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, padding: '4px 4px', overflow: 'hidden', opacity: open ? 1 : 0, maxHeight: open ? 60 : 0, transition: 'opacity 0.2s, max-height 0.3s cubic-bezier(0.23, 1, 0.32, 1)' }}>
           <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#334155', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {profile?.avatar_url
-                ? <img src={profile.avatar_url} alt="admin" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontWeight: 800, fontSize: '0.875rem', color: '#94A3B8' }}>{(profile?.full_name || 'A')[0]}</span>
+              ? <img src={profile.avatar_url} alt="admin" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span style={{ fontWeight: 800, fontSize: '0.875rem', color: '#94A3B8' }}>{(profile?.full_name || 'A')[0]}</span>
             }
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>

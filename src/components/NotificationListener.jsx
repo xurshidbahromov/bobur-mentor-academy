@@ -31,13 +31,12 @@ export default function NotificationListener() {
             style: {
               background: '#0F172A',
               color: 'white',
-              border: '1px solid rgba(52,97,255,0.3)',
+              border: '1px solid rgba(52,97,255,0.1)',
               boxShadow: '0 8px 32px rgba(52,97,255,0.2)',
             },
             duration: 5000,
           })
           
-          // We can also trigger a custom event so other components (like navbar) know to re-fetch unread counts
           window.dispatchEvent(new CustomEvent('bma:new-notification'))
         }
       )

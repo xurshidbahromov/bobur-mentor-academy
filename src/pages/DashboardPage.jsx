@@ -156,6 +156,7 @@ export default function DashboardPage() {
     }
   }, [isNotificationsOpen, user?.id])
 
+
   const handleClaimReward = async () => {
     if (claimedDaily || !user) return
     

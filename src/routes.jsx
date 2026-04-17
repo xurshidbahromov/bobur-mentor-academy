@@ -31,6 +31,7 @@ const AdminContent = lazy(() => import('./pages/admin/AdminContent'))
 const AdminGeneralQuizzes = lazy(() => import('./pages/admin/AdminGeneralQuizzes'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 const AdminPayments = lazy(() => import('./pages/admin/AdminPayments'))
+const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications'))
 
 // ── Page transition ───────────────────────────────────
 const pageVariants = {
@@ -60,14 +61,14 @@ export default function AppRoutes() {
           <Route path="/signup" element={<PW><SignupPage /></PW>} />
 
           {/* ── Auth zone ── */}
-          <Route path="/dashboard"         element={<PW><DashboardPage /></PW>} />
+          <Route path="/dashboard" element={<PW><DashboardPage /></PW>} />
           <Route path="/courses/:courseId" element={<PW><CourseDetailPage /></PW>} />
           <Route path="/lessons/:lessonId" element={<PW><LessonDetailPage /></PW>} />
-          <Route path="/shop"              element={<PW><ShopPage /></PW>} />
-          <Route path="/profile"           element={<PW><ProfilePage /></PW>} />
-          <Route path="/leaderboard"       element={<PW><LeaderboardPage /></PW>} />
-          <Route path="/quizzes"           element={<PW><QuizzesHubPage /></PW>} />
-          <Route path="/quiz/:lessonId"    element={<PW><QuizPage /></PW>} />
+          <Route path="/shop" element={<PW><ShopPage /></PW>} />
+          <Route path="/profile" element={<PW><ProfilePage /></PW>} />
+          <Route path="/leaderboard" element={<PW><LeaderboardPage /></PW>} />
+          <Route path="/quizzes" element={<PW><QuizzesHubPage /></PW>} />
+          <Route path="/quiz/:lessonId" element={<PW><QuizPage /></PW>} />
 
           {/* ── Admin ── */}
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
@@ -77,6 +78,7 @@ export default function AppRoutes() {
             <Route path="general-quizzes" element={<AdminGeneralQuizzes />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="payments" element={<AdminPayments />} />
+            <Route path="notifications" element={<AdminNotifications />} />
           </Route>
 
           {/* ── 404 ── */}
