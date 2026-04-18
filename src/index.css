@@ -356,3 +356,27 @@ input, textarea {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* === Bell Ring Animation === */
+@keyframes bell-ring {
+  0%   { transform: rotate(0deg); }
+  5%   { transform: rotate(18deg); }
+  10%  { transform: rotate(-16deg); }
+  15%  { transform: rotate(14deg); }
+  20%  { transform: rotate(-11deg); }
+  25%  { transform: rotate(8deg); }
+  30%  { transform: rotate(-5deg); }
+  35%  { transform: rotate(3deg); }
+  40%  { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.bell-ring {
+  animation: bell-ring 3s ease-in-out infinite;
+  transform-origin: 50% 0%;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.7; }
+}

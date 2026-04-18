@@ -290,12 +290,14 @@ export default function DashboardPage() {
                 <div style={{ position: 'relative' }}>
                   <button 
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)} 
-                    style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: 'white', border: '1px solid rgba(15,23,42,0.04)', boxShadow: '0 4px 12px rgba(15,23,42,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                    style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: unreadCount > 0 ? 'rgba(52,97,255,0.06)' : 'white', border: unreadCount > 0 ? '1px solid rgba(52,97,255,0.15)' : '1px solid rgba(15,23,42,0.04)', boxShadow: '0 4px 12px rgba(15,23,42,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <Bell size={20} color="#0F172A" />
+                    <div className={unreadCount > 0 ? 'bell-ring' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Bell size={20} color={unreadCount > 0 ? '#3461FF' : '#0F172A'} />
+                    </div>
                     {/* Unread Indicator */}
                     {unreadCount > 0 && (
-                      <div style={{ position: 'absolute', top: 12, right: 12, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '2px solid white' }} />
+                      <div style={{ position: 'absolute', top: 8, right: 8, width: 9, height: 9, background: '#EF4444', borderRadius: '50%', border: '2px solid white', animation: 'pulse-dot 1.8s ease-in-out infinite' }} />
                     )}
                   </button>
 
