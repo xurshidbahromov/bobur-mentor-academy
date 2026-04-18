@@ -248,11 +248,11 @@ input, textarea {
 /* === Lesson Detail Responsiveness === */
 .lesson-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .lesson-grid {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -265,7 +265,7 @@ input, textarea {
   overflow-y: auto;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .lesson-sidebar {
     position: static;
     max-height: none;

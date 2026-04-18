@@ -104,10 +104,10 @@ export default function LessonDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 20px 140px' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: 'clamp(12px, 4vw, 24px) clamp(12px, 4vw, 20px) 120px' }}>
 
       {/* ── Breadcrumbs ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24, fontSize: '0.875rem', fontWeight: 600, color: '#94A3B8' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16, fontSize: '0.8125rem', fontWeight: 600, color: '#94A3B8', flexWrap: 'wrap' }}>
         <button onClick={() => navigate('/dashboard')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 'inherit', cursor: 'pointer', padding: 0 }}>Dashboard</button>
         <span>/</span>
         <button onClick={() => navigate(`/courses/${lesson.course_id}`)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 700, cursor: 'pointer', padding: 0 }}>Kurs</button>
@@ -234,14 +234,14 @@ export default function LessonDetailPage() {
                   <div style={{ 
                     background: 'rgba(255, 255, 255, 0.7)', 
                     backdropFilter: 'blur(16px)',
-                    borderRadius: 32, padding: 'clamp(20px, 5vw, 32px)',
+                    borderRadius: 32, padding: 'clamp(16px, 4vw, 32px)',
                     border: '1px solid rgba(255, 255, 255, 0.5)',
                     boxShadow: '0 8px 32px rgba(15,23,42,0.03)'
                   }}>
-                    <h2 className="outfit-font" style={{ margin: '0 0 20px', fontSize: '1.5rem', fontWeight: 900, color: '#0F172A' }}>
+                    <h2 className="outfit-font" style={{ margin: '0 0 16px', fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 900, color: '#0F172A' }}>
                       Yuklab olish uchun fayllar
                     </h2>
-                    <div style={{ display: 'grid', gap: 16 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {lesson.materials.map((mat, i) => (
                         <a 
                           key={i} 
@@ -249,27 +249,34 @@ export default function LessonDetailPage() {
                           target="_blank" 
                           rel="noopener noreferrer"
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 16,
-                            background: 'rgba(255,255,255,0.9)', padding: '16px 20px', 
-                            borderRadius: 20, border: '1px solid rgba(15,23,42,0.05)',
+                            display: 'flex', alignItems: 'center', gap: 12,
+                            background: 'rgba(255,255,255,0.9)', 
+                            padding: 'clamp(12px, 3vw, 16px) clamp(12px, 3vw, 20px)', 
+                            borderRadius: 18, border: '1px solid rgba(15,23,42,0.05)',
                             textDecoration: 'none', color: 'inherit',
                             boxShadow: '0 4px 12px rgba(15,23,42,0.03)',
-                            transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)'
+                            transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                            minWidth: 0,
                           }}
                           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(15,23,42,0.08)' }}
                           onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,23,42,0.03)' }}
                         >
-                          <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(52,97,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3461FF', flexShrink: 0 }}>
-                            <FileText size={22} strokeWidth={2.5} />
+                          {/* File icon */}
+                          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(52,97,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3461FF', flexShrink: 0 }}>
+                            <FileText size={20} strokeWidth={2.5} />
                           </div>
+
+                          {/* Title + subtitle */}
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <h3 style={{ margin: '0 0 4px', fontSize: '1.0625rem', fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <h3 style={{ margin: '0 0 2px', fontSize: 'clamp(0.875rem, 3.5vw, 1rem)', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {mat.title}
                             </h3>
-                            <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', fontWeight: 600 }}>Dars materiali</p>
+                            <p style={{ margin: 0, fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>Dars materiali</p>
                           </div>
-                          <div style={{ padding: 10, background: '#1E293B', color: 'white', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Download size={18} strokeWidth={2.5} />
+
+                          {/* Download btn */}
+                          <div style={{ padding: 8, background: '#1E293B', color: 'white', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Download size={16} strokeWidth={2.5} />
                           </div>
                         </a>
                       ))}
