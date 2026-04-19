@@ -1,36 +1,43 @@
 // src/pages/ShopPage.jsx
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Coins, ShoppingCart, CreditCard, Zap, Star, Rocket, Crown, Gift, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react'
+import { Coins, ShoppingCart, CreditCard, Zap, Star, Rocket, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'sonner'
 import PaymentModal from '../components/PaymentModal'
 
+// 1 coin = 200 so'm (asos narx)
+// Paketlarda ommaviy skidka: qancha ko'p olsang, shuncha arzonroq
 const PACKAGES = [
   {
     id: 'starter', icon: Zap, color: '#3461FF', bg: 'rgba(52,97,255,0.08)',
-    name: 'Starter', coins: 100, price: '5 000', perCoin: '50 so\'m/coin',
-    glowClass: '', // Default blue
+    name: 'Starter', coins: 100,
+    priceRaw: 20000,    // 100 × 200 — skidkasiz
+    price: '20 000',
+    originalPrice: null, // skidka yo'q
+    discount: null,
+    perCoin: '200 so\'m/coin',
+    glowClass: '',
   },
   {
     id: 'standard', icon: Star, color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)',
-    name: 'Standard', coins: 300, price: '12 000', perCoin: '40 so\'m/coin',
+    name: 'Standard', coins: 300,
+    priceRaw: 52000,    // 300 × 200 = 60 000, 13% off = 52 200 → 52 000
+    price: '52 000',
+    originalPrice: '60 000',
+    discount: 13,
     badge: 'Mashhur', glowClass: 'glow-purple',
+    perCoin: '173 so\'m/coin',
   },
   {
-    id: 'pro', icon: Rocket, color: '#0EA5E9', bg: 'rgba(14,165,233,0.1)',
-    name: 'Pro', coins: 600, price: '21 000', perCoin: '35 so\'m/coin',
-    popular: true, badge: 'Eng ko\'p tanlanadi', glowClass: 'glow-sky',
-  },
-  {
-    id: 'premium', icon: Crown, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
-    name: 'Premium', coins: 1200, price: '36 000', perCoin: '30 so\'m/coin',
-    badge: 'Tejamkor', glowClass: 'glow-amber',
-  },
-  {
-    id: 'ultimate', icon: Gift, color: '#10B981', bg: 'rgba(16,185,129,0.1)',
-    name: 'Ultimate', coins: 2500, price: '62 500', perCoin: '25 so\'m/coin',
-    badge: 'Eng foydali', glowClass: 'glow-green',
+    id: 'pro', icon: Rocket, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
+    name: 'Pro', coins: 700,
+    priceRaw: 105000,   // 700 × 200 = 140 000, 25% off = 105 000
+    price: '105 000',
+    originalPrice: '140 000',
+    discount: 25,
+    popular: true, badge: 'Eng ko\'p tanlanadi', glowClass: 'glow-amber',
+    perCoin: '150 so\'m/coin',
   },
 ]
 
@@ -69,20 +76,21 @@ export default function ShopPage() {
       toast.error('Kamida 10 coin kiriting!')
       return
     }
-    // Custom amount — create a virtual package and open modal
-    const price = amount * 35
+    // 1 coin = 200 so'm (custom miqdorda skidka yo'q)
+    const priceRaw = amount * 200
     setSelectedPkg({
       id: 'custom',
       name: `Maxsus (${amount} coin)`,
       coins: amount,
-      price: price.toLocaleString(),
-      perCoin: '35 so\'m/coin',
+      priceRaw,
+      price: priceRaw.toLocaleString(),
+      perCoin: '200 so\'m/coin',
       color: '#3461FF',
       bg: 'rgba(52,97,255,0.08)',
     })
   }
 
-  const estimatedPrice = customCoins ? (parseInt(customCoins || 0) * 35).toLocaleString() : null
+  const estimatedPrice = customCoins ? (parseInt(customCoins || 0) * 200).toLocaleString() : null
 
   return (
     <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 100px' }}>
@@ -161,7 +169,7 @@ export default function ShopPage() {
       </motion.p>
 
       {/* ── Packages Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12, marginBottom: 36 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14, marginBottom: 36 }}>
         {PACKAGES.map((pkg, i) => {
           const IconComp = pkg.icon
           const isPopular = pkg.popular
@@ -180,8 +188,8 @@ export default function ShopPage() {
                 backdropFilter: 'blur(24px) saturate(2)',
                 WebkitBackdropFilter: 'blur(24px) saturate(2)',
                 border: isPopular ? `1.8px solid ${pkg.color}` : '1px solid var(--border-medium)',
-                borderRadius: 24, padding: '20px',
-                boxShadow: isPopular ? `0 12px 40px ${pkg.color}15` : '0 8px 32px rgba(15,23,42,0.04)',
+                borderRadius: 24, padding: '22px',
+                boxShadow: isPopular ? `0 12px 40px ${pkg.color}20` : '0 8px 32px rgba(15,23,42,0.04)',
                 position: 'relative', cursor: 'pointer',
                 transition: 'all 0.25s ease',
               }}
@@ -190,7 +198,7 @@ export default function ShopPage() {
               {isPopular && (
                 <div style={{
                   position: 'absolute', inset: -1, borderRadius: 21,
-                  background: `linear-gradient(135deg, ${pkg.color}60, transparent, ${pkg.color}30)`,
+                  background: `linear-gradient(135deg, ${pkg.color}50, transparent, ${pkg.color}25)`,
                   zIndex: -1,
                 }} />
               )}
@@ -210,6 +218,19 @@ export default function ShopPage() {
                 </div>
               )}
 
+              {/* Discount badge */}
+              {pkg.discount && (
+                <div style={{
+                  position: 'absolute', top: -10, left: 14,
+                  background: '#10B981', color: 'white',
+                  fontSize: '0.6rem', fontWeight: 800,
+                  padding: '3px 10px', borderRadius: 100,
+                  letterSpacing: '0.05em',
+                }}>
+                  -{pkg.discount}%
+                </div>
+              )}
+
               {/* Icon + name */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                 <div style={{
@@ -222,7 +243,7 @@ export default function ShopPage() {
                 </div>
                 <div>
                   <p className="outfit-font" style={{ margin: '0 0 1px', fontWeight: 800, fontSize: '1rem', color: '#0F172A' }}>{pkg.name}</p>
-                  <p style={{ margin: 0, fontSize: '0.6875rem', color: '#94A3B8', fontWeight: 500 }}>{pkg.perCoin}</p>
+                  <p style={{ margin: 0, fontSize: '0.6875rem', color: '#94A3B8', fontWeight: 600 }}>{pkg.perCoin}</p>
                 </div>
               </div>
 
@@ -237,7 +258,7 @@ export default function ShopPage() {
                 <span style={{ color: '#94A3B8', fontSize: '0.875rem', fontWeight: 500 }}>coin</span>
               </div>
 
-              {/* Buy button */}
+              {/* Buy button with price */}
               <div style={{
                 width: '100%',
                 background: isPopular ? pkg.color : `${pkg.color}0f`,
@@ -249,7 +270,14 @@ export default function ShopPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 boxShadow: isPopular ? `0 4px 14px ${pkg.color}40` : 'none',
               }}>
-                <span>{pkg.price} so'm</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
+                  {pkg.originalPrice && (
+                    <span style={{ fontSize: '0.7rem', textDecoration: 'line-through', opacity: 0.55, fontWeight: 600 }}>
+                      {pkg.originalPrice} so'm
+                    </span>
+                  )}
+                  <span>{pkg.price} so'm</span>
+                </div>
                 <ArrowRight size={16} />
               </div>
             </motion.div>
@@ -274,7 +302,7 @@ export default function ShopPage() {
           O'zingiz miqdor kiriting
         </p>
         <p style={{ margin: '0 0 18px', color: '#64748B', fontSize: '0.875rem' }}>
-          1 coin ≈ 35 so'm (taxminiy narx)
+          1 coin = 200 so'm (paketlarda chegirmali narx)
         </p>
 
         {/* Input */}

@@ -46,7 +46,7 @@ export default function PaymentModal({ pkg, onClose }) {
 
     setIsSubmitting(true)
     try {
-      const priceRaw = typeof pkg.price === 'string' ? parseInt(pkg.price.replace(/\D/g, '')) : pkg.price;
+      const priceRaw = pkg.priceRaw ?? (typeof pkg.price === 'string' ? parseInt(pkg.price.replace(/\D/g, '')) : pkg.price);
 
       const { error } = await supabase.from('coin_requests').insert({
         user_id: user.id,

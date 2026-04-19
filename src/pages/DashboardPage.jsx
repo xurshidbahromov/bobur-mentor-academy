@@ -11,6 +11,7 @@ import { supabase } from '../lib/supabase'
 import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target, Info } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUnreadNotifications } from '../context/useUnreadNotifications'
+import { useStreak } from '../hooks/useStreak'
 
 // ─────────────────────────────────────────────────────
 // Sub-components
@@ -118,18 +119,11 @@ export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
-  const [claimedDaily, setClaimedDaily] = useState(false)
+  const { canClaim, claimDailyReward } = useStreak()
   const [dbNotifications, setDbNotifications] = useState([])
   const unreadCount = useUnreadNotifications()
 
   useEffect(() => {
-    if (user) {
-      const today = new Date().toISOString().split('T')[0]
-      if (localStorage.getItem(`bma_daily_${user.id}_${today}`)) {
-        setClaimedDaily(true)
-      }
-    }
-
     async function fetchCourses() {
       const { data } = await supabase
         .from('courses')
@@ -158,59 +152,7 @@ export default function DashboardPage() {
 
 
   const handleClaimReward = async () => {
-    if (claimedDaily || !user) return
-    
-    // Optimistic UI updates
-    const today = new Date().toISOString().split('T')[0]
-    localStorage.setItem(`bma_daily_${user.id}_${today}`, 'true')
-    setClaimedDaily(true)
-    
-    const newCoins = (profile?.coins || 0) + 1
-    if (setProfile) {
-      setProfile(prev => ({ ...prev, coins: newCoins }))
-    }
-    
-    // DB background sync
-    supabase.from('profiles').update({ coins: newCoins }).eq('id', user.id).then()
-    
-    toast.success("Ajoyib! 🎉", { description: "Sizga mukofot tariqasida 1 ta Coin berildi!" })
-
-    const triggerConfetti = () => {
-      const duration = 2400; // slightly longer, premium slow fall
-      const animationEnd = Date.now() + duration;
-      const defaults = { 
-        startVelocity: 25, 
-        spread: 360, 
-        ticks: 90, 
-        zIndex: 10000, 
-        gravity: 0.85,
-        colors: ['#3461FF', '#8B5CF6', '#F59E0B', '#10B981', '#0EA5E9'] // Aura System colors
-      };
-
-      const randomInRange = (min, max) => Math.random() * (max - min) + min;
-
-      // Central burst for immediate impact
-      window.confetti({ ...defaults, particleCount: 70, spread: 120, startVelocity: 45, origin: { y: 0.6 } });
-
-      const interval = setInterval(function() {
-        const timeLeft = animationEnd - Date.now();
-        if (timeLeft <= 0) return clearInterval(interval);
-        
-        // Gentle side fountain effect
-        const particleCount = 30 * (timeLeft / duration);
-        window.confetti(Object.assign({}, defaults, { particleCount, gravity: 0.7, origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0.5, 0.7) } }));
-        window.confetti(Object.assign({}, defaults, { particleCount, gravity: 0.7, origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.5, 0.7) } }));
-      }, 300);
-    }
-
-    if (!window.confetti) {
-      const script = document.createElement('script')
-      script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js'
-      script.onload = triggerConfetti
-      document.head.appendChild(script)
-    } else {
-      triggerConfetti()
-    }
+    await claimDailyReward()
   }
 
   const coins = profile?.coins ?? 0
@@ -443,7 +385,7 @@ export default function DashboardPage() {
 
         {/* Daily Reward Box */}
         <AnimatePresence>
-          {!isSearchOpen && !claimedDaily && (
+          {!isSearchOpen && canClaim && (
             <motion.div 
               initial={{ opacity: 0, height: 0, marginBottom: 0 }} 
               animate={{ opacity: 1, height: 'auto', marginBottom: 32 }} 
@@ -465,27 +407,27 @@ export default function DashboardPage() {
 
                 <div style={{ flex: '1 1 200px' }}>
                   <h3 style={{ margin: '0 0 6px', fontSize: '1.1875rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {claimedDaily ? 'Mukofot olindi!' : 'Bugungi mukofotingiz tayyor!'}
+                    {!canClaim ? 'Mukofot olindi!' : 'Bugungi mukofotingiz tayyor!'}
                   </h3>
                   <p style={{ margin: 0, fontSize: '0.9375rem', color: '#64748B', fontWeight: 500 }}>
-                    {claimedDaily ? 'Ertaga yana kiring va tanga yig\'ing.' : 'Quyidagi tugmani bosib, 1 ta coin (tanga) oling va bilimlarga investitsiya qiling.'}
+                    {!canClaim ? 'Ertaga yana kiring va tanga yig\'ing.' : 'Quyidagi tugmani bosib, 1 ta coin (tanga) oling va bilimlarga investitsiya qiling.'}
                   </p>
                 </div>
                 <motion.button
-                  whileTap={claimedDaily ? {} : { scale: 0.95 }}
+                  whileTap={!canClaim ? {} : { scale: 0.95 }}
                   onClick={handleClaimReward}
-                  disabled={claimedDaily}
+                  disabled={!canClaim}
                   style={{
                     padding: '12px 24px', borderRadius: 100, border: 'none',
-                    background: claimedDaily ? 'rgba(15,23,42,0.05)' : '#3461FF',
-                    color: claimedDaily ? '#94A3B8' : 'white',
-                    fontWeight: 800, fontSize: '0.9375rem', cursor: claimedDaily ? 'default' : 'pointer',
+                    background: !canClaim ? 'rgba(15,23,42,0.05)' : '#3461FF',
+                    color: !canClaim ? '#94A3B8' : 'white',
+                    fontWeight: 800, fontSize: '0.9375rem', cursor: !canClaim ? 'default' : 'pointer',
                     display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, width: 'max-content',
-                    boxShadow: claimedDaily ? 'none' : '0 4px 16px rgba(52,97,255,0.2)'
+                    boxShadow: !canClaim ? 'none' : '0 4px 16px rgba(52,97,255,0.2)'
                   }}
                 >
-                  {claimedDaily ? <CheckCircle2 size={18} /> : <Gift size={18} />}
-                  {claimedDaily ? 'Olindi' : 'Olish (+1)'}
+                  {!canClaim ? <CheckCircle2 size={18} /> : <Gift size={18} />}
+                  {!canClaim ? 'Olindi' : 'Olish (+1)'}
                 </motion.button>
               </div>
             </motion.div>

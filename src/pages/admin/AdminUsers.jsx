@@ -19,7 +19,7 @@ export default function AdminUsers() {
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: false })
-    
+
     if (error) toast.error("Foydalanuvchilarni yuklashda xatolik")
     else setProfiles(data || [])
     setLoading(false)
@@ -39,7 +39,7 @@ export default function AdminUsers() {
       .from('profiles')
       .update({ coins: currentCoins + amount })
       .eq('id', profileId)
-    
+
     if (error) toast.error(error.message)
     else {
       toast.success("Coinlar yangilandi")
@@ -47,7 +47,7 @@ export default function AdminUsers() {
     }
   }
 
-  const filteredUsers = profiles.filter(p => 
+  const filteredUsers = profiles.filter(p =>
     p.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -60,7 +60,7 @@ export default function AdminUsers() {
 
       <div style={{ position: 'relative', marginBottom: '24px', maxWidth: '400px' }}>
         <Search size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#64748B' }} />
-        <input 
+        <input
           type="text"
           placeholder="Ism bo'yicha qidirish..."
           value={searchTerm}
@@ -71,80 +71,80 @@ export default function AdminUsers() {
 
       <div style={{ background: '#1E293B', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94A3B8', fontSize: '0.875rem' }}>
-              <th style={{ padding: '20px' }}>O'quvchi</th>
-              <th style={{ padding: '20px' }}>Balans</th>
-              <th style={{ padding: '20px' }}>Streak</th>
-              <th style={{ padding: '20px' }}>Ro'yxatdan o'tdi</th>
-              <th style={{ padding: '20px', textAlign: 'right' }}>Amallar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <>
-                {[1,2,3,4,5].map(i => (
-                  <tr key={i}>
-                    <td style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div className="skeleton-loader" style={{ width: 40, height: 40, borderRadius: '50%', background: '#334155', flexShrink: 0 }} />
-                        <div>
-                          <div className="skeleton-loader" style={{ height: 14, width: 120, borderRadius: 6, marginBottom: 6, background: '#334155' }} />
-                          <div className="skeleton-loader" style={{ height: 12, width: 70, borderRadius: 6, background: '#334155' }} />
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 60, borderRadius: 6, background: '#334155' }} /></td>
-                    <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 50, borderRadius: 6, background: '#334155' }} /></td>
-                    <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 90, borderRadius: 6, background: '#334155' }} /></td>
-                    <td style={{ padding: '16px 20px', textAlign: 'right' }}><div className="skeleton-loader" style={{ height: 32, width: 36, borderRadius: 10, background: '#334155', marginLeft: 'auto' }} /></td>
-                  </tr>
-                ))}
-              </>
-            ) : filteredUsers.length === 0 ? (
-              <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#64748B' }}>Foydalanuvchilar topilmadi.</td></tr>
-            ) : filteredUsers.map((p) => (
-              <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
-                <td style={{ padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#334155', overflow: 'hidden' }}>
-                      {p.avatar_url ? <img src={p.avatar_url} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Users size={20} color="#64748B" style={{ margin: '10px' }} />}
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 600 }}>{p.full_name || 'Ismsiz User'}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748B' }}>{p.role === 'admin' ? '🛡 Admin' : '🎓 Talaba'}</div>
-                    </div>
-                  </div>
-                </td>
-                <td style={{ padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#F59E0B', fontWeight: 700 }}>
-                    <Coins size={16} /> {p.coins.toLocaleString()}
-                  </div>
-                </td>
-                <td style={{ padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#EF4444', fontWeight: 700 }}>
-                    <Flame size={16} /> {p.streak_count} kun
-                  </div>
-                </td>
-                <td style={{ padding: '20px' }}>
-                  <div style={{ fontSize: '0.875rem', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Calendar size={14} /> {new Date(p.created_at).toLocaleDateString('uz-UZ')}
-                  </div>
-                </td>
-                <td style={{ padding: '20px', textAlign: 'right' }}>
-                  <button 
-                    onClick={() => handleAdjustCoins(p.id, p.coins)}
-                    title="Balansni tahrirlash"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#3461FF', padding: '8px', borderRadius: '10px', cursor: 'pointer' }}
-                  >
-                    <CreditCard size={18} />
-                  </button>
-                </td>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94A3B8', fontSize: '0.875rem' }}>
+                <th style={{ padding: '20px' }}>O'quvchi</th>
+                <th style={{ padding: '20px' }}>Balans</th>
+                <th style={{ padding: '20px' }}>Streak</th>
+                <th style={{ padding: '20px' }}>Ro'yxatdan o'tdi</th>
+                <th style={{ padding: '20px', textAlign: 'right' }}>Amallar</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {loading ? (
+                <>
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <tr key={i}>
+                      <td style={{ padding: '16px 20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div className="skeleton-loader" style={{ width: 40, height: 40, borderRadius: '50%', background: '#334155', flexShrink: 0 }} />
+                          <div>
+                            <div className="skeleton-loader" style={{ height: 14, width: 120, borderRadius: 6, marginBottom: 6, background: '#334155' }} />
+                            <div className="skeleton-loader" style={{ height: 12, width: 70, borderRadius: 6, background: '#334155' }} />
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 60, borderRadius: 6, background: '#334155' }} /></td>
+                      <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 50, borderRadius: 6, background: '#334155' }} /></td>
+                      <td style={{ padding: '16px 20px' }}><div className="skeleton-loader" style={{ height: 16, width: 90, borderRadius: 6, background: '#334155' }} /></td>
+                      <td style={{ padding: '16px 20px', textAlign: 'right' }}><div className="skeleton-loader" style={{ height: 32, width: 36, borderRadius: 10, background: '#334155', marginLeft: 'auto' }} /></td>
+                    </tr>
+                  ))}
+                </>
+              ) : filteredUsers.length === 0 ? (
+                <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: '#64748B' }}>Foydalanuvchilar topilmadi.</td></tr>
+              ) : filteredUsers.map((p) => (
+                <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
+                  <td style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#334155', overflow: 'hidden' }}>
+                        {p.avatar_url ? <img src={p.avatar_url} alt="av" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Users size={20} color="#64748B" style={{ margin: '10px' }} />}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{p.full_name || 'Ismsiz User'}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748B' }}>{p.role === 'admin' ? '🛡 Admin' : '🎓 Talaba'}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#F59E0B', fontWeight: 700 }}>
+                      <Coins size={16} /> {p.coins.toLocaleString()}
+                    </div>
+                  </td>
+                  <td style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#EF4444', fontWeight: 700 }}>
+                      <Flame size={16} /> {p.streak_count} kun
+                    </div>
+                  </td>
+                  <td style={{ padding: '20px' }}>
+                    <div style={{ fontSize: '0.875rem', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Calendar size={14} /> {new Date(p.created_at).toLocaleDateString('uz-UZ')}
+                    </div>
+                  </td>
+                  <td style={{ padding: '20px', textAlign: 'right' }}>
+                    <button
+                      onClick={() => handleAdjustCoins(p.id, p.coins)}
+                      title="Balansni tahrirlash"
+                      style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#3461FF', padding: '8px', borderRadius: '10px', cursor: 'pointer' }}
+                    >
+                      <CreditCard size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

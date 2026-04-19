@@ -88,7 +88,7 @@ export default function LandingPage() {
           marginTop: '48px', position: 'relative', zIndex: 1
         }}>
           {[
-            { icon: <Users size={16} />, text: "1,000+ o'quvchi" },
+            { icon: <Users size={16} />, text: "500+ o'quvchi" },
             { icon: <Star size={16} />, text: '4.9 reyting' },
             { icon: <Trophy size={16} />, text: '95% DTM natija' },
           ].map(({ icon, text }) => (

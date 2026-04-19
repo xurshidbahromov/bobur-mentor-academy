@@ -127,7 +127,7 @@ export default function AdminDashboard() {
               const height = (val / max) * 100
               return (
                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '100%', height: `${height}%`, background: 'linear-gradient(to top, #3461FF, #8B5CF6)', borderRadius: '6px 6px 2px 2px', minHeight: '4px', opacity: 0.8 + (height/500) }} />
+                  <div style={{ width: '100%', height: `${height}%`, background: 'linear-gradient(to top, #3461FF, #8B5CF6)', borderRadius: '6px 6px 2px 2px', minHeight: '4px', opacity: 0.8 + (height / 500) }} />
                   <span style={{ fontSize: '10px', color: '#475569', fontWeight: 600 }}>{i + 1}</span>
                 </div>
               )
@@ -148,11 +148,11 @@ export default function AdminDashboard() {
           </div>
 
           <div style={{ background: 'linear-gradient(135deg, #3461FF, #8B5CF6)', padding: '32px', borderRadius: '32px', position: 'relative', overflow: 'hidden' }}>
-             <h3 style={{ margin: '0 0 8px', fontSize: '1.125rem', fontWeight: 800 }}>Tezkor Harakat</h3>
-             <p style={{ margin: '0 0 20px', color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem' }}>Yangi kurs yoki dars qo'shish.</p>
-             <button style={{ background: 'white', color: '#3461FF', border: 'none', padding: '12px 24px', borderRadius: '14px', fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem' }}>
-               Boshlash
-             </button>
+            <h3 style={{ margin: '0 0 8px', fontSize: '1.125rem', fontWeight: 800 }}>Tezkor Harakat</h3>
+            <p style={{ margin: '0 0 20px', color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem' }}>Yangi kurs yoki dars qo'shish.</p>
+            <button style={{ background: 'white', color: '#3461FF', border: 'none', padding: '12px 24px', borderRadius: '14px', fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem' }}>
+              Boshlash
+            </button>
           </div>
         </div>
       </div>
