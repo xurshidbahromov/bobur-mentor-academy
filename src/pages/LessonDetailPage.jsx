@@ -24,6 +24,7 @@ export default function LessonDetailPage() {
   const [playlist, setPlaylist] = useState([])
   const [playlistLoading, setPlaylistLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('info') // 'info' | 'comments' | 'quiz'
+  const [isUnlocking, setIsUnlocking] = useState(false)
 
   useEffect(() => {
     if (lesson?.course_id) {
@@ -94,9 +95,13 @@ export default function LessonDetailPage() {
       navigate('/shop')
       return
     }
+    
+    setIsUnlocking(true)
     const { success, error } = await unlockWithCoins()
+    setIsUnlocking(false)
+    
     if (success) {
-      toast.success("Dars ochildi!")
+      toast.success("Dars muvaffaqiyatli ochildi!")
       if (setProfile) setProfile(prev => ({ ...prev, coins: prev.coins - unlockCost }))
     } else {
       toast.error("Xatolik: " + error)
@@ -126,7 +131,7 @@ export default function LessonDetailPage() {
               {canWatch ? (
                 <VideoPlayer videoId={lesson.youtube_video_id} lessonId={lesson.id} lessonTitle={lesson.title} />
               ) : (
-                <LockScreen lesson={lesson} profile={profile} onUnlock={handleUnlock} onShop={() => navigate('/shop')} />
+                <LockScreen lesson={lesson} profile={profile} onUnlock={handleUnlock} onShop={() => navigate('/shop')} isUnlocking={isUnlocking} />
               )}
             </div>
 
@@ -145,9 +150,9 @@ export default function LessonDetailPage() {
             }}>
               {[
                 { id: 'info',      label: "Ma'lumot",    icon: <Info size={15} strokeWidth={2.5} /> },
-                { id: 'comments',  label: 'Izohlar',     icon: <MessageCircle size={15} strokeWidth={2.5} /> },
+                { id: 'materials', label: 'Materiallar', icon: <Paperclip size={15} strokeWidth={2.5} /> },
                 { id: 'quiz',      label: 'Quiz',        icon: <Target size={15} strokeWidth={2.5} /> },
-                { id: 'materials', label: 'Materiallar', icon: <Paperclip size={15} strokeWidth={2.5} /> }
+                { id: 'comments',  label: 'Izohlar',     icon: <MessageCircle size={15} strokeWidth={2.5} /> }
               ].map((tab) => {
                 const isActive = activeTab === tab.id
                 // Logic based hiding
@@ -340,51 +345,130 @@ export default function LessonDetailPage() {
 }
 
 // ── Lock Screen ──────────────────────────────────────
-function LockScreen({ lesson, profile, onUnlock, onShop }) {
+function LockScreen({ lesson, profile, onUnlock, onShop, isUnlocking }) {
   const unlockCost = lesson.coin_price ?? 5
   const hasEnough = profile && profile.coins >= unlockCost
+  const thumbnailUrl = lesson.youtube_video_id ? `https://img.youtube.com/vi/${lesson.youtube_video_id}/hqdefault.jpg` : ''
 
   return (
     <div style={{
+      width: '100%',
       aspectRatio: '16/9',
-      minHeight: 260,
-      background: 'linear-gradient(135deg, #0F172A, #1E293B)',
+      position: 'relative',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      gap: 16, padding: 'clamp(16px, 4vw, 24px)',
+      overflow: 'hidden',
+      padding: 'clamp(12px, 3vw, 24px)'
     }}>
-      <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Lock size={28} color="white" />
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <p style={{ margin: '0 0 6px', color: 'white', fontWeight: 700, fontSize: '1.125rem' }}>Bu dars qulflangan</p>
-        <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem' }}>{unlockCost} coin sarflab oching</p>
-      </div>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-        {hasEnough ? (
-          <button onClick={onUnlock} style={{
-            background: 'linear-gradient(135deg, #3461FF, #214CE5)', color: 'white',
-            border: 'none', borderRadius: 14, padding: '13px 28px', fontWeight: 700,
-            fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <Coins size={18} /> {unlockCost} coin bilan ochish
-          </button>
-        ) : (
-          <>
-            <button onClick={onShop} style={{
-              background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white',
-              border: 'none', borderRadius: 14, padding: '13px 28px', fontWeight: 700,
-              fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <Coins size={18} /> Coin sotib olish
-            </button>
-          </>
-        )}
-      </div>
-      {!hasEnough && profile && (
-        <p style={{ color: '#64748B', fontSize: '0.8125rem', margin: 0 }}>
-          Balansingiz: {profile.coins} coin ({unlockCost - profile.coins} coin yetmaydi)
-        </p>
+      {/* Background Image with Blur */}
+      {thumbnailUrl && (
+        <div style={{
+          position: 'absolute', inset: -20, // Negative inset to hide blur edges
+          backgroundImage: `url(${thumbnailUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(20px) brightness(0.4)',
+          zIndex: 1
+        }} />
       )}
+      
+      {/* Fallback & Overlay Gradient */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to top, rgba(15,23,42,0.95), rgba(15,23,42,0.5))',
+        zIndex: 2
+      }} />
+
+      {/* Glassmorphic Card Content */}
+      <motion.div 
+        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: 'relative', zIndex: 10,
+          background: 'rgba(255, 255, 255, 0.08)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          borderRadius: 'clamp(16px, 3vw, 20px)', 
+          padding: 'clamp(16px, 4vw, 24px) clamp(16px, 5vw, 28px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', 
+          gap: 'clamp(10px, 2vw, 14px)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.4)', 
+          width: 'min(88%, 320px)', textAlign: 'center'
+        }}
+      >
+        <div style={{ position: 'relative' }}>
+          <div style={{ 
+            width: 'clamp(40px, 8vw, 48px)', height: 'clamp(40px, 8vw, 48px)', borderRadius: '50%', 
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.3), 0 8px 16px rgba(0,0,0,0.2)',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}>
+            <Lock size={18} color="white" />
+          </div>
+          {/* Subtle glow behind the lock */}
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'clamp(50px, 12vw, 70px)', height: 'clamp(50px, 12vw, 70px)', background: '#3461FF', filter: 'blur(30px)', opacity: 0.5, zIndex: -1 }} />
+        </div>
+
+        <div>
+          <h2 className="outfit-font" style={{ margin: '0 0 4px', color: 'white', fontWeight: 800, fontSize: 'clamp(1rem, 3.5vw, 1.15rem)', lineHeight: 1.2 }}>
+            {lesson.title || 'Dars qulflangan'}
+          </h2>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(0.75rem, 2.5vw, 0.8125rem)', fontWeight: 500, lineHeight: 1.4 }}>
+            Ko'rish uchun <strong style={{color: 'white'}}>{unlockCost} coin</strong> sarflashingiz kerak
+          </p>
+        </div>
+
+        <div style={{ width: '100%', marginTop: 'clamp(2px, 1vw, 6px)' }}>
+          {hasEnough ? (
+            <motion.button 
+              whileTap={{ scale: 0.97 }}
+              disabled={isUnlocking}
+              onClick={onUnlock} 
+              style={{
+                width: '100%', background: 'linear-gradient(135deg, #3461FF, #214CE5)', color: 'white',
+                border: 'none', borderRadius: 'clamp(10px, 2.5vw, 14px)', 
+                padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)', fontWeight: 700,
+                fontSize: 'clamp(0.8125rem, 2.5vw, 0.9375rem)', cursor: isUnlocking ? 'wait' : 'pointer', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: '0 8px 16px rgba(52,97,255,0.3)', opacity: isUnlocking ? 0.8 : 1
+              }}
+            >
+              <Coins size={16} />
+              {isUnlocking ? 'Ochilmoqda...' : `${unlockCost} coin bilan ochish`}
+            </motion.button>
+          ) : (
+            <motion.button 
+              whileTap={{ scale: 0.97 }}
+              onClick={onShop} 
+              style={{
+                width: '100%', background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white',
+                border: 'none', borderRadius: 'clamp(10px, 2.5vw, 14px)', 
+                padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)', fontWeight: 700,
+                fontSize: 'clamp(0.8125rem, 2.5vw, 0.9375rem)', cursor: 'pointer', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: '0 8px 16px rgba(245,158,11,0.3)'
+              }}
+            >
+              <Coins size={16} /> Do'konga o'tish
+            </motion.button>
+          )}
+        </div>
+
+        {profile && (
+          <div style={{ 
+            marginTop: -2, fontSize: 'clamp(0.65rem, 2vw, 0.75rem)', fontWeight: 600,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            color: hasEnough ? '#10B981' : '#EF4444' 
+          }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Balansingiz:</span> 
+            <span style={{ color: 'white', display: 'flex', alignItems: 'center', gap: 2 }}>
+              {profile.coins} <Coins size={10} fill="currentColor" />
+            </span>
+            {!hasEnough && `(${unlockCost - profile.coins} yetmaydi)`}
+          </div>
+        )}
+      </motion.div>
     </div>
   )
 }

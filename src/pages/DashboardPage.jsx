@@ -36,9 +36,47 @@ function CoinBadge({ coins }) {
 }
 
 function CourseCard({ course, index, onNavigate }) {
-  // Placeholder progress (can be replaced with real user progress calculation)
-  const progressPct = 0 
+  const { user } = useAuth()
   const glowClass = '' // Standardized look for all cards as requested
+
+  const [commentCount, setCommentCount] = useState(0)
+  const [progressPct, setProgressPct] = useState(0)
+
+  useEffect(() => {
+    async function fetchCourseStats() {
+      // Fetch comment count
+      const { count: cCount } = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('course_id', course.id)
+      if (cCount !== null) setCommentCount(cCount)
+
+      // Fetch Progress
+      if (user) {
+        const { data: lessonsData } = await supabase
+          .from('lessons')
+          .select('id')
+          .eq('course_id', course.id)
+          .eq('is_published', true)
+
+        if (lessonsData && lessonsData.length > 0) {
+          const lessonIds = lessonsData.map(l => l.id)
+          const { count: pCount } = await supabase
+            .from('lesson_progress')
+            .select('*', { count: 'exact', head: true })
+            .in('lesson_id', lessonIds)
+            .eq('user_id', user.id)
+            .eq('is_completed', true)
+            
+          if (pCount) {
+             const pct = Math.round((pCount / lessonIds.length) * 100)
+             setProgressPct(pct > 100 ? 100 : pct)
+          }
+        }
+      }
+    }
+    fetchCourseStats()
+  }, [course.id, user])
 
   return (
     <motion.button
@@ -48,7 +86,7 @@ function CourseCard({ course, index, onNavigate }) {
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       onClick={() => onNavigate(`/courses/${course.id}`)}
       style={{
-        position: 'relative', width: '100%', 
+        position: 'relative', width: '100%', height: '100%',
         background: 'rgba(255, 255, 255, 0.78)', 
         backdropFilter: 'blur(24px) saturate(2)',
         WebkitBackdropFilter: 'blur(24px) saturate(2)',
@@ -69,7 +107,7 @@ function CourseCard({ course, index, onNavigate }) {
       </div>
 
       {/* Course Info (Top part) */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
         <h3 style={{
           margin: '0 0 6px', fontWeight: 800, fontSize: '1.25rem',
           color: '#0F172A', letterSpacing: '-0.02em',
@@ -88,7 +126,7 @@ function CourseCard({ course, index, onNavigate }) {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94A3B8' }}>
           <MessageCircle size={18} />
-          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>0 izoh</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{commentCount} izoh</span>
         </div>
 
         <div style={{ position: 'relative', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -482,7 +520,7 @@ export default function DashboardPage() {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
         gap: 20,
-        alignItems: 'start'
+        alignItems: 'stretch'
       }}>
         {loading ? (
           // Soft Premium Skeleton
@@ -536,6 +574,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            style={{ height: '100%' }}
           >
             <CourseCard course={course} index={i} userCoins={coins} onNavigate={navigate} />
           </motion.div>

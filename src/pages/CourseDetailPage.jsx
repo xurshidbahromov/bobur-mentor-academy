@@ -7,13 +7,18 @@ import { useAuth } from '../context/AuthContext'
 import CommentSection from '../components/lesson/CommentSection'
 
 // ── Lesson Row Component ─────────────────────────────────────
-function LessonCard({ lesson, userCoins, onNavigate }) {
-  const isLocked = !lesson.is_free && (userCoins < (lesson.price || 0))
-  const canAccess = lesson.is_free || !isLocked
+function LessonCard({ lesson, isUnlocked, onNavigate }) {
+  // Haqiqatdan ochilganmi yo'qmi (bazadan) tekshiramiz
+  const canAccess = lesson.is_free || isUnlocked
+
+  // Narxni xavfsiz ifodalash uchun (qulflangan bo'lsa)
+  const price = lesson.coin_price ?? lesson.price ?? 5
 
   const handleClick = () => {
-    if (canAccess) onNavigate(`/lessons/${lesson.id}`)
-    else onNavigate('/shop')
+    // Hammasi bo'lib bitta joyda navigate qiladi.
+    // Qulflangan bo'lsa ham ichkariga (`LessonDetailPage`ga) kirishi kerak, 
+    // u yerdagi yangi LockScreen qolganini eplaydi!
+    onNavigate(`/lessons/${lesson.id}`)
   }
 
   return (
@@ -23,11 +28,11 @@ function LessonCard({ lesson, userCoins, onNavigate }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 14,
         width: '100%', maxWidth: '100%', padding: '16px', borderRadius: 20,
-        background: canAccess ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: `1px solid ${canAccess ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.2)'}`,
-        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.03)',
+        background: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        border: '1px solid rgba(15, 23, 42, 0.06)',
+        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03)',
         cursor: 'pointer', transition: 'all 0.24s cubic-bezier(0.22, 1, 0.36, 1)',
         WebkitTapHighlightColor: 'transparent',
         position: 'relative', overflow: 'hidden'
@@ -36,34 +41,31 @@ function LessonCard({ lesson, userCoins, onNavigate }) {
       <div style={{
         width: 44, height: 44, borderRadius: 14, flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: canAccess ? 'rgba(52, 97, 255, 0.08)' : 'rgba(100, 116, 139, 0.06)',
-        border: `1px solid ${canAccess ? 'rgba(52, 97, 255, 0.1)' : 'rgba(100, 116, 139, 0.1)'}`
+        background: 'rgba(52, 97, 255, 0.08)',
+        border: '1px solid rgba(52, 97, 255, 0.1)'
       }}>
-        {canAccess ? <Play size={18} color="#3461FF" fill="#3461FF" /> : <Lock size={18} color="#94A3B8" />}
+        {canAccess ? <Play size={18} color="#3461FF" fill="#3461FF" /> : <Lock size={18} color="#3461FF" />}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p className="outfit-font" style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: canAccess ? '#0F172A' : '#64748B', wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4, letterSpacing: '-0.01em' }}>
+        <p className="outfit-font" style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: '#0F172A', wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4, letterSpacing: '-0.01em' }}>
           {lesson.order_index}. {lesson.title}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-          {!lesson.is_free && (
-            <span style={{ fontSize: '0.6875rem', color: canAccess ? '#10B981' : '#EF4444', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              {canAccess ? 'Ochilgan' : `${lesson.price} COIN`}
-            </span>
-          )}
-          {lesson.is_free && (
+          {lesson.is_free ? (
             <span style={{ fontSize: '0.6875rem', color: '#10B981', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Bepul</span>
+          ) : canAccess ? (
+            <span style={{ fontSize: '0.6875rem', color: '#3461FF', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Davom etish</span>
+          ) : (
+            <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 500 }}>Premium dars</span>
           )}
         </div>
       </div>
       {!canAccess && (
         <div style={{
           flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4,
-          background: 'rgba(245, 158, 11, 0.1)', color: '#D97706',
-          padding: '6px 12px', borderRadius: 100, fontSize: '0.75rem', fontWeight: 800,
-          border: '1px solid rgba(245, 158, 11, 0.15)'
+          color: '#64748B', fontWeight: 700, fontSize: '0.875rem',
         }}>
-          <Coins size={12} strokeWidth={2.5} /> {lesson.price}
+          {price} <Coins size={14} fill="#F59E0B" color="#F59E0B" />
         </div>
       )}
     </motion.div>
@@ -74,27 +76,43 @@ function LessonCard({ lesson, userCoins, onNavigate }) {
 export default function CourseDetailPage() {
   const { courseId } = useParams()
   const navigate = useNavigate()
-  const { profile } = useAuth()
-  
+  const { user } = useAuth() // AuthContext dan user obyektini olamiz
+
   const [course, setCourse] = useState(null)
   const [lessons, setLessons] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('videos') // 'videos' | 'comments'
-
-  const coins = profile?.coins || 0
+  const [unlockedLessonIds, setUnlockedLessonIds] = useState(new Set()) // Bazadagi ruxsatlar
 
   useEffect(() => {
     async function loadData() {
-      const [courseRes, lessonsRes] = await Promise.all([
+      const promises = [
         supabase.from('courses').select('*').eq('id', courseId).single(),
         supabase.from('lessons').select('*').eq('course_id', courseId).eq('is_published', true).order('order_index')
-      ])
+      ]
+
+      if (user) {
+        // User qaysi darslarni sotib olganini tortamiz
+        promises.push(
+          supabase.from('user_access').select('lesson_id').eq('user_id', user.id)
+        )
+      }
+
+      const results = await Promise.all(promises)
+      const courseRes = results[0]
+      const lessonsRes = results[1]
+      const accessRes = user ? results[2] : null
+
       if (courseRes.data) setCourse(courseRes.data)
       if (lessonsRes.data) setLessons(lessonsRes.data)
+      if (accessRes && accessRes.data) {
+        setUnlockedLessonIds(new Set(accessRes.data.map(d => d.lesson_id)))
+      }
+
       setLoading(false)
     }
     loadData()
-  }, [courseId])
+  }, [courseId, user])
 
   if (loading) {
     return (
@@ -124,14 +142,14 @@ export default function CourseDetailPage() {
   return (
     <div style={{ minHeight: '100vh', paddingBottom: 140 }}>
       {/* ── Header (Sticky, Pill back button) ── */}
-      <header style={{ 
+      <header style={{
         position: 'sticky', top: 0, zIndex: 10,
         background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(20px)',
         padding: '16px 20px', borderBottom: '1px solid rgba(15,23,42,0.05)',
         display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}>
         <div style={{ width: '100%', maxWidth: 1040, display: 'flex', alignItems: 'center' }}>
-          <button 
+          <button
             onClick={() => navigate('/dashboard')}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
@@ -149,7 +167,7 @@ export default function CourseDetailPage() {
 
       {/* ── Main Content Container ── */}
       <main style={{ maxWidth: 1040, margin: '0 auto', padding: 'clamp(24px, 6vw, 32px) clamp(16px, 4vw, 24px)' }}>
-        
+
         {/* Course Info */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 32 }}>
           <h1 className="outfit-font" style={{ margin: '0 0 12px', fontSize: '2.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
@@ -163,7 +181,7 @@ export default function CourseDetailPage() {
         </motion.div>
 
         {/* Glassy Pill Tabs */}
-        <div style={{ 
+        <div style={{
           display: 'flex', background: 'rgba(15,23,42,0.04)', borderRadius: 100, padding: 4, marginBottom: 32,
           maxWidth: 400, border: '1px solid rgba(15,23,42,0.03)'
         }}>
@@ -207,7 +225,12 @@ export default function CourseDetailPage() {
                   </div>
                 ) : (
                   lessons.map(lesson => (
-                    <LessonCard key={lesson.id} lesson={lesson} userCoins={coins} onNavigate={navigate} />
+                    <LessonCard
+                      key={lesson.id}
+                      lesson={lesson}
+                      isUnlocked={unlockedLessonIds.has(lesson.id)}
+                      onNavigate={navigate}
+                    />
                   ))
                 )}
               </div>

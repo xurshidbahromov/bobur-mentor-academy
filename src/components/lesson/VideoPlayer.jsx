@@ -48,21 +48,35 @@ export default function VideoPlayer({ videoId, lessonId }) {
     return () => document.body.classList.remove('hide-ui-for-video')
   }, [isFullscreen])
 
+  const pendingSeekTimeRef = useRef(null)
+  const seekTimeoutRef = useRef(null)
+
   // Progress Tracking UI
   // Defining them up here so we can use them anywhere without stale issues!
   const startTrackingProgress = useCallback(() => {
     if (progressIntervalRef.current) return
     progressIntervalRef.current = setInterval(() => {
-      if (playerRef.current && playerRef.current.getCurrentTime) {
+      if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
         // ALWAYS keep duration updated (fixes getDuration returning 0 on initial load)
-        const currentDur = playerRef.current.getDuration()
-        if (currentDur && currentDur > 0) {
+        const currentDur = playerRef.current.getDuration() || 0
+        if (currentDur > 0) {
           setDuration(currentDur)
         }
         
         // ONLY update currentTime from video if the user is NOT dragging the bar
         if (!isDraggingRef.current) {
-          setCurrentTime(playerRef.current.getCurrentTime())
+          const actualTime = playerRef.current.getCurrentTime() || 0
+          
+          if (pendingSeekTimeRef.current !== null) {
+            if (Math.abs(actualTime - pendingSeekTimeRef.current) > 1.5) {
+               return // Youtube is buffering, ignore old time
+            } else {
+               pendingSeekTimeRef.current = null
+               if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current)
+            }
+          }
+          
+          setCurrentTime(actualTime)
         }
       }
     }, 150) // Fast 150ms update for smooth UI
@@ -189,19 +203,30 @@ export default function VideoPlayer({ videoId, lessonId }) {
     else playerRef.current.playVideo()
   }
 
+  const applySeek = (newTime) => {
+    if (!playerRef.current) return
+    pendingSeekTimeRef.current = newTime
+    playerRef.current.seekTo(newTime, true)
+    
+    if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current)
+    seekTimeoutRef.current = setTimeout(() => {
+       pendingSeekTimeRef.current = null
+    }, 2000)
+  }
+
   const skipTime = (amount, e) => {
     if (e) e.stopPropagation()
     if (!playerRef.current || !duration) return
     const newTime = Math.min(Math.max(currentTime + amount, 0), duration)
-    playerRef.current.seekTo(newTime, true)
     setCurrentTime(newTime)
+    applySeek(newTime)
   }
 
   // --- Advanced Drag & Seek Logic ---
   const scrubTimeRef = useRef(0)
 
-  const updateProgressFromEvent = useCallback((clientX, applySeek = false) => {
-    if (!trackRef.current || !duration || !playerRef.current) return
+  const updateProgressFromEvent = (clientX) => {
+    if (!trackRef.current || !duration) return
     const rect = trackRef.current.getBoundingClientRect()
     let x = clientX - rect.left
     if (x < 0) x = 0
@@ -211,18 +236,17 @@ export default function VideoPlayer({ videoId, lessonId }) {
     
     scrubTimeRef.current = newTime
     setCurrentTime(newTime) // Visually update immediately
-    
-    if (applySeek) {
-      playerRef.current.seekTo(newTime, true) // Tell YT player to scrub
-    }
-  }, [duration])
+  }
 
   const handlePointerDown = (e) => {
     // Only intercept left clicks or touch starts
     if (e.button !== undefined && e.button !== 0) return
     setIsDraggingSafe(true)
+    
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX)
+    updateProgressFromEvent(clientX)
     // Seek instantly on exact tap/click
-    updateProgressFromEvent(e.clientX || (e.touches && e.touches[0].clientX), true)
+    applySeek(scrubTimeRef.current)
   }
 
   useEffect(() => {
@@ -231,7 +255,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
         // Prevent default to disable scrolling while scrubbing on mobile
         if (e.cancelable) e.preventDefault() 
         const clientX = e.clientX || (e.touches && e.touches[0].clientX)
-        updateProgressFromEvent(clientX, false) // Only visual update -> NO Youtube API choking
+        updateProgressFromEvent(clientX) // Only visual update -> NO Youtube API choking
       }
     }
     const handlePointerUp = () => {
@@ -239,9 +263,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
         setIsDraggingSafe(false)
         setHoverPosition(null)
         // Crucial: Exact final seek applied here when dragging ends!
-        if (playerRef.current) {
-          playerRef.current.seekTo(scrubTimeRef.current, true)
-        }
+        applySeek(scrubTimeRef.current)
       }
     }
 
@@ -257,7 +279,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
       window.removeEventListener('touchmove', handlePointerMove)
       window.removeEventListener('touchend', handlePointerUp)
     }
-  }, [isDragging, updateProgressFromEvent, setIsDraggingSafe])
+  }, [isDragging, setIsDraggingSafe, duration])
 
   const handleMouseMoveTrack = (e) => {
     if (isDragging || !trackRef.current || !duration) return

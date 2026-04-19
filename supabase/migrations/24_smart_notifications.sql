@@ -133,23 +133,23 @@ CREATE TRIGGER on_coin_update_notify
 
 
 -- ──────────────────────────────────────────────────────────────
--- 4. KURS KIRISH HUQUQI BERILGANDA BILDIRISHNOMA
--- user_access jadvaliga INSERT bo'lganda (admin kurs ochib berganda)
+-- 4. DARS KIRISH HUQUQI BERILGANDA BILDIRISHNOMA
+-- user_access jadvaliga INSERT bo'lganda (coin bilan ochilganda yoki admin orqali)
 -- ──────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.notify_course_access()
 RETURNS TRIGGER AS $$
 DECLARE
-  v_course_title TEXT;
+  v_lesson_title TEXT;
 BEGIN
-  -- Kurs nomini olish
-  SELECT title INTO v_course_title FROM public.courses WHERE id = NEW.course_id;
+  -- Dars nomini olish
+  SELECT title INTO v_lesson_title FROM public.lessons WHERE id = NEW.lesson_id;
 
   INSERT INTO public.notifications (user_id, title, message, type)
   VALUES (
     NEW.user_id,
-    '📚 Yangi kursga kirish ochildi!',
-    '"' || COALESCE(v_course_title, 'Yangi kurs') || '" kursi uchun ruxsatingiz tasdiqlandi. Hoziroq boshlang!',
-    'info'
+    '🔓 Dars qulfdan chiqarildi!',
+    '"' || COALESCE(v_lesson_title, 'Yangi dars') || '" darsi muvaffaqiyatli ochildi. Darsni boshlashingiz mumkin!',
+    'success'
   );
 
   RETURN NEW;
