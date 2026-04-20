@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Target, Play, BookOpen } from 'lucide-react'
+import { Target, Play, BookOpen, Lock } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { toast } from 'sonner'
 
 // ── Shimmer skeleton block ─────────────────────────────
 function SkeletonBlock({ height = 20, width = '100%', radius = 12, mb = 0 }) {
@@ -30,19 +32,27 @@ function HubSkeleton() {
 }
 
 export default function QuizzesHubPage() {
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [courses, setCourses] = useState([])
   const [lessonsWithQuizzes, setLessonsWithQuizzes] = useState({})
   const [loading, setLoading] = useState(true)
+  const [unlockedLessonIds, setUnlockedLessonIds] = useState(new Set())
 
   useEffect(() => {
     async function fetchMap() {
       const { data: cData } = await supabase
         .from('courses').select('id, title').eq('is_published', true).order('created_at', { ascending: false })
       const { data: lData } = await supabase
-        .from('lessons').select('id, course_id, title').eq('is_published', true).order('order_index', { ascending: true })
+        .from('lessons').select('id, course_id, title, is_free').eq('is_published', true).order('order_index', { ascending: true })
       const { data: qData } = await supabase
         .from('quizzes').select('id, lesson_id').not('lesson_id', 'is', null)
+
+      let unlockedSet = new Set()
+      if (user) {
+        const { data: accessData } = await supabase.from('user_access').select('lesson_id').eq('user_id', user.id)
+        if (accessData) unlockedSet = new Set(accessData.map(a => a.lesson_id))
+      }
 
       const map = {}
       if (lData && qData) {
@@ -55,12 +65,13 @@ export default function QuizzesHubPage() {
         })
       }
 
+      setUnlockedLessonIds(unlockedSet)
       setCourses((cData || []).filter(c => map[c.id] && map[c.id].length > 0))
       setLessonsWithQuizzes(map)
       setLoading(false)
     }
     fetchMap()
-  }, [])
+  }, [user])
 
   return (
     <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 110px' }}>
@@ -137,11 +148,20 @@ export default function QuizzesHubPage() {
                       gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                       gap: 12,
                     }}>
-                      {lessonsWithQuizzes[course.id].map(lesson => (
+                      {lessonsWithQuizzes[course.id].map(lesson => {
+                        const canAccess = lesson.is_free || unlockedLessonIds.has(lesson.id)
+
+                        return (
                         <motion.div
                           key={lesson.id}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => navigate(`/quiz/${lesson.id}`)}
+                          whileTap={canAccess ? { scale: 0.97 } : { scale: 0.99 }}
+                          onClick={() => {
+                            if (!canAccess) {
+                              toast.info('Dars qulflangan', { description: 'Bu testni ishlash uchun avval Kurslar bo\'limidan darsni qulfdan chiqaring.' })
+                              return
+                            }
+                            navigate(`/quiz/${lesson.id}`)
+                          }}
                           style={{
                             background: 'rgba(255, 255, 255, 0.78)',
                             padding: '16px 20px',
@@ -151,7 +171,8 @@ export default function QuizzesHubPage() {
                             alignItems: 'center',
                             boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
                             border: '1px solid var(--border-medium)',
-                            cursor: 'pointer',
+                            cursor: canAccess ? 'pointer' : 'not-allowed',
+                            opacity: canAccess ? 1 : 0.65,
                             WebkitTapHighlightColor: 'transparent',
                             backdropFilter: 'blur(24px) saturate(2)',
                             WebkitBackdropFilter: 'blur(24px) saturate(2)',
@@ -170,13 +191,15 @@ export default function QuizzesHubPage() {
                           </div>
                           <div style={{
                             width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
-                            background: 'rgba(52,97,255,0.08)', color: '#3461FF',
+                            background: canAccess ? 'rgba(52,97,255,0.08)' : 'rgba(100,116,139,0.08)', 
+                            color: canAccess ? '#3461FF' : '#64748B',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}>
-                            <Play size={16} fill="currentColor" style={{ marginLeft: 2 }} />
+                            {canAccess ? <Play size={16} fill="currentColor" style={{ marginLeft: 2 }} /> : <Lock size={16} />}
                           </div>
                         </motion.div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </motion.div>
                 ))}
