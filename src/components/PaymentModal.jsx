@@ -16,8 +16,8 @@ export default function PaymentModal({ pkg, onClose }) {
   const [mounted, setMounted] = useState(false)
 
   const IconComp = PACKAGE_ICONS[pkg?.id] || Zap
-  const CARD_NUMBER = "8600 9999 9999 9999" // Sizning real kartangiz (uzbek/humo)
-  const CARD_NAME = "BOBURBEK"
+  const CARD_NUMBER = "9860 3501 4168 8076" // Sizning real kartangiz (uzbek/humo)
+  const CARD_NAME = "Bobur Tursunaxmedov"
   const ADMIN_TG = "@Bobur_mentor"
   const ADMIN_PHONE = "+998888787969"
 
