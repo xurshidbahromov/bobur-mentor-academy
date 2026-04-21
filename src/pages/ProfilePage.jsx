@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import {
   BookOpen, CheckCircle2, Flame, LogOut,
   ArrowRight, Trophy, ShieldCheck, Coins, ChevronRight,
-  MoreVertical, Calendar as CalendarIcon, Sparkles, Check, ArrowUpRight, Clock, Zap
+  MoreVertical, Calendar as CalendarIcon, Sparkles, Check, ArrowUpRight, Clock, Zap, Crown, Shield
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
@@ -28,7 +28,8 @@ export default function ProfilePage() {
     lessonsDone: 0,
     quizAvg: 0,
     activityDays: [],
-    performanceScore: 0
+    level: 1,
+    xp: 0
   })
 
   // Daily Reward Hook
@@ -63,14 +64,25 @@ export default function ProfilePage() {
       const { data: lActs } = await supabase.from('lesson_progress').select('updated_at').eq('user_id', user.id)
       
       const dates = new Set()
-      qActs?.forEach(d => dates.add(new Date(d.created_at).toISOString().split('T')[0]))
-      lActs?.forEach(d => dates.add(new Date(d.updated_at).toISOString().split('T')[0]))
+      
+      const toLocalDateStr = (utcString) => {
+        const d = new Date(utcString)
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      }
+
+      qActs?.forEach(d => dates.add(toLocalDateStr(d.created_at)))
+      lActs?.forEach(d => dates.add(toLocalDateStr(d.updated_at)))
+
+      const totalXp = (lCount || 0) * 100 + avg * 5
+      const currentLevel = Math.floor(totalXp / 1000) + 1
+      const xpInCurrentLevel = totalXp % 1000
 
       setExtStats({
         lessonsDone: lCount || 0,
         quizAvg: avg,
         activityDays: Array.from(dates),
-        performanceScore: Math.min(Math.round(((lCount || 0) * 10 + avg) / 2), 100)
+        level: currentLevel,
+        xp: xpInCurrentLevel
       })
     }
     fetchStats()
@@ -160,8 +172,84 @@ export default function ProfilePage() {
   ]
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 100px' }}>
-      <motion.div variants={container} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <>
+      <style>{`
+        .profile-page-wrapper { width: 100%; padding-bottom: 60px; }
+        .profile-container { max-width: 1040px; margin: 0 auto; }
+        
+        .profile-hero {
+          background: linear-gradient(145deg, #0F172A 0%, #1e3a8a 50%, #172554 100%);
+          position: relative;
+          overflow: hidden;
+          padding: 60px 0 160px;
+          border-radius: 0 0 40px 40px;
+          margin-bottom: -100px;
+          box-shadow: 0 20px 40px rgba(15,23,42,0.1);
+        }
+        
+        @media (max-width: 768px) {
+          .profile-hero {
+            padding: 40px 0 140px;
+            border-radius: 0 0 32px 32px;
+            margin-bottom: -80px;
+          }
+        }
+        
+        .profile-hero-title {
+          margin: 0 0 10px;
+          font-weight: 900;
+          color: white;
+          letter-spacing: -0.04em;
+          line-height: 1.1;
+          font-size: clamp(2rem, 6vw, 3rem);
+        }
+
+        .profile-content { padding: 0 24px; position: relative; zIndex: 2; }
+        @media (max-width: 768px) { .profile-content { padding: 0 16px; } }
+      `}</style>
+      
+      <div className="profile-page-wrapper">
+        {/* ── FULL WIDTH HERO ── */}
+        <div className="profile-hero">
+          {/* Ambient Glows */}
+          <div style={{ position: 'absolute', top: -50, right: -50, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -50, left: -50, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+             {/* Floating Icons (Matching pattern: One icon type per page) */}
+          {[
+            { top: '15%', right: '12%', size: 48, delay: 0 },
+            { top: '55%', right: '25%', size: 28, delay: 0.4 },
+            { top: '25%', left: '8%', size: 36, delay: 0.2 },
+            { bottom: '25%', left: '20%', size: 22, delay: 0.6 },
+          ].map((c, i) => (
+            <motion.div
+              key={i}
+              animate={{ y: [0, -12, 0], rotate: [0, 8, -8, 0] }}
+              transition={{ repeat: Infinity, duration: 4 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
+              style={{ position: 'absolute', opacity: 0.12, pointerEvents: 'none', ...c }}
+            >
+              <Shield size={c.size} color="white" />
+            </motion.div>
+          ))}
+
+          <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+            <div style={{ maxWidth: 800 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <ShieldCheck size={14} color="#60A5FA" />
+                  <span style={{ color: '#DBEAFE', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Hisob Ma'lumotlari</span>
+                </div>
+              </div>
+              <h1 className="outfit-font profile-hero-title">
+                Sizning Profilingiz
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 1040px CONSTRAINED CONTENT ── */}
+        <div className="profile-container">
+          <div className="profile-content">
+            <motion.div variants={container} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* ── Avatar Hero Card ── */}
         <motion.div variants={item} className="card-glow-hover" style={{
@@ -327,11 +415,11 @@ export default function ProfilePage() {
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)' }}>
                     <Sparkles size={16} color="#8B5CF6" />
                   </div>
-                  <span className="outfit-font" style={{ fontWeight: 800, color: '#4C1D95', fontSize: '1.1875rem', letterSpacing: '-0.01em' }}>Progress</span>
+                  <span className="outfit-font" style={{ fontWeight: 800, color: '#4C1D95', fontSize: '1.1875rem', letterSpacing: '-0.01em' }}>Daraja & XP</span>
                 </div>
-                <button style={{ background: 'none', border: 'none', color: '#8B5CF6', cursor: 'pointer', opacity: 0.6 }}>
-                  <MoreVertical size={20} />
-                </button>
+                <div style={{ background: 'rgba(139, 92, 246, 0.12)', color: '#8B5CF6', padding: '4px 10px', borderRadius: 100, fontSize: '0.75rem', fontWeight: 800 }}>
+                  {extStats.xp} / 1000 XP
+                </div>
               </div>
 
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px 0', position: 'relative', zIndex: 1 }}>
@@ -343,7 +431,7 @@ export default function ProfilePage() {
                       />
                       <motion.path
                         initial={{ pathLength: 0 }}
-                        animate={{ pathLength: extStats.performanceScore / 100 }}
+                        animate={{ pathLength: extStats.xp / 1000 }}
                         transition={{ duration: 1.8, ease: "easeOut" }}
                         d="M 10 50 A 40 40 0 0 1 90 50"
                         fill="none" stroke="url(#gaugeGradient)" strokeWidth="10" strokeLinecap="round"
@@ -356,8 +444,8 @@ export default function ProfilePage() {
                       </defs>
                     </svg>
                     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 15 }}>
-                       <span className="outfit-font" style={{ fontSize: '2.5rem', fontWeight: 900, color: '#1E1B4B', lineHeight: 1, letterSpacing: '-0.04em' }}>{extStats.performanceScore * 2}</span>
-                       <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#8B5CF6', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Score</span>
+                       <span className="outfit-font" style={{ fontSize: '2.5rem', fontWeight: 900, color: '#1E1B4B', lineHeight: 1, letterSpacing: '-0.04em' }}>{extStats.level}</span>
+                       <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#8B5CF6', opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Daraja</span>
                     </div>
                  </div>
               </div>
@@ -377,11 +465,14 @@ export default function ProfilePage() {
               {/* Decorative background tint */}
               <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, background: 'rgba(16, 185, 129, 0.05)', borderRadius: '50%', filter: 'blur(40px)' }} />
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, position: 'relative', zIndex: 1 }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)' }}>
-                  <CalendarIcon size={16} color="#10B981" />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)' }}>
+                    <CalendarIcon size={16} color="#10B981" />
+                  </div>
+                  <span className="outfit-font" style={{ fontWeight: 800, color: '#064E3B', fontSize: '1.1875rem', letterSpacing: '-0.01em' }}>Aktivlik</span>
                 </div>
-                <span className="outfit-font" style={{ fontWeight: 800, color: '#064E3B', fontSize: '1.1875rem', letterSpacing: '-0.01em' }}>Aktivlik</span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#10B981' }}>{["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"][new Date().getMonth()]}</span>
               </div>
               
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, padding: '4px', position: 'relative', zIndex: 1 }}>
@@ -402,15 +493,17 @@ export default function ProfilePage() {
                         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
                         const isActive = extStats.activityDays.includes(dateStr)
                         const isToday = day === now.getDate()
+                        const isPast = day < now.getDate()
 
                         return (
                           <div key={day} style={{
                             aspectRatio: '1', borderRadius: '50%', 
-                            background: isActive ? '#10B981' : (isToday ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.5)'),
-                            color: isActive ? 'white' : '#064E3B',
+                            background: isActive ? '#10B981' : 'transparent',
+                            color: isActive ? 'white' : (isPast ? '#94A3B8' : '#CBD5E1'),
+                            border: isToday && !isActive ? '2px solid #10B981' : (isActive ? '2px solid #10B981' : 'none'),
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.75rem', fontWeight: 800,
-                            boxShadow: isToday ? '0 0 0 2px #10B981' : 'none',
+                            fontSize: '0.8rem', fontWeight: isActive || isToday ? 800 : 500,
+                            boxShadow: isActive ? '0 4px 10px rgba(16, 185, 129, 0.3)' : 'none',
                             transition: 'all 0.24s cubic-bezier(0.22, 1, 0.36, 1)',
                             cursor: 'default'
                           }}>
@@ -563,7 +656,10 @@ export default function ProfilePage() {
 
 
 
-      </motion.div>
-    </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

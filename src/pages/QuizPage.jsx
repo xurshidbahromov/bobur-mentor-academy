@@ -290,6 +290,7 @@ export default function QuizPage() {
   const { user }     = useAuth()
 
   const [lesson,  setLesson]  = useState(null)
+  const [allQuizzes, setAllQuizzes] = useState([]) // All fetched quizzes (for general)
   const [quizzes, setQuizzes] = useState([])
   const [loading, setLoading] = useState(true)
   const [phase,     setPhase]     = useState('intro')
@@ -301,6 +302,7 @@ export default function QuizPage() {
   const [answers,   setAnswers]   = useState({})
   const [score,     setScore]     = useState(0)
   const [zoomedImage, setZoomedImage] = useState(null)
+  const [countChoice, setCountChoice] = useState(10) // General quiz: how many questions
 
   const [timeLeft,    setTimeLeft]  = useState(SECONDS_PER_QUESTION)
   const [timeSpent,   setTimeSpent] = useState(0)
@@ -316,8 +318,9 @@ export default function QuizPage() {
         const { data: q } = await supabase
           .from('quizzes').select('*').eq('is_general', true).order('created_at')
         const shuffled = (q || []).sort(() => Math.random() - 0.5)
-        setLesson({ title: 'Umumiy Test (Random)' })
-        setQuizzes(shuffled)
+        setLesson({ title: 'Umumiy Test' })
+        setAllQuizzes(shuffled) // Save all for slicing later
+        // Don't set quizzes yet — user picks count first
       } else {
         const [{ data: l }, { data: q }] = await Promise.all([
           supabase.from('lessons').select('id, title').eq('id', lessonId).single(),
@@ -453,17 +456,68 @@ export default function QuizPage() {
                 <HelpCircle size={40} />
               </div>
               <h2 className="outfit-font" style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0F172A', margin: '0 0 12px' }}>Testga tayyormisiz?</h2>
-              <p style={{ color: '#64748B', lineHeight: 1.6, marginBottom: 40, fontSize: '1rem' }}>
-                Ushbu dars bo'yicha bilimlaringizni tekshiring.<br />Jami <strong>{quizzes.length} ta savol</strong>. Har biriga 60 soniya vaqt.
-              </p>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                whileHover={{ scale: 1.01 }}
-                onClick={() => { startTimeRef.current = Date.now(); setPhase('quiz') }}
-                style={{ width: '100%', padding: '18px', borderRadius: 18, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '1.0625rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-              >
-                Boshladik <ChevronRight size={20} />
-              </motion.button>
+
+              {isGeneral ? (
+                // ── General Quiz: Count Selector ──
+                <>
+                  <p style={{ color: '#64748B', lineHeight: 1.6, marginBottom: 24, fontSize: '1rem' }}>
+                    Bazada <strong style={{ color: '#0F172A' }}>{allQuizzes.length} ta</strong> umumiy savol bor.<br />Nechta savoldan iborat test yechmoqchisiz?
+                  </p>
+
+                  {/* Count options */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 28 }}>
+                    {[5, 10, 20, allQuizzes.length].filter((v, i, arr) => arr.indexOf(v) === i).map(n => (
+                      <motion.button
+                        key={n}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => setCountChoice(n)}
+                        style={{
+                          padding: '16px 12px',
+                          borderRadius: 16,
+                          border: `2px solid ${countChoice === n ? '#2563EB' : '#E2E8F0'}`,
+                          background: countChoice === n ? '#EFF6FF' : 'white',
+                          color: countChoice === n ? '#2563EB' : '#64748B',
+                          fontWeight: 800,
+                          fontSize: '1rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.18s',
+                        }}
+                      >
+                        {n === allQuizzes.length ? `Hammasi (${n})` : `${n} ta`}
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.01 }}
+                    onClick={() => {
+                      const picked = allQuizzes.slice(0, countChoice)
+                      setQuizzes(picked)
+                      startTimeRef.current = Date.now()
+                      setPhase('quiz')
+                    }}
+                    style={{ width: '100%', padding: '18px', borderRadius: 18, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '1.0625rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                  >
+                    {countChoice} ta savol boshlash <ChevronRight size={20} />
+                  </motion.button>
+                </>
+              ) : (
+                // ── Lesson-specific Quiz ──
+                <>
+                  <p style={{ color: '#64748B', lineHeight: 1.6, marginBottom: 40, fontSize: '1rem' }}>
+                    Ushbu dars bo'yicha bilimlaringizni tekshiring.<br />Jami <strong>{quizzes.length} ta savol</strong>. Har biriga 60 soniya vaqt.
+                  </p>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.01 }}
+                    onClick={() => { startTimeRef.current = Date.now(); setPhase('quiz') }}
+                    style={{ width: '100%', padding: '18px', borderRadius: 18, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '1.0625rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                  >
+                    Boshladik <ChevronRight size={20} />
+                  </motion.button>
+                </>
+              )}
             </motion.div>
           )}
 
@@ -553,7 +607,16 @@ export default function QuizPage() {
           {phase === 'result' && (
             <ResultCard
               score={score} total={quizzes.length} timeSpent={timeSpent}
-              onRetry={() => { savedRef.current = false; setPhase('intro'); setScore(0); setCurrent(0); setSelected(null); setSubmitted(false); setIsCorrect(false) }}
+              onRetry={() => {
+                savedRef.current = false
+                // Re-shuffle for general quizzes
+                if (isGeneral) {
+                  const reshuffled = [...allQuizzes].sort(() => Math.random() - 0.5)
+                  setAllQuizzes(reshuffled)
+                  setQuizzes([]) // reset visible quizzes, user picks again
+                }
+                setPhase('intro'); setScore(0); setCurrent(0); setSelected(null); setSubmitted(false); setIsCorrect(false)
+              }}
               onBack={() => isGeneral ? navigate('/quizzes') : navigate(`/lessons/${lessonId}`)}
             />
           )}

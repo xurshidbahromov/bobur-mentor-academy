@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Trophy, Flame, Coins, Crown } from 'lucide-react'
+import { Trophy, Flame, Coins, Crown, Star, Sparkles } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
@@ -226,16 +226,73 @@ export default function LeaderboardPage() {
   const rest = leaders.slice(3)
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 80px' }}>
+    <>
+      <style>{`
+        .leader-page-wrapper { width: 100%; padding-bottom: 80px; }
+        .leader-container { max-width: 1040px; margin: 0 auto; }
+        
+        .leader-hero {
+          background: linear-gradient(145deg, #1E1B4B 0%, #78350F 50%, #D97706 100%);
+          position: relative;
+          overflow: hidden;
+          padding: 60px 0 160px;
+          border-radius: 0 0 40px 40px;
+          margin-bottom: -120px;
+          box-shadow: 0 20px 40px rgba(15,23,42,0.15);
+        }
+        
+        @media (max-width: 768px) {
+          .leader-hero {
+            padding: 40px 0 140px;
+            border-radius: 0 0 32px 32px;
+            margin-bottom: -80px;
+          }
+        }
+        
+        .leader-content { padding: 0 24px; position: relative; zIndex: 2; }
+        @media (max-width: 768px) { .leader-content { padding: 0 16px; } }
+      `}</style>
+      
+      <div className="leader-page-wrapper">
+        
+        {/* ── FULL WIDTH HERO ── */}
+        <div className="leader-hero">
+          <div style={{ position: 'absolute', top: -50, right: -50, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(253,230,138,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -50, left: -50, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(251,191,36,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          
+          {/* Floating Icons (Matching pattern: One icon type per page) */}
+          {[
+            { top: '15%', right: '10%', size: 48, delay: 0 },
+            { top: '55%', right: '25%', size: 28, delay: 0.4 },
+            { top: '25%', left: '8%', size: 36, delay: 0.2 },
+            { bottom: '25%', left: '20%', size: 22, delay: 0.6 },
+          ].map((c, i) => (
+            <motion.div
+              key={i}
+              animate={{ y: [0, -12, 0], rotate: [0, 8, -8, 0] }}
+              transition={{ repeat: Infinity, duration: 4 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
+              style={{ position: 'absolute', opacity: 0.12, pointerEvents: 'none', ...c }}
+            >
+              <Trophy size={c.size} color="white" />
+            </motion.div>
+          ))}
 
-      {/* ── Header ── */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 32 }}>
+          <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+            
+            {/* ── Header ── */}
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 className="outfit-font" style={{ margin: '0 0 8px', fontSize: '2.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Trophy size={14} color="#FDE68A" />
+                <span style={{ color: '#FEF3C7', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Peshqadamlar</span>
+              </div>
+            </div>
+            <h1 className="outfit-font" style={{ margin: '0 0 8px', fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, color: 'white', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
               Reyting
             </h1>
-            <p style={{ margin: 0, color: '#64748B', fontSize: '1rem', fontWeight: 500 }}>
+            <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '1rem', fontWeight: 500 }}>
               Top 50 o'quvchilar ro'yxati
             </p>
           </div>
@@ -243,13 +300,13 @@ export default function LeaderboardPage() {
           {myRank >= 0 && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              background: 'rgba(255, 255, 255, 0.78)', backdropFilter: 'blur(24px) saturate(2)',
-              border: '1px solid var(--border-medium)',
+              background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(24px) saturate(2)',
+              border: '1px solid rgba(255,255,255,0.2)',
               borderRadius: 100, padding: '10px 24px',
-              boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
+              boxShadow: '0 8px 32px rgba(15,23,42,0.1)',
             }}>
-              <span style={{ color: '#475569', fontSize: '0.9375rem', fontWeight: 600 }}>Sizning o'rningiz:</span>
-              <span style={{ color: '#3461FF', fontWeight: 900, fontSize: '1.25rem' }}>#{myRank + 1}</span>
+              <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9375rem', fontWeight: 600 }}>Sizning o'rningiz:</span>
+              <span style={{ color: 'white', fontWeight: 900, fontSize: '1.25rem' }}>#{myRank + 1}</span>
             </div>
           )}
         </div>
@@ -259,9 +316,10 @@ export default function LeaderboardPage() {
       <motion.div
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          display: 'flex', marginBottom: 32,
-          background: 'rgba(15,23,42,0.03)', borderRadius: 100, padding: 4,
-          border: '1px solid rgba(15,23,42,0.04)',
+          display: 'flex', marginBottom: 20,
+          background: 'rgba(0,0,0,0.15)', borderRadius: 100, padding: 4,
+          border: '1px solid rgba(255,255,255,0.1)',
+          maxWidth: 400
         }}
       >
         {[
@@ -274,17 +332,17 @@ export default function LeaderboardPage() {
               key={t.key}
               onClick={() => setTab(t.key)}
               style={{
-                flex: 1, padding: '12px', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                fontWeight: isActive ? 700 : 600, fontSize: '0.9375rem', position: 'relative',
-                background: 'transparent', color: isActive ? '#0F172A' : '#64748B',
+                flex: 1, padding: '10px 12px', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                fontWeight: isActive ? 800 : 600, fontSize: '0.9375rem', position: 'relative',
+                background: 'transparent', color: isActive ? '#78350F' : 'rgba(255,255,255,0.6)',
                 WebkitTapHighlightColor: 'transparent', transition: 'color 0.3s ease',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, zIndex: 1
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, zIndex: 1
               }}
             >
               {isActive && (
                 <motion.div
                   layoutId="leaderboardTab"
-                  style={{ position: 'absolute', inset: 0, background: 'white', borderRadius: 100, boxShadow: '0 2px 8px rgba(15,23,42,0.08)' }}
+                  style={{ position: 'absolute', inset: 0, background: '#FDE68A', borderRadius: 100, boxShadow: '0 2px 8px rgba(15,23,42,0.15)' }}
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -295,6 +353,13 @@ export default function LeaderboardPage() {
           )
         })}
       </motion.div>
+
+          </div>
+        </div>
+
+        {/* ── CONTENT (Overlapping Hero) ── */}
+        <div className="leader-container">
+          <div className="leader-content">
 
       {/* Podium — only if at least 3 users */}
       {loading ? (
@@ -362,6 +427,9 @@ export default function LeaderboardPage() {
         )}
       </div>
 
+          </div>
+        </div>
     </div>
+    </>
   )
 }

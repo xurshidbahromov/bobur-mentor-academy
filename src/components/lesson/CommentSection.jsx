@@ -150,11 +150,9 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
         <form 
           onSubmit={handleSubmit}
           style={{ 
-            background: 'rgba(255, 255, 255, 0.7)', 
-            backdropFilter: 'blur(16px)',
-            borderRadius: 24, padding: 16,
-            border: '1px solid rgba(255, 255, 255, 0.5)',
-            boxShadow: '0 8px 32px rgba(15,23,42,0.04)',
+            background: 'white', 
+            borderRadius: 20, padding: 16,
+            border: '1px solid rgba(0,0,0,0.05)',
             marginBottom: 32,
             display: 'flex', gap: 12
           }}
@@ -247,11 +245,9 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 style={{ 
-                  background: 'rgba(255, 255, 255, 0.6)', 
-                  backdropFilter: 'blur(12px)',
-                  borderRadius: 24, padding: '20px',
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
-                  boxShadow: '0 4px 12px rgba(15,23,42,0.02)',
+                  background: 'white', 
+                  borderRadius: 20, padding: '16px',
+                  border: '1px solid rgba(0,0,0,0.05)',
                   display: 'flex', gap: 14,
                   position: 'relative'
                 }}

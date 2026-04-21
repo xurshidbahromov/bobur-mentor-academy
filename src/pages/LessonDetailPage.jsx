@@ -5,7 +5,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight, FileText, Download, Info, MessageCircle, Target, Paperclip } from 'lucide-react'
+import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight, FileText, Download, Info, MessageCircle, Target, Paperclip, BookOpen } from 'lucide-react'
 import { useLesson, useQuizzes } from '../hooks/useLessons'
 import { useAccess } from '../hooks/useAccess'
 import { useAuth } from '../context/AuthContext'
@@ -109,16 +109,41 @@ export default function LessonDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: 'clamp(12px, 4vw, 24px) clamp(12px, 4vw, 20px) 120px' }}>
-
-      {/* ── Breadcrumbs ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16, fontSize: '0.8125rem', fontWeight: 600, color: '#94A3B8', flexWrap: 'wrap' }}>
-        <button onClick={() => navigate('/dashboard')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 'inherit', cursor: 'pointer', padding: 0 }}>Dashboard</button>
-        <span>/</span>
-        <button onClick={() => navigate(`/courses/${lesson.course_id}`)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 700, cursor: 'pointer', padding: 0 }}>Kurs</button>
-        <span>/</span>
-        <span style={{ color: '#475569' }}>Dars #{lesson.order_index}</span>
+    <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: 100 }}>
+      {/* ── Floating Navigator (Pill) ── */}
+      <div style={{ 
+        position: 'fixed', top: 20, left: 0, right: 0, zIndex: 100,
+        display: 'flex', justifyContent: 'center', pointerEvents: 'none'
+      }}>
+        <motion.div
+          initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+          style={{
+            pointerEvents: 'auto',
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px) saturate(1.8)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
+            padding: '6px 6px 6px 12px', borderRadius: 100,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+          }}
+        >
+          <span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 600 }}>Kurs:</span>
+          <button
+            onClick={() => navigate(`/courses/${lesson.course_id}`)}
+            style={{
+              background: 'rgba(0,0,0,0.05)', border: 'none',
+              color: '#0F172A', fontWeight: 800, fontSize: '0.8125rem',
+              padding: '6px 14px', borderRadius: 100,
+              cursor: 'pointer', transition: 'all 0.2s',
+            }}
+          >
+            Orqaga qaytish
+          </button>
+        </motion.div>
       </div>
+
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 20px 40px' }}>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         
@@ -127,7 +152,7 @@ export default function LessonDetailPage() {
           
           {/* Left Column: Video & Info */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div style={{ borderRadius: 32, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', background: '#000' }}>
+            <div style={{ borderRadius: 32, overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', background: '#F1F5F9', border: '1px solid rgba(0,0,0,0.05)' }}>
               {canWatch ? (
                 <VideoPlayer videoId={lesson.youtube_video_id} lessonId={lesson.id} lessonTitle={lesson.title} />
               ) : (
@@ -135,16 +160,13 @@ export default function LessonDetailPage() {
               )}
             </div>
 
-            {/* Glassy Tab Bar — always 1 row, no wrap */}
+            {/* Tab Bar */}
             <div style={{ 
               display: 'flex',
               overflowX: 'auto',
-              background: 'rgba(255, 255, 255, 0.7)', 
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
+              background: '#F1F5F9', 
               borderRadius: 24, padding: 4, 
-              border: '1px solid rgba(255, 255, 255, 0.5)',
-              boxShadow: '0 8px 32px rgba(15,23,42,0.03)',
+              border: '1px solid rgba(0,0,0,0.05)',
               scrollbarWidth: 'none',
               WebkitOverflowScrolling: 'touch',
             }}>
@@ -166,11 +188,11 @@ export default function LessonDetailPage() {
                     style={{
                       flex: '1 0 auto',
                       padding: '10px 16px', borderRadius: 20, border: 'none',
-                      background: isActive ? '#FFFFFF' : 'transparent',
-                      color: isActive ? '#0F172A' : '#64748B',
+                      background: isActive ? 'white' : 'transparent',
+                      color: isActive ? '#3461FF' : '#64748B',
                       fontWeight: 800, fontSize: '0.8125rem',
-                      boxShadow: isActive ? '0 4px 12px rgba(15,23,42,0.08)' : 'none',
-                      cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+                      boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                      cursor: 'pointer', transition: 'all 0.2s',
                       WebkitTapHighlightColor: 'transparent',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       gap: 6, whiteSpace: 'nowrap',
@@ -194,25 +216,23 @@ export default function LessonDetailPage() {
               >
                 {activeTab === 'info' && (
                   <div style={{ 
-                    background: 'rgba(255, 255, 255, 0.7)', 
-                    backdropFilter: 'blur(16px)',
-                    borderRadius: 32, padding: 'clamp(20px, 5vw, 32px)',
-                    border: '1px solid rgba(255, 255, 255, 0.5)',
-                    boxShadow: '0 8px 32px rgba(15,23,42,0.03)'
+                    background: 'white', 
+                    borderRadius: 24, padding: '24px',
+                    border: '1px solid rgba(0,0,0,0.05)'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                       <span style={{
                         fontSize: '0.6875rem', fontWeight: 800, letterSpacing: '0.06em',
                         color: lesson.is_free ? '#10B981' : '#3461FF',
                         background: lesson.is_free ? 'rgba(16,185,129,0.08)' : 'rgba(52,97,255,0.08)',
-                        padding: '4px 12px', borderRadius: 100, border: '1px solid rgba(0,0,0,0.03)'
+                        padding: '4px 12px', borderRadius: 100
                       }}>
                         {lesson.is_free ? 'BEPUL' : `${lesson.coin_price ?? 5} COIN`}
                       </span>
                       <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 700 }}>DARS #{lesson.order_index}</span>
                     </div>
                     <h1 className="outfit-font" style={{ 
-                      margin: '0 0 16px', fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 900, color: '#0F172A', 
+                      margin: '0 0 16px', fontSize: 'clamp(1.5rem, 5vw, 2.125rem)', fontWeight: 900, color: '#0F172A', 
                       letterSpacing: '-0.03em', lineHeight: 1.15, wordBreak: 'break-word', overflowWrap: 'anywhere' 
                     }}>
                       {lesson.title}
@@ -237,13 +257,11 @@ export default function LessonDetailPage() {
 
                 {activeTab === 'materials' && canWatch && lesson.materials?.length > 0 && (
                   <div style={{ 
-                    background: 'rgba(255, 255, 255, 0.7)', 
-                    backdropFilter: 'blur(16px)',
-                    borderRadius: 32, padding: 'clamp(16px, 4vw, 32px)',
-                    border: '1px solid rgba(255, 255, 255, 0.5)',
-                    boxShadow: '0 8px 32px rgba(15,23,42,0.03)'
+                    background: 'white', 
+                    borderRadius: 24, padding: '24px',
+                    border: '1px solid rgba(0,0,0,0.05)'
                   }}>
-                    <h2 className="outfit-font" style={{ margin: '0 0 16px', fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 900, color: '#0F172A' }}>
+                    <h2 className="outfit-font" style={{ margin: '0 0 20px', fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 900, color: '#0F172A' }}>
                       Yuklab olish uchun fayllar
                     </h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -255,32 +273,26 @@ export default function LessonDetailPage() {
                           rel="noopener noreferrer"
                           style={{
                             display: 'flex', alignItems: 'center', gap: 12,
-                            background: 'rgba(255,255,255,0.9)', 
-                            padding: 'clamp(12px, 3vw, 16px) clamp(12px, 3vw, 20px)', 
-                            borderRadius: 18, border: '1px solid rgba(15,23,42,0.05)',
+                            background: '#F8FAFC', 
+                            padding: 'clamp(14px, 3vw, 18px)', 
+                            borderRadius: 20, border: '1px solid rgba(0,0,0,0.04)',
                             textDecoration: 'none', color: 'inherit',
-                            boxShadow: '0 4px 12px rgba(15,23,42,0.03)',
-                            transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                            transition: 'all 0.2s ease',
                             minWidth: 0,
                           }}
-                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(15,23,42,0.08)' }}
-                          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,23,42,0.03)' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.transform = 'none' }}
                         >
-                          {/* File icon */}
-                          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(52,97,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3461FF', flexShrink: 0 }}>
+                          <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(52,97,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3461FF', flexShrink: 0 }}>
                             <FileText size={20} strokeWidth={2.5} />
                           </div>
-
-                          {/* Title + subtitle */}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <h3 style={{ margin: '0 0 2px', fontSize: 'clamp(0.875rem, 3.5vw, 1rem)', fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {mat.title}
                             </h3>
                             <p style={{ margin: 0, fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>Dars materiali</p>
                           </div>
-
-                          {/* Download btn */}
-                          <div style={{ padding: 8, background: '#1E293B', color: 'white', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <div style={{ width: 36, height: 36, background: 'white', color: '#475569', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(0,0,0,0.05)' }}>
                             <Download size={16} strokeWidth={2.5} />
                           </div>
                         </a>
@@ -294,18 +306,16 @@ export default function LessonDetailPage() {
 
           {/* Right Column: Playlist Sidebar */}
           <aside className="lesson-sidebar" style={{ 
-            background: 'rgba(255, 255, 255, 0.7)', 
-            backdropFilter: 'blur(20px)',
-            borderRadius: 32, padding: 'clamp(20px, 5vw, 24px)',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
-            boxShadow: '0 12px 40px rgba(15,23,42,0.04)'
+            background: 'white', 
+            borderRadius: 24, padding: 20,
+            border: '1px solid rgba(0,0,0,0.05)'
           }}>
             <h3 className="outfit-font" style={{ margin: '0 0 20px', fontSize: '1.25rem', fontWeight: 900, color: '#0F172A' }}>
               Darslar ro'yxati
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {playlistLoading ? (
-                <p style={{ color: '#94A3B8', fontSize: '0.875rem' }}>Yuklanmoqda...</p>
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.875rem' }}>Yuklanmoqda...</p>
               ) : playlist.map((item) => {
                 const isActive = item.id === lessonId
                 return (
@@ -315,24 +325,24 @@ export default function LessonDetailPage() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       width: '100%', maxWidth: '100%', padding: '12px', borderRadius: 16, border: 'none',
-                      background: isActive ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
-                      color: isActive ? 'white' : '#475569',
-                      cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left',
-                      boxShadow: isActive ? '0 8px 20px rgba(52,97,255,0.2)' : 'none'
+                      background: isActive ? 'rgba(52,97,255,0.08)' : 'transparent',
+                      color: isActive ? '#3461FF' : '#475569',
+                      cursor: 'pointer', transition: 'all 0.2s ease', textAlign: 'left',
                     }}
                   >
                     <div style={{ 
                       width: 28, height: 28, borderRadius: 8, 
-                      background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.05)',
+                      background: isActive ? '#3461FF' : 'rgba(0,0,0,0.05)',
+                      color: isActive ? 'white' : '#94A3B8',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: '0.75rem', fontWeight: 800, flexShrink: 0
                     }}>
                       {item.order_index}
                     </div>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 700, flex: 1, wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4 }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: isActive ? 800 : 700, flex: 1, wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4 }}>
                       {item.title}
                     </span>
-                    {!item.is_free && !isActive && <Lock size={14} style={{ opacity: 0.5 }} />}
+                    {!item.is_free && !isActive && <Lock size={14} style={{ opacity: 0.4 }} />}
                   </button>
                 )
               })}
@@ -341,7 +351,8 @@ export default function LessonDetailPage() {
         </div>
       </div>
     </div>
-  )
+  </div>
+)
 }
 
 // ── Lock Screen ──────────────────────────────────────
@@ -362,110 +373,102 @@ function LockScreen({ lesson, profile, onUnlock, onShop, isUnlocking }) {
       {/* Background Image with Blur */}
       {thumbnailUrl && (
         <div style={{
-          position: 'absolute', inset: -20, // Negative inset to hide blur edges
+          position: 'absolute', inset: -20,
           backgroundImage: `url(${thumbnailUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: 'blur(20px) brightness(0.4)',
+          filter: 'blur(40px) brightness(0.6) saturate(1.2)',
           zIndex: 1
         }} />
       )}
       
-      {/* Fallback & Overlay Gradient */}
+      {/* Subtle Dark Overlay to ensure readability */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(15,23,42,0.95), rgba(15,23,42,0.5))',
+        background: 'linear-gradient(135deg, rgba(15,23,42,0.6), rgba(15,23,42,0.3))',
         zIndex: 2
       }} />
 
-      {/* Glassmorphic Card Content */}
+      {/* Glassmorphic Card Content (Ultra Compact) */}
       <motion.div 
-        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+        initial={{ opacity: 0, y: 10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: 'relative', zIndex: 10,
-          background: 'rgba(255, 255, 255, 0.08)',
-          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          borderRadius: 'clamp(16px, 3vw, 20px)', 
-          padding: 'clamp(16px, 4vw, 24px) clamp(16px, 5vw, 28px)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          borderRadius: 16, 
+          padding: '12px 16px',
           display: 'flex', flexDirection: 'column', alignItems: 'center', 
-          gap: 'clamp(10px, 2vw, 14px)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.4)', 
-          width: 'min(88%, 320px)', textAlign: 'center'
+          gap: 10,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.2)', 
+          width: 'min(90%, 260px)', textAlign: 'center'
         }}
       >
-        <div style={{ position: 'relative' }}>
-          <div style={{ 
-            width: 'clamp(40px, 8vw, 48px)', height: 'clamp(40px, 8vw, 48px)', borderRadius: '50%', 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.3), 0 8px 16px rgba(0,0,0,0.2)',
-            border: '1px solid rgba(255,255,255,0.2)'
-          }}>
-            <Lock size={18} color="white" />
-          </div>
-          {/* Subtle glow behind the lock */}
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'clamp(50px, 12vw, 70px)', height: 'clamp(50px, 12vw, 70px)', background: '#3461FF', filter: 'blur(30px)', opacity: 0.5, zIndex: -1 }} />
+        <div style={{ 
+          width: 32, height: 32, borderRadius: '50%', 
+          background: 'rgba(52, 97, 255, 0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <Lock size={14} color="#3461FF" />
         </div>
 
         <div>
-          <h2 className="outfit-font" style={{ margin: '0 0 4px', color: 'white', fontWeight: 800, fontSize: 'clamp(1rem, 3.5vw, 1.15rem)', lineHeight: 1.2 }}>
-            {lesson.title || 'Dars qulflangan'}
-          </h2>
-          <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: 'clamp(0.75rem, 2.5vw, 0.8125rem)', fontWeight: 500, lineHeight: 1.4 }}>
-            Ko'rish uchun <strong style={{color: 'white'}}>{unlockCost} coin</strong> sarflashingiz kerak
-          </p>
+           <div style={{ 
+            display: 'inline-flex', alignItems: 'center', gap: 4, 
+            background: 'rgba(245, 158, 11, 0.1)', color: '#D97706',
+            padding: '4px 12px', borderRadius: 8, fontSize: '0.75rem', fontWeight: 800,
+            textTransform: 'uppercase', marginBottom: 2
+          }}>
+            <Coins size={12} fill="currentColor" /> {unlockCost} COIN
+          </div>
         </div>
 
-        <div style={{ width: '100%', marginTop: 'clamp(2px, 1vw, 6px)' }}>
+        <div style={{ width: '100%' }}>
           {hasEnough ? (
             <motion.button 
               whileTap={{ scale: 0.97 }}
               disabled={isUnlocking}
               onClick={onUnlock} 
               style={{
-                width: '100%', background: 'linear-gradient(135deg, #3461FF, #214CE5)', color: 'white',
-                border: 'none', borderRadius: 'clamp(10px, 2.5vw, 14px)', 
-                padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)', fontWeight: 700,
-                fontSize: 'clamp(0.8125rem, 2.5vw, 0.9375rem)', cursor: isUnlocking ? 'wait' : 'pointer', 
+                width: '100%', background: '#3461FF', color: 'white',
+                border: 'none', borderRadius: 10, 
+                padding: '8px 12px', fontWeight: 700,
+                fontSize: '0.8125rem', cursor: isUnlocking ? 'wait' : 'pointer', 
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                boxShadow: '0 8px 16px rgba(52,97,255,0.3)', opacity: isUnlocking ? 0.8 : 1
               }}
             >
-              <Coins size={16} />
-              {isUnlocking ? 'Ochilmoqda...' : `${unlockCost} coin bilan ochish`}
+              {isUnlocking ? 'Ochilmoqda...' : `Ochish`}
             </motion.button>
           ) : (
             <motion.button 
               whileTap={{ scale: 0.97 }}
               onClick={onShop} 
               style={{
-                width: '100%', background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white',
-                border: 'none', borderRadius: 'clamp(10px, 2.5vw, 14px)', 
-                padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)', fontWeight: 700,
-                fontSize: 'clamp(0.8125rem, 2.5vw, 0.9375rem)', cursor: 'pointer', 
+                width: '100%', background: '#F59E0B', color: 'white',
+                border: 'none', borderRadius: 10, 
+                padding: '8px 12px', fontWeight: 700,
+                fontSize: '0.8125rem', cursor: 'pointer', 
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                boxShadow: '0 8px 16px rgba(245,158,11,0.3)'
               }}
             >
-              <Coins size={16} /> Do'konga o'tish
+              Do'konga o'tish
             </motion.button>
           )}
         </div>
 
         {profile && (
           <div style={{ 
-            marginTop: -2, fontSize: 'clamp(0.65rem, 2vw, 0.75rem)', fontWeight: 600,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            fontSize: '0.625rem', fontWeight: 800,
+            display: 'flex', alignItems: 'center', gap: 3,
             color: hasEnough ? '#10B981' : '#EF4444' 
           }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Balansingiz:</span> 
-            <span style={{ color: 'white', display: 'flex', alignItems: 'center', gap: 2 }}>
-              {profile.coins} <Coins size={10} fill="currentColor" />
+            <span style={{ color: '#94A3B8' }}>Balansingiz:</span> 
+            <span style={{ color: '#0F172A', display: 'flex', alignItems: 'center', gap: 2 }}>
+              {profile.coins} <Coins size={8} fill="currentColor" />
             </span>
-            {!hasEnough && `(${unlockCost - profile.coins} yetmaydi)`}
           </div>
         )}
       </motion.div>
@@ -481,12 +484,10 @@ function QuizStartCard({ quizzes, bestScore, onStart }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       style={{
-        background: 'rgba(255, 255, 255, 0.75)', 
-        backdropFilter: 'blur(20px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+        background: 'white', 
         borderRadius: 32, padding: 'clamp(24px, 6vw, 32px)',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 12px 40px rgba(15,23,42,0.06)',
+        border: '1px solid rgba(0,0,0,0.05)',
+        boxShadow: '0 10px 40px rgba(15,23,42,0.04)',
         position: 'relative', overflow: 'hidden',
         maxWidth: 600
       }}
@@ -497,10 +498,10 @@ function QuizStartCard({ quizzes, bestScore, onStart }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, position: 'relative', zIndex: 1 }}>
         <div style={{ 
           width: 56, height: 56, borderRadius: 18, 
-          background: 'white', color: '#2563EB', 
+          background: 'rgba(52,97,255,0.08)', color: '#3461FF', 
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          boxShadow: '0 4px 12px rgba(37,99,235,0.1)',
-          border: '1px solid rgba(37,99,235,0.05)'
+          boxShadow: '0 8px 20px rgba(52,97,255,0.1)',
+          border: '1px solid rgba(52,97,255,0.1)'
         }}>
           <ClipboardList size={26} strokeWidth={2.5} />
         </div>
@@ -517,15 +518,16 @@ function QuizStartCard({ quizzes, bestScore, onStart }) {
       {bestScore && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 14,
-          background: 'rgba(255, 255, 255, 0.5)', 
+          background: '#F8FAFC', 
           borderRadius: 20, padding: '16px 20px', marginBottom: 28,
-          border: '1px solid rgba(15,23,42,0.04)',
+          border: '1px solid rgba(0,0,0,0.04)',
           position: 'relative', zIndex: 1
         }}>
           <div style={{ 
             width: 40, height: 40, borderRadius: '50%', 
             background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(245,158,11,0.15)'
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            border: '1px solid rgba(0,0,0,0.03)'
           }}>
             <Trophy size={20} color="#F59E0B" fill="#F59E0B" />
           </div>
@@ -550,11 +552,11 @@ function QuizStartCard({ quizzes, bestScore, onStart }) {
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         style={{
           width: '100%', padding: '18px', borderRadius: 18, border: 'none',
-          background: 'linear-gradient(135deg, #1E293B, #0F172A)', 
+          background: 'linear-gradient(135deg, #1D4ED8, #1E40AF)', 
           color: 'white', fontWeight: 800, fontSize: '1rem',
           cursor: 'pointer', fontFamily: 'inherit',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-          boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
+          boxShadow: '0 8px 24px rgba(29,78,216,0.25)',
           WebkitTapHighlightColor: 'transparent',
           position: 'relative', zIndex: 1
         }}

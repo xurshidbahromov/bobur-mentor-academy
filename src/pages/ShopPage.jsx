@@ -6,63 +6,41 @@ import { useAuth } from '../context/AuthContext'
 import { toast } from 'sonner'
 import PaymentModal from '../components/PaymentModal'
 
-// 1 coin = 200 so'm (asos narx)
-// Paketlarda ommaviy skidka: qancha ko'p olsang, shuncha arzonroq
+// ── Data ──────────────────────────────────────────────────────
 const PACKAGES = [
   {
     id: 'starter', icon: Zap, color: '#3461FF', bg: 'rgba(52,97,255,0.08)',
-    name: 'Starter', coins: 100,
-    priceRaw: 20000,    // 100 × 200 — skidkasiz
-    price: '20 000',
-    originalPrice: null, // skidka yo'q
-    discount: null,
-    perCoin: '200 so\'m/coin',
-    glowClass: '',
+    name: 'Starter', coins: 100, priceRaw: 20000,
+    price: '20 000', originalPrice: null, discount: null,
+    perCoin: "200 so'm / coin", featured: false,
   },
   {
     id: 'standard', icon: Star, color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)',
-    name: 'Standard', coins: 300,
-    priceRaw: 52000,    // 300 × 200 = 60 000, 13% off = 52 200 → 52 000
-    price: '52 000',
-    originalPrice: '60 000',
-    discount: 13,
-    badge: 'Mashhur', glowClass: 'glow-purple',
-    perCoin: '173 so\'m/coin',
+    name: 'Standard', coins: 300, priceRaw: 52000,
+    price: '52 000', originalPrice: '60 000', discount: 13,
+    badge: 'Mashhur', perCoin: "173 so'm / coin", featured: false,
   },
   {
     id: 'pro', icon: Rocket, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
-    name: 'Pro', coins: 700,
-    priceRaw: 105000,   // 700 × 200 = 140 000, 25% off = 105 000
-    price: '105 000',
-    originalPrice: '140 000',
-    discount: 25,
-    popular: true, badge: 'Eng ko\'p tanlanadi', glowClass: 'glow-amber',
-    perCoin: '150 so\'m/coin',
+    name: 'Pro', coins: 700, priceRaw: 105000,
+    price: '105 000', originalPrice: '140 000', discount: 25,
+    badge: 'Eng foydali', perCoin: "150 so'm / coin", featured: true,
   },
 ]
 
 const STEPS = [
-  { 
-    icon: ShoppingCart, color: '#3461FF', bg: 'rgba(52,97,255,0.1)',
-    title: 'Paket tanlang',
-    text: 'Kerakli coin paketini tanlang va "Sotib olish" tugmasini bosing'
-  },
-  { 
-    icon: CreditCard, color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)',
-    title: "Karta orqali to'lang",
-    text: "Ekranda ko'rsatilgan Karta raqamiga yozilgan summani o'tkazing"
-  },
-  { 
-    icon: CheckCircle2, color: '#10B981', bg: 'rgba(16,185,129,0.1)',
-    title: 'Kvitansiya yuboring',
-    text: "To'lov qilinganligini isboti sifatida skrinshotni Adminga yuboring"
-  },
-  { 
-    icon: Zap, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)',
-    title: 'Coinlar tushadi',
-    text: "Admin sizning so'rovingizni tasdiqlashi bilan coinlar hisobingizga qo'shiladi"
-  },
+  { icon: ShoppingCart, color: '#3461FF', title: 'Paket tanlang', text: 'Kerakli coin paketini tanlang' },
+  { icon: CreditCard, color: '#8B5CF6', title: "Karta orqali to'lang", text: "Ko'rsatilgan raqamga summani o'tkazing" },
+  { icon: CheckCircle2, color: '#10B981', title: 'Kvitansiya yuboring', text: 'Skrinshot orqali adminga yuboring' },
+  { icon: Zap, color: '#F59E0B', title: 'Coinlar tushadi', text: "Admin tasdiqlashi bilan hisobga qo'shiladi" },
 ]
+
+// ── Animation variants ──────────────────────────────────────
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { delay, duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+})
 
 export default function ShopPage() {
   const { profile } = useAuth()
@@ -72,358 +50,359 @@ export default function ShopPage() {
 
   const handleCustomBuy = () => {
     const amount = parseInt(customCoins)
-    if (!amount || amount < 10) {
-      toast.error('Kamida 10 coin kiriting!')
-      return
-    }
-    // 1 coin = 200 so'm (custom miqdorda skidka yo'q)
+    if (!amount || amount < 10) { toast.error('Kamida 10 coin kiriting!'); return }
     const priceRaw = amount * 200
-    setSelectedPkg({
-      id: 'custom',
-      name: `Maxsus (${amount} coin)`,
-      coins: amount,
-      priceRaw,
-      price: priceRaw.toLocaleString(),
-      perCoin: '200 so\'m/coin',
-      color: '#3461FF',
-      bg: 'rgba(52,97,255,0.08)',
+    setSelectedPkg({ 
+      id: 'custom', name: `Maxsus (${amount} coin)`, 
+      coins: amount, priceRaw, price: priceRaw.toLocaleString(), 
+      perCoin: "200 so'm/coin", color: '#3461FF', bg: 'rgba(52,97,255,0.08)' 
     })
   }
 
   const estimatedPrice = customCoins ? (parseInt(customCoins || 0) * 200).toLocaleString() : null
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 100px' }}>
+    <>
+      <style>{`
+        .shop-page-wrapper { width: 100%; padding-bottom: 60px; }
+        .shop-container { max-width: 1040px; margin: 0 auto; }
+        
+        .shop-hero {
+          background: linear-gradient(145deg, #0F172A 0%, #1E293B 50%, #1a1040 100%);
+          position: relative;
+          overflow: hidden;
+          padding: 60px 0 160px;
+          border-radius: 0 0 40px 40px;
+          margin-bottom: -100px;
+          box-shadow: 0 20px 40px rgba(15,23,42,0.1);
+        }
+        
+        @media (max-width: 768px) {
+          .shop-hero {
+            padding: 40px 0 140px;
+            border-radius: 0 0 32px 32px;
+            margin-bottom: -80px;
+          }
+        }
 
-      {/* ── Header ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{ marginBottom: 32 }}
-      >
-        <h1 className="outfit-font" style={{
-          margin: '0 0 6px', fontSize: '2.5rem', fontWeight: 900,
-          color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1,
-        }}>
-          Do'kon
-        </h1>
-        <p style={{ margin: 0, color: '#64748B', fontSize: '0.9375rem', fontWeight: 500 }}>
-          Qulfli darslarni ochish uchun coin sotib oling
-        </p>
-      </motion.div>
+        .shop-hero-title {
+          margin: 0 0 24px;
+          font-weight: 900;
+          color: white;
+          letter-spacing: -0.04em;
+          line-height: 1.1;
+          font-size: clamp(2rem, 6vw, 3rem);
+        }
 
-      {/* ── Balance Card ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          background: 'rgba(255, 255, 255, 0.78)',
-          backdropFilter: 'blur(32px) saturate(2)',
-          WebkitBackdropFilter: 'blur(32px) saturate(2)',
-          border: '1px solid var(--border-medium)',
-          borderRadius: 32, padding: '24px',
-          marginBottom: 36,
-          display: 'flex', alignItems: 'center', gap: 20,
-          boxShadow: '0 8px 32px rgba(15, 23, 42, 0.05)',
-          position: 'relative', overflow: 'hidden',
-        }}
-      >
-        {/* subtle BG glow */}
-        <div style={{
-          position: 'absolute', right: -40, top: -40,
-          width: 160, height: 160, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
+        .shop-content { padding: 0 24px; position: relative; zIndex: 2; }
+        @media (max-width: 768px) { .shop-content { padding: 0 16px; } }
 
-        <div style={{
-          width: 60, height: 60, borderRadius: 18, flexShrink: 0,
-          background: 'linear-gradient(135deg, #FEF3C7, #FDE68A)',
-          border: '1px solid rgba(245,158,11,0.2)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(245,158,11,0.2)',
-        }}>
-          <Coins size={28} color="#D97706" />
-        </div>
+        .packages-grid {
+          display: grid;
+          gap: 16px;
+          margin-bottom: 32px;
+        }
 
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ margin: '0 0 2px', color: '#64748B', fontSize: '0.875rem', fontWeight: 600 }}>
-            Hozirgi balansingiz
-          </p>
-          <p className="outfit-font" style={{
-            margin: 0, color: '#0F172A', fontSize: '2.25rem',
-            fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1,
-          }}>
-            {coins.toLocaleString()}
-            <span style={{ fontSize: '1.125rem', fontWeight: 700, color: '#D97706', marginLeft: 8 }}>coin</span>
-          </p>
-        </div>
-      </motion.div>
+        @media (min-width: 768px) {
+          .packages-grid {
+            grid-template-columns: repeat(3, 1fr);
+            align-items: stretch;
+          }
+        }
 
-      {/* ── Section Label ── */}
-      <motion.p
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.14 }}
-        style={{ margin: '0 0 16px', fontWeight: 700, fontSize: '0.75rem', color: '#94A3B8', letterSpacing: '0.1em', textTransform: 'uppercase' }}
-      >
-        Paketlar
-      </motion.p>
+        .step-grid {
+          display: grid;
+          gap: 20px;
+        }
 
-      {/* ── Packages Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14, marginBottom: 36 }}>
-        {PACKAGES.map((pkg, i) => {
-          const IconComp = pkg.icon
-          const isPopular = pkg.popular
-          return (
+        @media (min-width: 768px) {
+          .step-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 40px; }
+        }
+        @media (min-width: 1000px) {
+          .step-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* Input */
+        .shop-input-row {
+          display: flex; align-items: center; gap: 12px;
+          border: 1.5px solid rgba(15,23,42,0.08); border-radius: 14px;
+          padding: 0 16px; height: 56px; background: #FFF; margin-bottom: 16px;
+          transition: border-color 0.2s;
+        }
+        .shop-input-row:focus-within {
+          border-color: #3461FF;
+          box-shadow: 0 0 0 4px rgba(52,97,255,0.1);
+        }
+        .shop-input-row input {
+          flex: 1; border: none; outline: none; background: transparent;
+          font-size: 1.0625rem; font-weight: 700; color: #0F172A; font-family: inherit;
+          -webkit-appearance: none;
+        }
+      `}</style>
+
+      <div className="shop-page-wrapper">
+        {/* ── FULL WIDTH HERO ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="shop-hero"
+        >
+          {/* Ambient Glows */}
+          <div style={{ position: 'absolute', top: -100, right: -50, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -50, left: -50, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: '20%', left: '30%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+          {/* Floating Coins Animation */}
+          {[
+            { top: '15%', right: '10%', size: 48, delay: 0 },
+            { top: '65%', right: '20%', size: 28, delay: 0.4 },
+            { top: '25%', left: '8%', size: 36, delay: 0.2 },
+            { bottom: '20%', left: '25%', size: 22, delay: 0.6 },
+          ].map((c, i) => (
             <motion.div
-              key={pkg.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 + i * 0.07, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setSelectedPkg(pkg)}
-              className={`card-glow-hover ${pkg.glowClass || ''}`}
+              key={i}
+              animate={{ y: [0, -12, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 3.5 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
+              style={{ position: 'absolute', opacity: 0.15, pointerEvents: 'none', ...c }}
+            >
+              <Coins size={c.size} color="white" />
+            </motion.div>
+          ))}
+
+          <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+            <div style={{ maxWidth: 800 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <ShoppingCart size={14} color="#F59E0B" />
+                  <span style={{ color: '#FDE68A', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Market va Bonuslar</span>
+                </div>
+              </div>
+
+              <h1 className="outfit-font shop-hero-title">
+                Bilimingizga investitsiya qiling
+              </h1>
+
+              {/* Premium Balance Pill */}
+              <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
               style={{
-                background: isPopular ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.78)',
-                backdropFilter: 'blur(24px) saturate(2)',
-                WebkitBackdropFilter: 'blur(24px) saturate(2)',
-                border: isPopular ? `1.8px solid ${pkg.color}` : '1px solid var(--border-medium)',
-                borderRadius: 24, padding: '22px',
-                boxShadow: isPopular ? `0 12px 40px ${pkg.color}20` : '0 8px 32px rgba(15,23,42,0.04)',
-                position: 'relative', cursor: 'pointer',
-                transition: 'all 0.25s ease',
+                display: 'inline-flex', alignItems: 'center', gap: 12,
+                background: 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 100, padding: '8px 24px 8px 10px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
               }}
             >
-              {/* Popular glow ring */}
-              {isPopular && (
-                <div style={{
-                  position: 'absolute', inset: -1, borderRadius: 21,
-                  background: `linear-gradient(135deg, ${pkg.color}50, transparent, ${pkg.color}25)`,
-                  zIndex: -1,
-                }} />
-              )}
-
-              {/* Badge */}
-              {pkg.badge && (
-                <div style={{
-                  position: 'absolute', top: -10, right: 14,
-                  background: isPopular ? pkg.color : '#E2E8F0',
-                  color: isPopular ? 'white' : '#475569',
-                  fontSize: '0.6rem', fontWeight: 800,
-                  padding: '3px 10px', borderRadius: 100,
-                  letterSpacing: '0.06em', textTransform: 'uppercase',
-                }}>
-                  {isPopular && <Sparkles size={8} style={{ display: 'inline', marginRight: 3 }} />}
-                  {pkg.badge}
-                </div>
-              )}
-
-              {/* Discount badge */}
-              {pkg.discount && (
-                <div style={{
-                  position: 'absolute', top: -10, left: 14,
-                  background: '#10B981', color: 'white',
-                  fontSize: '0.6rem', fontWeight: 800,
-                  padding: '3px 10px', borderRadius: 100,
-                  letterSpacing: '0.05em',
-                }}>
-                  -{pkg.discount}%
-                </div>
-              )}
-
-              {/* Icon + name */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 14,
-                  background: pkg.bg, color: pkg.color,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  boxShadow: isPopular ? `0 4px 12px ${pkg.color}30` : 'none',
-                }}>
-                  <IconComp size={22} />
-                </div>
-                <div>
-                  <p className="outfit-font" style={{ margin: '0 0 1px', fontWeight: 800, fontSize: '1rem', color: '#0F172A' }}>{pkg.name}</p>
-                  <p style={{ margin: 0, fontSize: '0.6875rem', color: '#94A3B8', fontWeight: 600 }}>{pkg.perCoin}</p>
-                </div>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #FCD34D, #D97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(245,158,11,0.3)' }}>
+                <Coins size={18} color="white" />
               </div>
-
-              {/* Coin amount */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 16 }}>
-                <span className="outfit-font" style={{
-                  fontWeight: 900, fontSize: '2rem', color: pkg.color,
-                  letterSpacing: '-0.04em', lineHeight: 1,
-                }}>
-                  {pkg.coins.toLocaleString()}
-                </span>
-                <span style={{ color: '#94A3B8', fontSize: '0.875rem', fontWeight: 500 }}>coin</span>
-              </div>
-
-              {/* Buy button with price */}
-              <div style={{
-                width: '100%',
-                background: isPopular ? pkg.color : `${pkg.color}0f`,
-                color: isPopular ? 'white' : pkg.color,
-                border: isPopular ? 'none' : `1px solid ${pkg.color}30`,
-                borderRadius: 12, padding: '11px 16px',
-                fontWeight: 700, fontSize: '0.9375rem',
-                cursor: 'pointer', fontFamily: 'inherit',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                boxShadow: isPopular ? `0 4px 14px ${pkg.color}40` : 'none',
-              }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-                  {pkg.originalPrice && (
-                    <span style={{ fontSize: '0.7rem', textDecoration: 'line-through', opacity: 0.55, fontWeight: 600 }}>
-                      {pkg.originalPrice} so'm
-                    </span>
-                  )}
-                  <span>{pkg.price} so'm</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1 }}>Sizning Balansingiz</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 2 }}>
+                  <span className="outfit-font" style={{ color: 'white', fontSize: '1.35rem', fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                    {coins.toLocaleString()}
+                  </span>
+                  <span style={{ color: '#FCD34D', fontSize: '0.75rem', fontWeight: 700 }}>coin</span>
                 </div>
-                <ArrowRight size={16} />
               </div>
             </motion.div>
-          )
-        })}
-      </div>
-
-      {/* ── Custom Amount ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.38, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          background: 'rgba(255, 255, 255, 0.78)',
-          backdropFilter: 'blur(32px) saturate(2)',
-          WebkitBackdropFilter: 'blur(32px) saturate(2)',
-          border: '1px solid var(--border-medium)',
-          borderRadius: 32, padding: '28px', marginBottom: 24,
-          boxShadow: '0 12px 40px rgba(15,23,42,0.05)',
-        }}
-      >
-        <p className="outfit-font" style={{ margin: '0 0 4px', fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>
-          O'zingiz miqdor kiriting
-        </p>
-        <p style={{ margin: '0 0 18px', color: '#64748B', fontSize: '0.875rem' }}>
-          1 coin = 200 so'm (paketlarda chegirmali narx)
-        </p>
-
-        {/* Input */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-          border: '1.5px solid rgba(15,23,42,0.08)', borderRadius: 16,
-          padding: '0 16px', height: 56, background: '#F8FAFC',
-          marginBottom: 12,
-        }}>
-          <Coins size={20} color="#D97706" />
-          <input
-            type="number" min="10"
-            placeholder="Masalan: 250"
-            value={customCoins}
-            onChange={e => setCustomCoins(e.target.value)}
-            style={{
-              flex: 1, border: 'none', outline: 'none', background: 'transparent',
-              fontSize: '1.0625rem', fontWeight: 700, color: '#0F172A', fontFamily: 'inherit',
-              borderRadius: 0, WebkitAppearance: 'none'
-            }}
-          />
-          <AnimatePresence mode="wait">
-            {customCoins && (
-              <motion.span
-                key={estimatedPrice}
-                initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }}
-                transition={{ duration: 0.25 }}
-                style={{ color: '#64748B', fontSize: '0.875rem', fontWeight: 600, whiteSpace: 'nowrap' }}
-              >
-                ≈ {estimatedPrice} so'm
-              </motion.span>
-            )}
-          </AnimatePresence>
+          </div>
         </div>
-
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={handleCustomBuy}
-          style={{
-            width: '100%',
-            background: 'linear-gradient(135deg, #3461FF, #214CE5)',
-            color: 'white', border: 'none', borderRadius: 14,
-            padding: '15px 20px', fontWeight: 700, fontSize: '1rem',
-            cursor: 'pointer', fontFamily: 'inherit',
-            boxShadow: '0 4px 18px rgba(52,97,255,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          <ArrowRight size={18} />
-          To'lovga o'tish
-        </motion.button>
       </motion.div>
 
-      {/* ── How to buy ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.46, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          background: 'rgba(255, 255, 255, 0.78)', 
-          backdropFilter: 'blur(32px) saturate(2)',
-          WebkitBackdropFilter: 'blur(32px) saturate(2)',
-          border: '1px solid var(--border-medium)',
-          borderRadius: 32, padding: '28px',
-          boxShadow: '0 12px 40px rgba(15,23,42,0.05)',
-        }}
-      >
-        <p className="outfit-font" style={{ margin: '0 0 20px', fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>
-          Qanday sotib olish mumkin?
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {STEPS.map((step, i) => {
-            const StepIcon = step.icon
-            return (
+        {/* ── 1040px CONSTRAINED CONTENT ── */}
+        <div className="shop-container">
+          <div className="shop-content">
+          
+          {/* Section Indicator */}
+          <motion.div {...fadeUp(0.1)} style={{ maxWidth: 1040, margin: '0 auto' }}>
+            <p style={{ margin: '0 0 16px', fontWeight: 800, fontSize: '0.75rem', color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Coin Paketlari
+            </p>
+            
+            {/* Packages Grid */}
+            <div className="packages-grid">
+              {PACKAGES.map((pkg, i) => {
+                const isPro = pkg.featured;
+                const IconComp = pkg.icon;
+                
+                return (
+                  <motion.div
+                    key={pkg.id}
+                    {...fadeUp(0.15 + (i * 0.1))}
+                    whileHover={{ y: -4, boxShadow: isPro ? '0 24px 48px rgba(245,158,11,0.3)' : '0 16px 32px rgba(15,23,42,0.12)' }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSelectedPkg(pkg)}
+                    style={{
+                      background: isPro ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : 'rgba(255, 255, 255, 0.65)',
+                      backdropFilter: 'blur(32px) saturate(2)',
+                      WebkitBackdropFilter: 'blur(32px) saturate(2)',
+                      border: isPro ? 'none' : '1px solid rgba(255, 255, 255, 0.8)',
+                      borderRadius: 32,
+                      padding: isPro ? '36px 28px' : '28px 24px',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      boxShadow: isPro ? '0 16px 32px rgba(245,158,11,0.2)' : '0 8px 32px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,1)',
+                      transition: 'all 0.3s ease',
+                      display: 'flex', flexDirection: 'column',
+                      transform: isPro ? 'scale(1.03)' : 'scale(1)', // Slight pop out on desktop
+
+                      zIndex: isPro ? 2 : 1,
+                    }}
+                  >
+                    {/* Inner glowing element for Pro */}
+                    {isPro && (
+                      <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)' }} />
+                    )}
+
+                    {/* Badges */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, position: 'relative', zIndex: 1 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 14, background: isPro ? 'rgba(255,255,255,0.2)' : 'rgba(255, 255, 255, 0.7)', color: isPro ? 'white' : pkg.color, display: 'flex', alignItems: 'center', justifyContent: 'center', border: isPro ? 'none' : '1px solid rgba(255,255,255,0.8)' }}>
+                        <IconComp size={22} />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                        {pkg.discount && (
+                          <span style={{ background: isPro ? '#065F46' : '#10B981', color: isPro ? '#A7F3D0' : 'white', fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: 100 }}>
+                            -{pkg.discount}%
+                          </span>
+                        )}
+                        {pkg.badge && (
+                          <span style={{ background: isPro ? 'rgba(0,0,0,0.2)' : '#F1F5F9', color: isPro ? 'white' : '#475569', fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: 100, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            {isPro && <Sparkles size={10} />}
+                            {pkg.badge}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <p style={{ margin: '0 0 4px', color: isPro ? 'rgba(255,255,255,0.7)' : '#64748B', fontSize: '0.875rem', fontWeight: 600 }}>{pkg.name} Paketi</p>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 16 }}>
+                        <span className="outfit-font" style={{ fontWeight: 900, fontSize: '3rem', color: isPro ? 'white' : '#0F172A', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                          {pkg.coins}
+                        </span>
+                        <span style={{ color: isPro ? 'rgba(255,255,255,0.7)' : '#94A3B8', fontSize: '0.9rem', fontWeight: 600 }}>coin</span>
+                      </div>
+
+                      <div style={{ paddingTop: 16, borderTop: isPro ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(15,23,42,0.06)', marginTop: 'auto' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                          <div>
+                            {pkg.originalPrice && (
+                              <p style={{ margin: '0 0 2px', fontSize: '0.75rem', textDecoration: 'line-through', color: isPro ? 'rgba(255,255,255,0.4)' : '#94A3B8', fontWeight: 600 }}>{pkg.originalPrice} so'm</p>
+                            )}
+                            <p style={{ margin: 0, fontWeight: 900, fontSize: '1.25rem', color: isPro ? 'white' : '#0F172A', letterSpacing: '-0.02em' }}>{pkg.price} <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>so'm</span></p>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: isPro ? 'rgba(255,255,255,0.6)' : '#64748B', fontWeight: 600 }}>{pkg.perCoin}</p>
+                          </div>
+                          <div style={{ width: 44, height: 44, borderRadius: '50%', background: isPro ? 'white' : `${pkg.color}15`, color: isPro ? '#D97706' : pkg.color, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.2s' }}>
+                            <ArrowRight size={20} strokeWidth={2.5} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Custom Amount & Guide container grid (Desktop) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              
+              {/* Custom Input */}
               <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                {...fadeUp(0.4)}
                 style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 16,
-                  paddingBottom: i < STEPS.length - 1 ? 20 : 0,
-                  position: 'relative',
+                  background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px) saturate(2)', WebkitBackdropFilter: 'blur(32px) saturate(2)',
+                  border: '1px solid rgba(15,23,42,0.06)', borderRadius: 32, padding: '32px',
+                  boxShadow: '0 12px 32px rgba(15,23,42,0.04)',
                 }}
               >
-                {/* Connector line */}
-                {i < STEPS.length - 1 && (
-                  <div style={{
-                    position: 'absolute', left: 19, top: 42,
-                    width: 2, height: 'calc(100% - 2px)',
-                    background: `linear-gradient(to bottom, ${step.color}40, transparent)`,
-                    borderRadius: 2,
-                  }} />
-                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div>
+                    <h3 className="outfit-font" style={{ margin: '0 0 6px', fontWeight: 800, color: '#0F172A', fontSize: '1.25rem' }}>O'zingiz miqdor kiriting</h3>
+                    <p style={{ margin: 0, color: '#64748B', fontSize: '0.9rem', fontWeight: 500 }}>1 coin = 200 so'm (o'zingiz kiritgan miqdorda chegirma yo'q)</p>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'center' }}>
+                    <div className="shop-input-row" style={{ margin: 0 }}>
+                      <Coins size={22} color="#D97706" />
+                      <input
+                        type="number" min="10" placeholder="Minimum 10 coin"
+                        value={customCoins} onChange={e => setCustomCoins(e.target.value)}
+                      />
+                      <AnimatePresence mode="wait">
+                        {customCoins && (
+                          <motion.span
+                            key={estimatedPrice}
+                            initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.2 }}
+                            style={{ color: '#0F172A', fontSize: '1rem', fontWeight: 800, whiteSpace: 'nowrap', background: '#F1F5F9', padding: '6px 12px', borderRadius: 8 }}
+                          >
+                            ≈ {estimatedPrice} so'm
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </div>
 
-                {/* Step icon */}
-                <div style={{
-                  width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                  background: step.bg,
-                  border: `1px solid ${step.color}30`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginTop: 14,
-                }}>
-                  <StepIcon size={18} color={step.color} strokeWidth={2} />
-                </div>
-
-                <div style={{ paddingTop: 8, flex: 1 }}>
-                  <p className="outfit-font" style={{ margin: '0 0 3px', fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>
-                    {step.title}
-                  </p>
-                  <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5 }}>
-                    {step.text}
-                  </p>
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={handleCustomBuy}
+                      style={{
+                        background: 'linear-gradient(135deg, #3461FF 0%, #214CE5 100%)',
+                        color: 'white', border: 'none', borderRadius: 14,
+                        padding: '0 24px', height: 56, fontWeight: 700, fontSize: '1rem',
+                        cursor: 'pointer', fontFamily: 'inherit',
+                        boxShadow: '0 8px 24px rgba(52,97,255,0.25)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
+                    >
+                      <span>To'lovga o'tish</span>
+                      <ArrowRight size={18} />
+                    </motion.button>
+                  </div>
                 </div>
               </motion.div>
-            )
-          })}
-        </div>
-      </motion.div>
-      {/* Payment Modal */}
-      <PaymentModal pkg={selectedPkg} onClose={() => setSelectedPkg(null)} />
 
+              {/* How to Buy Guide */}
+              <motion.div
+                {...fadeUp(0.5)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)',
+                  border: '1px solid rgba(15,23,42,0.04)', borderRadius: 32, padding: '32px',
+                }}
+              >
+                <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,23,42,0.05)' }}>
+                    <ShoppingCart size={20} color="#0F172A" />
+                  </div>
+                  <h3 className="outfit-font" style={{ margin: 0, fontWeight: 800, color: '#0F172A', fontSize: '1.25rem' }}>Qanday ishlaydi?</h3>
+                </div>
+
+                <div className="step-grid">
+                  {STEPS.map((step, i) => {
+                    const StepIcon = step.icon;
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(15,23,42,0.06)', marginTop: 2 }}>
+                          <span className="outfit-font" style={{ color: step.color, fontWeight: 900, fontSize: '0.9rem' }}>{i + 1}</span>
+                        </div>
+                        <div>
+                          <p className="outfit-font" style={{ margin: '0 0 4px', fontWeight: 800, fontSize: '0.95rem', color: '#0F172A' }}>{step.title}</p>
+                          <p style={{ margin: 0, color: '#64748B', fontSize: '0.85rem', fontWeight: 500, lineHeight: 1.5 }}>{step.text}</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
     </div>
+
+    <PaymentModal pkg={selectedPkg} onClose={() => setSelectedPkg(null)} />
+    </>
   )
 }

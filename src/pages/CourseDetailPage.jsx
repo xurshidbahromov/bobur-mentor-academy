@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Play, Lock, Coins, MessageCircle, Info } from 'lucide-react'
+import { ArrowLeft, Play, Lock, Coins, MessageCircle, Info, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import CommentSection from '../components/lesson/CommentSection'
@@ -24,27 +24,24 @@ function LessonCard({ lesson, isUnlocked, onNavigate }) {
   return (
     <motion.div
       onClick={handleClick}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ scale: 0.97 }}
       style={{
         display: 'flex', alignItems: 'center', gap: 14,
         width: '100%', maxWidth: '100%', padding: '16px', borderRadius: 20,
-        background: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        border: '1px solid rgba(15, 23, 42, 0.06)',
-        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03)',
-        cursor: 'pointer', transition: 'all 0.24s cubic-bezier(0.22, 1, 0.36, 1)',
+        background: 'white',
+        border: '1px solid rgba(0, 0, 0, 0.05)',
+        cursor: 'pointer', transition: 'all 0.2s ease',
         WebkitTapHighlightColor: 'transparent',
-        position: 'relative', overflow: 'hidden'
+        position: 'relative'
       }}
     >
       <div style={{
         width: 44, height: 44, borderRadius: 14, flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(52, 97, 255, 0.08)',
-        border: '1px solid rgba(52, 97, 255, 0.1)'
+        background: 'rgba(0, 0, 0, 0.03)',
+        border: '1px solid rgba(0, 0, 0, 0.05)'
       }}>
-        {canAccess ? <Play size={18} color="#3461FF" fill="#3461FF" /> : <Lock size={18} color="#3461FF" />}
+        {canAccess ? <Play size={18} color="#3461FF" fill="#3461FF" /> : <Lock size={18} color="#94A3B8" />}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p className="outfit-font" style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: '#0F172A', wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4, letterSpacing: '-0.01em' }}>
@@ -63,7 +60,7 @@ function LessonCard({ lesson, isUnlocked, onNavigate }) {
       {!canAccess && (
         <div style={{
           flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4,
-          color: '#64748B', fontWeight: 700, fontSize: '0.875rem',
+          color: '#475569', fontWeight: 700, fontSize: '0.875rem',
         }}>
           {price} <Coins size={14} fill="#F59E0B" color="#F59E0B" />
         </div>
@@ -140,50 +137,64 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: 140 }}>
-      {/* ── Header (Sticky, Pill back button) ── */}
-      <header style={{
-        position: 'sticky', top: 0, zIndex: 10,
-        background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(20px)',
-        padding: '16px 20px', borderBottom: '1px solid rgba(15,23,42,0.05)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center'
+    <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: 100 }}>
+      {/* ── Floating Navigator (Pill) ── */}
+      <div style={{ 
+        position: 'fixed', top: 20, left: 0, right: 0, zIndex: 100,
+        display: 'flex', justifyContent: 'center', pointerEvents: 'none'
       }}>
-        <div style={{ width: '100%', maxWidth: 1040, display: 'flex', alignItems: 'center' }}>
-          <button
-            onClick={() => navigate('/dashboard')}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              background: 'rgba(52,97,255,0.08)', border: '1px solid rgba(52,97,255,0.12)', cursor: 'pointer',
-              color: '#3461FF', fontWeight: 700, fontSize: '0.9375rem',
-              padding: '8px 16px 8px 12px', borderRadius: 100,
-              WebkitTapHighlightColor: 'transparent', transition: 'all 0.2s',
-              boxShadow: '0 4px 12px rgba(52,97,255,0.04)'
-            }}
-          >
-            <ArrowLeft size={18} strokeWidth={2.5} /> Orqaga
-          </button>
-        </div>
-      </header>
+        <motion.button
+          initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+          onClick={() => navigate('/dashboard')}
+          style={{
+            pointerEvents: 'auto',
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px) saturate(1.8)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            border: '1px solid rgba(0, 0, 0, 0.05)',
+            color: '#0F172A', fontWeight: 800, fontSize: '0.875rem',
+            padding: '10px 20px 10px 16px', borderRadius: 100,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+            cursor: 'pointer', transition: 'all 0.2s',
+            WebkitTapHighlightColor: 'transparent'
+          }}
+          whileHover={{ scale: 1.05, background: 'rgba(255, 255, 255, 0.9)' }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <ArrowLeft size={18} strokeWidth={3} /> Orqaga
+        </motion.button>
+      </div>
 
-      {/* ── Main Content Container ── */}
-      <main style={{ maxWidth: 1040, margin: '0 auto', padding: 'clamp(24px, 6vw, 32px) clamp(16px, 4vw, 24px)' }}>
+      <main style={{ maxWidth: 1040, margin: '0 auto', padding: '100px 24px 40px' }}>
 
-        {/* Course Info */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 32 }}>
-          <h1 className="outfit-font" style={{ margin: '0 0 12px', fontSize: '2.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+        {/* Hero Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }} 
+          animate={{ opacity: 1, y: 0 }}
+          style={{ 
+            background: 'white', borderRadius: 32, padding: '40px 32px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.03)',
+            marginBottom: 32
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+             <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#3461FF', background: 'rgba(52,97,255,0.08)', padding: '4px 12px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.06em' }}>O'quv Rejasi</span>
+          </div>
+          <h1 className="outfit-font" style={{ margin: '0 0 16px', fontSize: 'clamp(2rem, 5vw, 2.75rem)', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.15 }}>
             {course.title}
           </h1>
           {course.description && (
-            <p style={{ margin: 0, fontSize: '1rem', color: '#64748B', lineHeight: 1.6, fontWeight: 500, maxWidth: 600 }}>
+            <p style={{ margin: 0, fontSize: '1.0625rem', color: '#44546F', lineHeight: 1.6, fontWeight: 500, maxWidth: 800 }}>
               {course.description}
             </p>
           )}
         </motion.div>
 
-        {/* Glassy Pill Tabs */}
+        {/* Tabs Island */}
         <div style={{
-          display: 'flex', background: 'rgba(15,23,42,0.04)', borderRadius: 100, padding: 4, marginBottom: 32,
-          maxWidth: 400, border: '1px solid rgba(15,23,42,0.03)'
+          display: 'flex', background: '#EDF1F7', borderRadius: 100, padding: 4, marginBottom: 32,
+          maxWidth: 320, border: '1px solid rgba(0,0,0,0.05)'
         }}>
           {['videos', 'comments'].map((tab) => {
             const isActive = activeTab === tab
@@ -193,12 +204,12 @@ export default function CourseDetailPage() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 style={{
-                  flex: 1, padding: '12px', borderRadius: 100, border: 'none',
-                  background: isActive ? '#FFFFFF' : 'transparent',
-                  color: isActive ? '#0F172A' : '#64748B',
-                  fontWeight: 800, fontSize: '0.9375rem',
-                  boxShadow: isActive ? '0 4px 12px rgba(15,23,42,0.08)' : 'none',
-                  cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+                  flex: 1, padding: '10px', borderRadius: 100, border: 'none',
+                  background: isActive ? 'white' : 'transparent',
+                  color: isActive ? '#3461FF' : '#64748B',
+                  fontWeight: 800, fontSize: '0.875rem',
+                  boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                  cursor: 'pointer', transition: 'all 0.2s',
                   WebkitTapHighlightColor: 'transparent',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
                 }}

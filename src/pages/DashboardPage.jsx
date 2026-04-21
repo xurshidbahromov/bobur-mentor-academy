@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useTelegram } from '../context/TelegramProvider'
 import { supabase } from '../lib/supabase'
-import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target, Info } from 'lucide-react'
+import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target, Info, Sparkles, GraduationCap } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUnreadNotifications } from '../context/useUnreadNotifications'
 import { useStreak } from '../hooks/useStreak'
@@ -203,7 +203,61 @@ export default function DashboardPage() {
   )
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 24px 40px' }}>
+    <>
+      <style>{`
+        .dash-page-wrapper { width: 100%; padding-bottom: 60px; }
+        .dash-container { max-width: 1040px; margin: 0 auto; }
+        
+        .dash-hero {
+          background: linear-gradient(135deg, #0F172A 0%, #262364ff 25%, #3c2f52ff 55%, #153283ff 80%, #025886ff 100%);
+          position: relative;
+          z-index: 10;
+          padding: 48px 0 100px;
+          border-radius: 0 0 40px 40px;
+          margin-bottom: -60px;
+          box-shadow: 0 20px 40px rgba(13,13,43,0.25);
+        }
+        
+        @media (max-width: 768px) {
+          .dash-hero {
+            padding: 32px 0 90px;
+            border-radius: 0 0 32px 32px;
+            margin-bottom: -50px;
+          }
+        }
+        
+        .dash-content { padding: 0 24px; position: relative; z-index: 20; }
+        @media (max-width: 768px) { .dash-content { padding: 0 16px; } }
+      `}</style>
+      
+      <div className="dash-page-wrapper">
+        {/* ── FULL WIDTH MESH HERO ── */}
+        <div className="dash-hero">
+          {/* Clipped background glow layer — separate from content so notification panel can overflow */}
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', borderRadius: '0 0 40px 40px', zIndex: 0, pointerEvents: 'none' }}>
+            <div style={{ position: 'absolute', top: -80, right: -60, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 65%)' }} />
+            <div style={{ position: 'absolute', bottom: -60, left: -80, width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.2) 0%, transparent 65%)' }} />
+            <div style={{ position: 'absolute', top: '30%', right: '20%', width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(217,119,6,0.08) 0%, transparent 65%)' }} />
+
+            {/* Floating Icons (Matching pattern: One icon type per page) */}
+            {[
+              { top: '15%', right: '10%', size: 48, delay: 0 },
+              { top: '65%', right: '25%', size: 28, delay: 0.4 },
+              { top: '25%', left: '8%', size: 36, delay: 0.2 },
+              { bottom: '20%', left: '20%', size: 22, delay: 0.6 },
+            ].map((c, i) => (
+              <motion.div
+                key={i}
+                animate={{ y: [0, -12, 0], rotate: [0, 8, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 4 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
+                style={{ position: 'absolute', opacity: 0.12, pointerEvents: 'none', ...c }}
+              >
+                <BookOpen size={c.size} color="white" />
+              </motion.div>
+            ))}
+          </div>
+
+          <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
 
       {/* ── Header ── */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 24 }}>
@@ -250,12 +304,12 @@ export default function DashboardPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <span style={{ 
                     margin: 0, fontSize: '0.8125rem', fontWeight: 700, 
-                    color: 'var(--text-muted)', letterSpacing: '-0.01em' 
+                    color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.01em' 
                   }}>
                     Assalomu alaykum,
                   </span>
                   <h2 className="outfit-font" style={{ 
-                    margin: 0, fontSize: 'min(7vw, 1.75rem)', color: '#0F172A', 
+                    margin: 0, fontSize: 'min(7vw, 1.75rem)', color: 'white', 
                     fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1
                   }}>
                     {firstName}
@@ -270,74 +324,32 @@ export default function DashboardPage() {
                 <div style={{ position: 'relative' }}>
                   <button 
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)} 
-                    style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: unreadCount > 0 ? 'rgba(52,97,255,0.06)' : 'white', border: unreadCount > 0 ? '1px solid rgba(52,97,255,0.15)' : '1px solid rgba(15,23,42,0.04)', boxShadow: '0 4px 12px rgba(15,23,42,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                    style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', backdropFilter: 'blur(8px)' }}
                   >
                     <div className={unreadCount > 0 ? 'bell-ring' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Bell size={20} color={unreadCount > 0 ? '#3461FF' : '#0F172A'} />
+                      <Bell size={20} color="white" />
                     </div>
                     {/* Unread Indicator */}
                     {unreadCount > 0 && (
                       <div style={{ position: 'absolute', top: 8, right: 8, width: 9, height: 9, background: '#EF4444', borderRadius: '50%', border: '2px solid white', animation: 'pulse-dot 1.8s ease-in-out infinite' }} />
                     )}
                   </button>
-
-                  <AnimatePresence>
-                    {isNotificationsOpen && (
-                      <>
-                        {/* Invisible overlay for click-outside to close */}
-                        <div 
-                          style={{ position: 'fixed', inset: 0, zIndex: 90 }} 
-                          onClick={() => setIsNotificationsOpen(false)} 
-                        />
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          transition={{ duration: 0.2, ease: "easeOut" }}
-                          style={{
-                            position: 'absolute', top: 54, right: 0, width: 300,
-                            background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(24px) saturate(2.5)',
-                            WebkitBackdropFilter: 'blur(24px) saturate(2.5)',
-                            border: '1px solid rgba(52,97,255,0.15)', borderRadius: 24, padding: '20px 16px',
-                            boxShadow: '0 12px 40px rgba(15,23,42,0.08)', zIndex: 100,
-                            maxHeight: 400, overflowY: 'auto'
-                          }}
-                        >
-                        <h4 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 800, color: '#0F172A', paddingLeft: 4 }}>Bildirishnomalar</h4>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                          {dbNotifications.length === 0 ? (
-                            <p style={{ margin: '10px 0', fontSize: '0.875rem', color: '#64748B', textAlign: 'center' }}>Hozircha xabarlar yo'q.</p>
-                          ) : (
-                            dbNotifications.map(n => {
-                              let IconNode = <Info size={16} color="#3461FF" />;
-                              let bgNode = 'rgba(52,97,255,0.1)';
-                              if (n.type === 'success') { IconNode = <CheckCircle2 size={16} color="#10B981" />; bgNode = 'rgba(16,185,129,0.1)'; }
-                              if (n.type === 'warning') { IconNode = <AlertCircle size={16} color="#F59E0B" />; bgNode = 'rgba(245,158,11,0.1)'; }
-                              if (n.type === 'error') { IconNode = <AlertCircle size={16} color="#EF4444" />; bgNode = 'rgba(239,68,68,0.1)'; }
-                              
-                              return (
-                                <div key={n.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '0 4px', opacity: n.is_read ? 0.7 : 1 }}>
-                                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: bgNode, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                    {IconNode}
-                                  </div>
-                                  <div>
-                                    <p style={{ margin: '0 0 2px', fontSize: '0.875rem', fontWeight: n.is_read ? 600 : 700, color: '#0F172A', lineHeight: 1.3 }}>{n.title}</p>
-                                    <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4, fontWeight: 500 }}>{n.message}</p>
-                                    <span style={{ fontSize: '0.65rem', color: '#94A3B8', fontWeight: 500, marginTop: 4, display: 'block' }}>
-                                      {new Date(n.created_at).toLocaleString('uz-UZ', { hour: '2-digit', minute:'2-digit', day: 'numeric', month: 'short' })}
-                                    </span>
-                                  </div>
-                                </div>
-                              )
-                            })
-                          )}
-                        </div>
-                      </motion.div>
-                    </>
-                    )}
-                  </AnimatePresence>
                 </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Badge Pill */}
+        <AnimatePresence>
+          {!isSearchOpen && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              style={{ marginBottom: 12 }}
+            >
+              <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <BookOpen size={14} color="#A5F3FC" />
+                <span style={{ color: '#E0F2FE', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>O'quv Dasturlari</span>
               </div>
             </motion.div>
           )}
@@ -349,7 +361,7 @@ export default function DashboardPage() {
             initial={false}
             animate={{ opacity: isSearchOpen ? 0 : 1 }}
             className="outfit-font" 
-            style={{ margin: 0, fontSize: '2.5rem', color: '#0F172A', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, pointerEvents: isSearchOpen ? 'none' : 'auto' }}
+            style={{ margin: 0, fontSize: '2.5rem', color: 'white', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, pointerEvents: isSearchOpen ? 'none' : 'auto' }}
           >
             Darslar
           </motion.h1>
@@ -359,8 +371,8 @@ export default function DashboardPage() {
             initial={false} 
             animate={{ 
               width: isSearchOpen ? '100%' : 44,
-              backgroundColor: isSearchOpen ? 'rgba(255,255,255,0.95)' : 'rgba(52,97,255,0.04)',
-              borderColor: isSearchOpen ? 'rgba(52,97,255,0.15)' : 'rgba(52,97,255,0.08)'
+              backgroundColor: isSearchOpen ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.12)',
+              borderColor: isSearchOpen ? 'rgba(15,23,42,0.1)' : 'rgba(255,255,255,0.2)'
             }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             className="glass-card"
@@ -380,7 +392,7 @@ export default function DashboardPage() {
           >
             {/* Lupa strictly positioned on the far left ALWAYS */}
             <div style={{ position: 'absolute', left: 0, top: 0, width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-              <Search size={20} strokeWidth={2.5} color="#3461FF" style={{ display: 'block' }} />
+              <Search size={20} strokeWidth={2.5} color={isSearchOpen ? '#0F172A' : 'white'} style={{ display: 'block', transition: 'color 0.2s' }} />
             </div>
 
             {/* Input stretches fully, taking space but avoiding Lupa and X */}
@@ -420,8 +432,56 @@ export default function DashboardPage() {
             
           </motion.div>
         </div>
+          </motion.div>
 
-        {/* Daily Reward Box */}
+          {/* ── Test Markazi Quick Access (inside hero) ── */}
+          <AnimatePresence>
+            {!isSearchOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                style={{ marginTop: 20 }}
+              >
+                <motion.button
+                  onClick={() => navigate('/quizzes')}
+                  whileTap={{ scale: 0.97 }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 10,
+                    background: 'rgba(255,255,255,0.12)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: 100, padding: '10px 20px 10px 14px',
+                    cursor: 'pointer', color: 'white',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: 'rgba(16,185,129,0.9)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <Target size={14} color="white" />
+                  </div>
+                  <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Testlar Markazi</span>
+                  <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)' }} />
+                  <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>Bilimingizni sinab ko'ring →</span>
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          </div>
+        </div>
+
+        {/* ── CONTENT (overlapping hero) ── */}
+        <div className="dash-container">
+          <div className="dash-content">
+      
+      {/* Daily Reward Box */}
         <AnimatePresence>
           {!isSearchOpen && canClaim && (
             <motion.div 
@@ -471,50 +531,6 @@ export default function DashboardPage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
-
-      {/* ── Quiz Hub Banner ── */}
-      <AnimatePresence>
-        {!isSearchOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            style={{ marginBottom: 32 }}
-          >
-            <div 
-              onClick={() => navigate('/quizzes')}
-              style={{
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                borderRadius: 28, padding: '24px 28px', color: 'white', position: 'relative', overflow: 'hidden',
-                boxShadow: '0 16px 32px rgba(16, 185, 129, 0.25)', cursor: 'pointer',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-              }}
-            >
-              {/* Decorative Background */}
-              <div style={{ position: 'absolute', top: -30, right: -10, opacity: 0.15, transform: 'rotate(15deg)' }}><Target size={180} /></div>
-              
-              <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.2)', borderRadius: 100, fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Yangi</div>
-                  <h3 className="outfit-font" style={{ margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>Testlar Markazi</h3>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.9375rem', color: 'rgba(255, 255, 255, 0.9)', lineHeight: 1.4, maxWidth: '85%' }}>
-                  Darslarga va Umumiy mavzularga oid random qiziqarli savollarni yechib bilimingizni charxlang!
-                </p>
-              </div>
-
-              <div style={{ 
-                width: 48, height: 48, borderRadius: '50%', background: 'white', color: '#059669', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, zIndex: 1,
-                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
-              }}>
-                <Play size={20} fill="currentColor" style={{ marginLeft: 3 }} />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* ── Courses Grid ── */}
       <div style={{
         display: 'grid',
@@ -581,6 +597,67 @@ export default function DashboardPage() {
         ))}
       </div>
 
+          </div>
+        </div>
+
+      {/* Global Notifications Level (Above Hero and Content) */}
+      <AnimatePresence>
+        {isNotificationsOpen && (
+          <>
+            {/* Invisible overlay for click-outside to close */}
+            <div 
+              style={{ position: 'fixed', inset: 0, zIndex: 9998 }} 
+              onClick={() => setIsNotificationsOpen(false)} 
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              style={{
+                position: 'fixed', top: 100, right: 16, width: 300,
+                background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px) saturate(2.5)',
+                WebkitBackdropFilter: 'blur(24px) saturate(2.5)',
+                border: '1px solid rgba(52,97,255,0.15)', borderRadius: 24, padding: '20px 16px',
+                boxShadow: '0 12px 40px rgba(15,23,42,0.15)', zIndex: 9999,
+                maxHeight: 400, overflowY: 'auto'
+              }}
+            >
+              <h4 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 800, color: '#0F172A', paddingLeft: 4 }}>Bildirishnomalar</h4>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {dbNotifications.length === 0 ? (
+                  <p style={{ margin: '10px 0', fontSize: '0.875rem', color: '#64748B', textAlign: 'center' }}>Hozircha xabarlar yo'q.</p>
+                ) : (
+                  dbNotifications.map(n => {
+                    let IconNode = <Info size={16} color="#3461FF" />;
+                    let bgNode = 'rgba(52,97,255,0.1)';
+                    if (n.type === 'success') { IconNode = <CheckCircle2 size={16} color="#10B981" />; bgNode = 'rgba(16,185,129,0.1)'; }
+                    if (n.type === 'warning') { IconNode = <AlertCircle size={16} color="#F59E0B" />; bgNode = 'rgba(245,158,11,0.1)'; }
+                    if (n.type === 'error') { IconNode = <AlertCircle size={16} color="#EF4444" />; bgNode = 'rgba(239,68,68,0.1)'; }
+                    
+                    return (
+                      <div key={n.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '0 4px', opacity: n.is_read ? 0.7 : 1 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: bgNode, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {IconNode}
+                        </div>
+                        <div>
+                          <p style={{ margin: '0 0 2px', fontSize: '0.875rem', fontWeight: n.is_read ? 600 : 700, color: '#0F172A', lineHeight: 1.3 }}>{n.title}</p>
+                          <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4, fontWeight: 500 }}>{n.message}</p>
+                          <span style={{ fontSize: '0.65rem', color: '#94A3B8', fontWeight: 500, marginTop: 4, display: 'block' }}>
+                            {new Date(n.created_at).toLocaleString('uz-UZ', { hour: '2-digit', minute:'2-digit', day: 'numeric', month: 'short' })}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <style>{`
         @keyframes shimmer {
           0%   { opacity: 1; }
@@ -589,5 +666,6 @@ export default function DashboardPage() {
         }
       `}</style>
     </div>
+    </>
   )
 }
