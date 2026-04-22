@@ -1,15 +1,14 @@
 // src/components/layout/PublicBottomNav.jsx
 // Mehmonlar uchun (Landing / About) mobildagi pastki navigatsiya.
-
 import { NavLink } from 'react-router-dom'
 import { useTelegram } from '../../context/TelegramProvider'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Home, Info, LogIn } from 'lucide-react'
 
 const TABS = [
   { to: '/', label: "Asosiy", Icon: Home },
   { to: '/about', label: "Biz haqimizda", Icon: Info },
-  { to: '/login', label: "Kirish", Icon: LogIn },
+  { to: '/login', label: "Kirish", Icon: LogIn, isPrimary: true },
 ]
 
 export default function PublicBottomNav() {
@@ -21,66 +20,75 @@ export default function PublicBottomNav() {
       <nav className="public-bottom-nav" style={{
         position: 'fixed',
         bottom: safeArea,
-        left: 20, right: 20,
-        background: 'rgba(255,255,255,0.85)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        border: '1.5px solid rgba(255,255,255,0.8)',
-        borderRadius: 28,
-        padding: '6px 8px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'calc(100% - 32px)',
+        maxWidth: '420px',
+        background: 'rgba(255, 255, 255, 0.45)',
+        backdropFilter: 'blur(30px) saturate(2)',
+        WebkitBackdropFilter: 'blur(30px) saturate(2)',
+        border: '1px solid rgba(255, 255, 255, 0.4)',
+        borderRadius: '100px',
+        padding: '6px',
         display: 'flex',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        zIndex: 200,
-        boxShadow: '0 14px 34px rgba(52,97,255,0.18), 0 4px 14px rgba(0,0,0,0.06)',
+        zIndex: 500,
+        boxShadow: '0 12px 40px rgba(52, 97, 255, 0.14)',
       }}>
-        {TABS.map(({ to, label, Icon }) => (
-          <NavLink key={to} to={to} style={{ textDecoration: 'none', flex: 1 }}>
-            {({ isActive }) => (
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 4,
-                padding: '8px 4px',
-                minHeight: 56,
-                justifyContent: 'center',
-                WebkitTapHighlightColor: 'transparent',
-              }}>
-                <div style={{ position: 'relative' }}>
-                  {isActive && (
-                    <motion.div
-                      layoutId="pub-tab-pill"
-                      style={{
-                        position: 'absolute',
-                        inset: '-8px -16px',
-                        background: 'rgba(52,97,255,0.1)',
-                        borderRadius: 16,
-                        zIndex: 0,
-                      }}
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                  <div style={{
-                    position: 'relative', zIndex: 1,
-                    color: isActive ? '#3461FF' : '#94A3B8',
-                    transition: 'color 0.2s',
-                  }}>
-                    <Icon size={24} strokeWidth={isActive ? 2.2 : 1.7} />
-                  </div>
-                </div>
+        {TABS.map(({ to, label, Icon, isPrimary }) => (
+          <NavLink key={to} to={to} style={{ textDecoration: 'none', display: 'flex' }}>
+            {({ isActive }) => {
+              // Primary (Kirish) tab is always "open" (shows label and has background)
+              const showLabel = isActive || isPrimary
+              const hasBg = isActive || isPrimary
 
-                <span style={{
-                  fontSize: '0.6875rem',
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#3461FF' : '#94A3B8',
-                  letterSpacing: '-0.01em',
-                  transition: 'color 0.2s, font-weight 0.2s',
-                }}>
-                  {label}
-                </span>
-              </div>
-            )}
+              return (
+                <motion.div
+                  layout
+                  whileTap={{ scale: 0.94 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 35, mass: 0.8 }}
+                  style={{
+                    height: 48,
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: showLabel ? '0 18px' : '0 12px',
+                    borderRadius: '100px',
+                    background: hasBg ? '#FFFFFF' : 'transparent',
+                    boxShadow: hasBg ? '0 4px 15px rgba(52, 97, 255, 0.12)' : 'none',
+                    color: isActive ? '#3461FF' : '#64748B',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    WebkitTapHighlightColor: 'transparent',
+                    transition: 'background 0.2s, color 0.2s',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                    
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      {showLabel && (
+                        <motion.span
+                          initial={isPrimary ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.2 }}
+                          style={{
+                            fontSize: '0.8125rem',
+                            fontWeight: 800,
+                            whiteSpace: 'nowrap',
+                            letterSpacing: '-0.01em',
+                            color: isActive ? '#3461FF' : (isPrimary ? '#0F172A' : '#64748B')
+                          }}
+                        >
+                          {label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              )
+            }}
           </NavLink>
         ))}
       </nav>
@@ -91,7 +99,7 @@ export default function PublicBottomNav() {
           .public-bottom-nav { display: none !important; }
         }
         @media (max-width: 767px) {
-          .public-zone-wrapper { padding-bottom: calc(80px + env(safe-area-inset-bottom, 16px)) !important; }
+          .public-zone-wrapper { padding-bottom: calc(90px + env(safe-area-inset-bottom, 16px)) !important; }
         }
       `}</style>
     </>
