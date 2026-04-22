@@ -49,9 +49,17 @@ export function AuthProvider({ children }) {
   }, [])
 
   // ── Standard auth ──────────────────────────────────────────────
-  const signUp = async ({ email, password }) => {
+  const signUp = async ({ email, password, fullName }) => {
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (data?.user) {
+      // Immediately save the full name to the profile
+      if (fullName) {
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          full_name: fullName,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'id' })
+      }
       // Need a bit of delay since trigger handles profile creation
       setTimeout(() => processReferral(), 2000)
     }
