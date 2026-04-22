@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { useTelegram } from '../context/TelegramProvider'
 import { supabase } from '../lib/supabase'
+import { useQuery } from '@tanstack/react-query'
 import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target, Info, Sparkles, GraduationCap } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUnreadNotifications } from '../context/useUnreadNotifications'
@@ -40,16 +41,23 @@ function CourseCard({ course, index, onNavigate }) {
   const glowClass = '' // Standardized look for all cards as requested
 
   const [commentCount, setCommentCount] = useState(0)
+  const [commentAvatars, setCommentAvatars] = useState([])
   const [progressPct, setProgressPct] = useState(0)
 
   useEffect(() => {
     async function fetchCourseStats() {
-      // Fetch comment count
-      const { count: cCount } = await supabase
+      // Fetch comment count and latest 3 avatars
+      const { data: commentsData, count: cCount } = await supabase
         .from('comments')
-        .select('*', { count: 'exact', head: true })
+        .select('id, profiles(avatar_url)', { count: 'exact' })
         .eq('course_id', course.id)
+        .order('created_at', { ascending: false })
+        .limit(3)
+        
       if (cCount !== null) setCommentCount(cCount)
+      if (commentsData) {
+        setCommentAvatars(commentsData.map(c => c.profiles?.avatar_url).filter(Boolean))
+      }
 
       // Fetch Progress
       if (user) {
@@ -87,14 +95,13 @@ function CourseCard({ course, index, onNavigate }) {
       onClick={() => onNavigate(`/courses/${course.id}`)}
       style={{
         position: 'relative', width: '100%', height: '100%',
-        background: 'rgba(255, 255, 255, 0.78)', 
-        backdropFilter: 'blur(24px) saturate(2)',
-        WebkitBackdropFilter: 'blur(24px) saturate(2)',
-        border: '1px solid var(--border-medium)', 
+        background: 'rgba(255, 255, 255, 0.9)', 
+        backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+        border: '1px solid rgba(0, 0, 0, 0.04)', 
         cursor: 'pointer',
         padding: '24px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
         display: 'flex', flexDirection: 'column', gap: 16,
-        borderRadius: 28, boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
+        borderRadius: 32, boxShadow: '0 12px 40px rgba(0,0,0,0.06)',
         overflow: 'hidden'
       }}
     >
@@ -106,16 +113,26 @@ function CourseCard({ course, index, onNavigate }) {
         <BookOpen size={180} />
       </div>
 
-      {/* Course Info (Top part) */}
+      {/* Top icon and title */}
       <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
-        <h3 style={{
-          margin: '0 0 6px', fontWeight: 800, fontSize: '1.25rem',
-          color: '#0F172A', letterSpacing: '-0.02em',
+        <div style={{
+          width: 56, height: 56, borderRadius: 16,
+          background: 'rgba(52, 97, 255, 0.08)', border: '1px solid rgba(52, 97, 255, 0.1)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0, marginBottom: 16
         }}>
+          {course.icon_url ? (
+            <img src={course.icon_url} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+          ) : (
+            <BookOpen size={28} color="#3461FF" />
+          )}
+        </div>
+
+        <h3 className="outfit-font" style={{ margin: '0 0 6px', fontSize: '1.375rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
           {course.title}
         </h3>
         {course.description && (
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748B', lineHeight: 1.55 }}>
+          <p style={{ margin: 0, color: '#64748B', fontSize: '0.9375rem', lineHeight: 1.5, fontWeight: 500 }}>
             {course.description}
           </p>
         )}
@@ -127,19 +144,30 @@ function CourseCard({ course, index, onNavigate }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94A3B8' }}>
           <MessageCircle size={18} />
           <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{commentCount} izoh</span>
+          
+          {commentAvatars.length > 0 && (
+            <div style={{ display: 'flex', marginLeft: 4 }}>
+              {commentAvatars.map((url, i) => (
+                <img key={i} src={url} alt="avatar" style={{ 
+                  width: 20, height: 20, borderRadius: '50%', 
+                  border: '2px solid white', marginLeft: i > 0 ? -8 : 0,
+                  objectFit: 'cover'
+                }} />
+              ))}
+            </div>
+          )}
         </div>
 
-        <div style={{ position: 'relative', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ position: 'relative', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#3461FF', borderRadius: '50%', boxShadow: '0 4px 12px rgba(52,97,255,0.2)' }}>
           <svg width="44" height="44" viewBox="0 0 44 44" style={{ transform: 'rotate(-90deg)', position: 'absolute', inset: 0 }}>
-            <circle cx="22" cy="22" r="19" fill="none" stroke="#F1F5F9" strokeWidth="2.5" />
-            <circle cx="22" cy="22" r="19" fill="none" stroke="#3461FF" strokeWidth="3" 
-              strokeDasharray={`${2 * Math.PI * 19 * (progressPct / 100)} ${2 * Math.PI * 19}`} strokeLinecap="round" 
+            <circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
+            <circle cx="22" cy="22" r="20" fill="none" stroke="white" strokeWidth="2.5" 
+              strokeDasharray={`${2 * Math.PI * 20 * (progressPct / 100)} ${2 * Math.PI * 20}`} strokeLinecap="round" 
               style={{ transition: 'stroke-dasharray 0.5s ease' }} 
             />
           </svg>
-          <ArrowRight size={20} color="#3461FF" />
+          <ArrowRight size={20} color="white" />
         </div>
-
       </div>
     </motion.button>
   )
@@ -152,8 +180,6 @@ export default function DashboardPage() {
   const { user, profile, setProfile } = useAuth()
   const { isTelegram } = useTelegram()
   const navigate = useNavigate()
-  const [courses, setCourses] = useState([])
-  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
@@ -161,18 +187,19 @@ export default function DashboardPage() {
   const [dbNotifications, setDbNotifications] = useState([])
   const unreadCount = useUnreadNotifications()
 
-  useEffect(() => {
-    async function fetchCourses() {
-      const { data } = await supabase
+  // Use React Query for courses
+  const { data: courses = [], isLoading: loading } = useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('courses')
         .select('*')
         .eq('is_published', true)
         .order('created_at', { ascending: true })
-      setCourses(data || [])
-      setLoading(false)
+      if (error) throw error
+      return data || []
     }
-    fetchCourses()
-  }, [user])
+  })
 
   useEffect(() => {
     if (isNotificationsOpen && user?.id) {

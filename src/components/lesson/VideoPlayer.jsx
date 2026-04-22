@@ -49,37 +49,57 @@ export default function VideoPlayer({ videoId, lessonId }) {
   }, [isFullscreen])
 
   const pendingSeekTimeRef = useRef(null)
-  const seekTimeoutRef = useRef(null)
+
+  // -- Controls Visibility Logic (YouTube Style) --
+  const [showControls, setShowControls] = useState(true)
+  const hideControlsTimeoutRef = useRef(null)
+
+  const wakeControls = useCallback(() => {
+    setShowControls(true)
+    if (hideControlsTimeoutRef.current) clearTimeout(hideControlsTimeoutRef.current)
+    // Only auto-hide if playing and not dragging
+    hideControlsTimeoutRef.current = setTimeout(() => {
+      if (isPlaying && !isDraggingRef.current) {
+        setShowControls(false)
+      }
+    }, 3000)
+  }, [isPlaying])
+
+  // Keep controls awake while paused or dragging
+  useEffect(() => {
+    if (!isPlaying || isDragging) {
+      setShowControls(true)
+      if (hideControlsTimeoutRef.current) clearTimeout(hideControlsTimeoutRef.current)
+    } else {
+      wakeControls()
+    }
+  }, [isPlaying, isDragging, wakeControls])
+
 
   // Progress Tracking UI
-  // Defining them up here so we can use them anywhere without stale issues!
   const startTrackingProgress = useCallback(() => {
     if (progressIntervalRef.current) return
     progressIntervalRef.current = setInterval(() => {
       if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
-        // ALWAYS keep duration updated (fixes getDuration returning 0 on initial load)
         const currentDur = playerRef.current.getDuration() || 0
-        if (currentDur > 0) {
-          setDuration(currentDur)
-        }
+        if (currentDur > 0) setDuration(currentDur)
         
-        // ONLY update currentTime from video if the user is NOT dragging the bar
         if (!isDraggingRef.current) {
           const actualTime = playerRef.current.getCurrentTime() || 0
           
           if (pendingSeekTimeRef.current !== null) {
-            if (Math.abs(actualTime - pendingSeekTimeRef.current) > 1.5) {
-               return // Youtube is buffering, ignore old time
+            // Wait indefinitely for Youtube to finish buffering and catch up to the seek time
+            if (Math.abs(actualTime - pendingSeekTimeRef.current) > 2) {
+               return // Still seeking/buffering, ignore actualTime
             } else {
-               pendingSeekTimeRef.current = null
-               if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current)
+               pendingSeekTimeRef.current = null // Caught up!
             }
           }
           
           setCurrentTime(actualTime)
         }
       }
-    }, 150) // Fast 150ms update for smooth UI
+    }, 150) 
   }, [])
 
   const stopTrackingProgress = useCallback(() => {
@@ -141,7 +161,6 @@ export default function VideoPlayer({ videoId, lessonId }) {
 
         if (data?.last_pos_seconds > 0) {
           event.target.seekTo(data.last_pos_seconds, true)
-          // Wait for seek to complete before updating visually
           setTimeout(() => setCurrentTime(data.last_pos_seconds), 200)
           toast.info("Davom ettirilmoqda...", {
             description: `Darsni qolgan joyidan davom ettiryapsiz.`,
@@ -153,17 +172,14 @@ export default function VideoPlayer({ videoId, lessonId }) {
 
     const onPlayerStateChange = (event) => {
       const state = event.data
-      
       if (state === 1) { // Playing
         setIsPlaying(true)
         startSavingProgress()
         startTrackingProgress()
-      } else { // Paused, Ended, Buffering, Unstarted
+      } else { 
         setIsPlaying(false)
         stopSavingProgress()
         stopTrackingProgress()
-        
-        // Ensure duration updates even on initial buffer
         if (playerRef.current) {
           const dur = playerRef.current.getDuration()
           if (dur > 0) setDuration(dur)
@@ -173,45 +189,36 @@ export default function VideoPlayer({ videoId, lessonId }) {
 
     window.onYouTubeIframeAPIReady = () => {
       new window.YT.Player(`yt-${videoId}`, {
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
-        }
+        events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
       })
     }
 
-    // Fallback if API was already loaded
     if (window.YT && window.YT.Player && !playerRef.current) {
       new window.YT.Player(`yt-${videoId}`, {
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
-        }
+        events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
       })
     }
 
     return () => {
       stopSavingProgress()
       stopTrackingProgress()
+      if (hideControlsTimeoutRef.current) clearTimeout(hideControlsTimeoutRef.current)
     }
   }, [videoId, lessonId, user, startSavingProgress, stopSavingProgress, startTrackingProgress, stopTrackingProgress])
 
-  // Player Handlers
-  const togglePlay = () => {
+  const togglePlay = (e) => {
+    if (e) e.stopPropagation()
     if (!playerRef.current || !isReady) return
     if (isPlaying) playerRef.current.pauseVideo()
     else playerRef.current.playVideo()
+    wakeControls()
   }
 
   const applySeek = (newTime) => {
     if (!playerRef.current) return
     pendingSeekTimeRef.current = newTime
     playerRef.current.seekTo(newTime, true)
-    
-    if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current)
-    seekTimeoutRef.current = setTimeout(() => {
-       pendingSeekTimeRef.current = null
-    }, 2000)
+    wakeControls()
   }
 
   const skipTime = (amount, e) => {
@@ -222,47 +229,51 @@ export default function VideoPlayer({ videoId, lessonId }) {
     applySeek(newTime)
   }
 
-  // --- Advanced Drag & Seek Logic ---
   const scrubTimeRef = useRef(0)
 
-  const updateProgressFromEvent = (clientX) => {
+  const updateProgressFromEvent = (e) => {
     if (!trackRef.current || !duration) return
-    const rect = trackRef.current.getBoundingClientRect()
-    let x = clientX - rect.left
-    if (x < 0) x = 0
-    if (x > rect.width) x = rect.width
-    const percent = x / rect.width
+    let percent = 0;
+    if (isFullscreen && window.innerWidth <= 768) {
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+      percent = clientY / window.innerHeight;
+    } else {
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      const rect = trackRef.current.getBoundingClientRect()
+      let x = clientX - rect.left
+      if (x < 0) x = 0
+      if (x > rect.width) x = rect.width
+      percent = x / rect.width
+    }
+    if (percent < 0) percent = 0;
+    if (percent > 1) percent = 1;
+
     const newTime = percent * duration
-    
     scrubTimeRef.current = newTime
-    setCurrentTime(newTime) // Visually update immediately
+    setCurrentTime(newTime)
+    wakeControls()
   }
 
   const handlePointerDown = (e) => {
-    // Only intercept left clicks or touch starts
     if (e.button !== undefined && e.button !== 0) return
     setIsDraggingSafe(true)
-    
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX)
-    updateProgressFromEvent(clientX)
-    // Seek instantly on exact tap/click
+    updateProgressFromEvent(e)
     applySeek(scrubTimeRef.current)
   }
 
   useEffect(() => {
     const handlePointerMove = (e) => {
       if (isDragging) {
-        // Prevent default to disable scrolling while scrubbing on mobile
         if (e.cancelable) e.preventDefault() 
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX)
-        updateProgressFromEvent(clientX) // Only visual update -> NO Youtube API choking
+        updateProgressFromEvent(e)
+      } else {
+        wakeControls() // Wake on global mouse move over video
       }
     }
     const handlePointerUp = () => {
       if (isDragging) {
         setIsDraggingSafe(false)
         setHoverPosition(null)
-        // Crucial: Exact final seek applied here when dragging ends!
         applySeek(scrubTimeRef.current)
       }
     }
@@ -279,7 +290,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
       window.removeEventListener('touchmove', handlePointerMove)
       window.removeEventListener('touchend', handlePointerUp)
     }
-  }, [isDragging, setIsDraggingSafe, duration])
+  }, [isDragging, setIsDraggingSafe, duration, wakeControls])
 
   const handleMouseMoveTrack = (e) => {
     if (isDragging || !trackRef.current || !duration) return
@@ -287,17 +298,38 @@ export default function VideoPlayer({ videoId, lessonId }) {
     const x = e.clientX - rect.left
     const percent = Math.max(0, Math.min(x / rect.width, 1))
     setHoverPosition({ x, time: percent * duration })
+    wakeControls()
   }
 
   const handleMouseLeaveTrack = () => {
     if (!isDragging) setHoverPosition(null)
   }
 
-  // UI calculations
+  const handleVideoAreaClick = (e) => {
+    if (!isPlaying) {
+      // Always play if it's currently paused
+      togglePlay(e)
+      return
+    }
+
+    if (window.innerWidth <= 768) {
+      // Mobile & Playing: Toggle controls visibility
+      setShowControls(!showControls)
+      if (!showControls) wakeControls()
+    } else {
+      // Desktop & Playing: Toggle play/pause
+      togglePlay(e)
+    }
+  }
+
   const progressPercent = duration ? (currentTime / duration) * 100 : 0
 
   return (
-    <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', userSelect: 'none' }}>
+    <div 
+      style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', userSelect: 'none' }}
+      onMouseMove={wakeControls}
+      onTouchStart={wakeControls}
+    >
 
       {/* VIDEO CONTAINER */}
       <div
@@ -325,7 +357,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
 
         {/* SECURE SHIELD (Play/Pause Area) */}
         <div
-          onClick={togglePlay}
+          onClick={handleVideoAreaClick}
           onContextMenu={(e) => { e.preventDefault(); return false; }}
           style={{
             position: 'absolute', inset: 0, zIndex: 10, cursor: 'pointer',
@@ -334,7 +366,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
           }}
         >
           {/* PREMIUM CENTER PLAY BUTTON */}
-          {!isPlaying && isReady && (
+          {!isPlaying && isReady && showControls && (
             <div className="premium-play-bubble" style={{
               position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
               borderRadius: '50%',
@@ -358,10 +390,10 @@ export default function VideoPlayer({ videoId, lessonId }) {
             backdropFilter: 'blur(20px) saturate(1.5)', WebkitBackdropFilter: 'blur(20px) saturate(1.5)',
             border: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex', flexDirection: 'column',
-            opacity: isPlaying && !isDragging ? 0 : 1,
-            transform: isPlaying && !isDragging ? 'translateY(10px)' : 'translateY(0)',
+            opacity: showControls ? 1 : 0,
+            transform: showControls ? 'translateY(0)' : 'translateY(10px)',
             transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            pointerEvents: isPlaying && !isDragging ? 'none' : 'auto'
+            pointerEvents: showControls ? 'auto' : 'none'
           }}
           className="custom-controls"
         >
@@ -387,7 +419,6 @@ export default function VideoPlayer({ videoId, lessonId }) {
             onPointerDown={handlePointerDown}
             onMouseMove={handleMouseMoveTrack}
             onMouseLeave={handleMouseLeaveTrack}
-            // Touch handlers mapped directly for robustness
             onTouchStart={handlePointerDown}
             className="progress-container"
             style={{
@@ -409,35 +440,33 @@ export default function VideoPlayer({ videoId, lessonId }) {
               }} />
             </div>
 
-            {/* Playhead thumb (visible on hover/drag) */}
+            {/* Playhead thumb */}
             <div className="progress-thumb" style={{
               position: 'absolute', left: `${progressPercent}%`, top: '50%',
               width: 14, height: 14, borderRadius: '50%', background: 'white',
-              transform: 'translate(-50%, -50%) scale(0)',
+              transform: 'translate(-50%, -50%) scale(1)', // Always show slightly
               boxShadow: '0 2px 4px rgba(0,0,0,0.3)', transition: 'transform 0.2s',
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              opacity: isDragging ? 1 : 0.8
             }} />
           </div>
 
           {/* Actions Bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div className="controls-action-bar" style={{ display: 'flex', alignItems: 'center' }}>
-              {/* Play/Pause Button */}
               <button onClick={togglePlay} className="control-btn play-pause-btn" style={{ color: 'white', borderRadius: 8 }}>
                 {isPlaying ? <Pause className="btn-icon" fill="currentColor" strokeWidth={0} /> : <Play className="btn-icon" fill="currentColor" strokeWidth={0} />}
               </button>
 
-              {/* Fast Rewind / Forward (The "Best New Features") */}
               <div className="skip-btns" style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-                <button onClick={() => skipTime(-10)} className="control-btn" title="Orqaga 10 soniya" style={{ color: 'white', borderRadius: 8 }}>
+                <button onClick={(e) => skipTime(-10, e)} className="control-btn" title="Orqaga 10 soniya" style={{ color: 'white', borderRadius: 8 }}>
                   <RotateCcw className="btn-icon-small" strokeWidth={2.5} />
                 </button>
-                <button onClick={() => skipTime(10)} className="control-btn" title="Oldinga 10 soniya" style={{ color: 'white', borderRadius: 8 }}>
+                <button onClick={(e) => skipTime(10, e)} className="control-btn" title="Oldinga 10 soniya" style={{ color: 'white', borderRadius: 8 }}>
                   <RotateCw className="btn-icon-small" strokeWidth={2.5} />
                 </button>
               </div>
 
-              {/* Minimal Time indicator */}
               <div className="time-indicator" style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
                 {formatTime(currentTime)} <span style={{ opacity: 0.4, margin: '0 2px' }}>/</span> {formatTime(duration)}
               </div>
@@ -445,7 +474,7 @@ export default function VideoPlayer({ videoId, lessonId }) {
 
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <button
-                onClick={() => setIsFullscreen(!isFullscreen)}
+                onClick={(e) => { e.stopPropagation(); setIsFullscreen(!isFullscreen); wakeControls(); }}
                 className="control-btn"
                 style={{ color: 'white', opacity: 0.8, borderRadius: 8 }}
               >
@@ -454,7 +483,6 @@ export default function VideoPlayer({ videoId, lessonId }) {
             </div>
           </div>
         </div>
-
       </div>
 
       <style>{`

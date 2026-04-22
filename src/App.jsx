@@ -9,6 +9,17 @@ import { TelegramProvider, useTelegram } from './context/TelegramProvider'
 import { useAuth } from './context/AuthContext'
 import { useEffect } from 'react'
 import { Toaster } from 'sonner'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes
+      refetchOnWindowFocus: false, // Don't aggressively refetch
+      retry: 1
+    },
+  },
+})
 
 import PublicNavbar from './components/layout/PublicNavbar'
 import AuthSidebar from './components/layout/AuthSidebar'
@@ -268,35 +279,37 @@ function AppShell() {
 // ── Root ───────────────────────────────────────────────
 export default function App() {
   return (
-    <BrowserRouter>
-      <TelegramProvider>
-        <AuthProvider>
-          <TelegramAutoLogin />
-          <SmartRedirect />
-          <NotificationListener />
-          <Analytics />
-          <SpeedInsights />
-          <Toaster
-            position="top-center"
-            richColors
-            toastOptions={{
-              style: {
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                borderRadius: '20px',
-                padding: '16px',
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1.5px solid rgba(255,255,255,0.8)',
-                boxShadow: '0 14px 34px rgba(0,0,0,0.08)',
-                fontWeight: 600,
-                fontSize: '0.9375rem'
-              }
-            }}
-          />
-          <AppShell />
-        </AuthProvider>
-      </TelegramProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TelegramProvider>
+          <AuthProvider>
+            <TelegramAutoLogin />
+            <SmartRedirect />
+            <NotificationListener />
+            <Analytics />
+            <SpeedInsights />
+            <Toaster
+              position="top-center"
+              richColors
+              toastOptions={{
+                style: {
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  borderRadius: '20px',
+                  padding: '16px',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1.5px solid rgba(255,255,255,0.8)',
+                  boxShadow: '0 14px 34px rgba(0,0,0,0.08)',
+                  fontWeight: 600,
+                  fontSize: '0.9375rem'
+                }
+              }}
+            />
+            <AppShell />
+          </AuthProvider>
+        </TelegramProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }

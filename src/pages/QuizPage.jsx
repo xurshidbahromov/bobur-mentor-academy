@@ -190,8 +190,8 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
   const secs = timeSpent % 60
 
   // Grade color
-  const gradeColor = pct >= 80 ? '#22C55E' : pct >= 50 ? '#F59E0B' : '#EF4444'
-  const gradeText  = pct >= 80 ? 'Zo\'r natija!' : pct >= 50 ? 'Yaxshi harakat!' : 'Qayta urinib ko\'ring'
+  const gradeColor = pct >= 80 ? '#10B981' : pct >= 50 ? '#F59E0B' : '#EF4444'
+  const gradeText  = pct >= 80 ? 'Ajoyib natija!' : pct >= 50 ? 'Yaxshi harakat!' : 'Yana urinib ko\'ring'
 
   const stars = pct >= 80 ? 3 : pct >= 50 ? 2 : 1
 
@@ -202,45 +202,47 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
         style={{
-          background: 'white', border: '1px solid rgba(0,0,0,0.06)',
-          borderRadius: 32, padding: '40px 32px', textAlign: 'center',
-          boxShadow: '0 20px 60px rgba(15,23,42,0.08)', marginBottom: 24,
+          background: 'rgba(255, 255, 255, 0.9)', 
+          backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+          border: '1px solid rgba(0,0,0,0.06)',
+          borderRadius: 36, padding: '48px 32px', textAlign: 'center',
+          boxShadow: '0 24px 80px rgba(15,23,42,0.08)', marginBottom: 24,
+          position: 'relative', overflow: 'hidden'
         }}
       >
+        {/* Glow behind the trophy */}
+        <div style={{
+          position: 'absolute', top: 0, left: '50%', transform: 'translate(-50%, -50%)',
+          width: 300, height: 300, borderRadius: '50%', background: gradeColor,
+          opacity: 0.1, filter: 'blur(60px)', pointerEvents: 'none'
+        }} />
+
         {/* Stars row */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 32 }}>
           {[1, 2, 3].map(i => (
             <motion.div
               key={i}
-              initial={{ scale: 0, rotate: -30 }}
+              initial={{ scale: 0, rotate: -40 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 18, delay: i * 0.12 }}
+              style={{ position: 'relative' }}
             >
               <Star
-                size={40}
+                size={i === 2 ? 56 : 44}
                 color={i <= stars ? '#FCD34D' : '#E2E8F0'}
                 fill={i <= stars ? '#FCD34D' : '#E2E8F0'}
+                style={{ filter: i <= stars ? 'drop-shadow(0 4px 12px rgba(252,211,77,0.4))' : 'none', transform: i === 2 ? 'translateY(-10px)' : 'none' }}
               />
             </motion.div>
           ))}
         </div>
-
-        {/* Trophy */}
-        <motion.div
-          initial={{ scale: 0, rotate: -20 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.45 }}
-          style={{ display: 'inline-flex', padding: 18, borderRadius: 24, background: `${gradeColor}15`, color: gradeColor, marginBottom: 20 }}
-        >
-          <Trophy size={44} />
-        </motion.div>
 
         <motion.h2
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55 }}
           className="outfit-font"
-          style={{ margin: '0 0 4px', fontSize: '2.25rem', fontWeight: 900, color: gradeColor, letterSpacing: '-0.04em' }}
+          style={{ margin: '0 0 8px', fontSize: '3rem', fontWeight: 900, color: gradeColor, letterSpacing: '-0.04em', lineHeight: 1 }}
         >
           {pct}%
         </motion.h2>
@@ -248,33 +250,41 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.65 }}
-          style={{ margin: '0 0 8px', fontWeight: 800, fontSize: '1.1rem', color: '#0F172A' }}
+          style={{ margin: '0 0 8px', fontWeight: 800, fontSize: '1.25rem', color: '#0F172A' }}
         >
           {gradeText}
         </motion.p>
-        <p style={{ margin: '0 0 32px', color: '#64748B', fontSize: '0.9375rem' }}>
-          {total} tadan <strong style={{ color: '#0F172A' }}>{score} ta</strong> to'g'ri javob
+        <p style={{ margin: '0 0 32px', color: '#64748B', fontSize: '1rem', fontWeight: 500 }}>
+          {total} tadan <strong style={{ color: '#0F172A', fontWeight: 700 }}>{score} ta</strong> to'g'ri javob topdingiz
         </p>
 
         {/* Metrics */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28 }}>
-          <div style={{ padding: '16px', borderRadius: 18, background: '#F8FAFC', textAlign: 'center' }}>
-            <p style={{ margin: '0 0 4px', fontSize: '1.5rem', fontWeight: 800, color: '#0F172A' }}>{score}</p>
-            <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>To'g'ri</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 36 }}>
+          <div style={{ padding: '20px', borderRadius: 24, background: '#F8FAFC', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>
+            <p style={{ margin: '0 0 6px', fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{score}</p>
+            <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>To'g'ri</p>
           </div>
-          <div style={{ padding: '16px', borderRadius: 18, background: '#F8FAFC', textAlign: 'center' }}>
-            <p style={{ margin: '0 0 4px', fontSize: '1.5rem', fontWeight: 800, color: '#0F172A' }}>{mins}:{String(secs).padStart(2,'0')}</p>
-            <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Vaqt</p>
+          <div style={{ padding: '20px', borderRadius: 24, background: '#F8FAFC', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>
+            <p style={{ margin: '0 0 6px', fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{mins}:{String(secs).padStart(2,'0')}</p>
+            <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Vaqt</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
-          <button onClick={onBack} style={{ flex: 1, padding: '16px', borderRadius: 16, background: '#F1F5F9', color: '#475569', border: 'none', fontWeight: 700, fontSize: '0.9375rem', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', gap: 16 }}>
+          <motion.button 
+            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }}
+            onClick={onBack} 
+            style={{ flex: 1, padding: '18px', borderRadius: 20, background: '#F1F5F9', color: '#475569', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s' }}
+          >
             Darsga qaytish
-          </button>
-          <button onClick={onRetry} style={{ flex: 1, padding: '16px', borderRadius: 16, background: '#1E293B', color: 'white', border: 'none', fontWeight: 700, fontSize: '0.9375rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <RotateCcw size={17} /> Qayta
-          </button>
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.02, boxShadow: '0 8px 24px rgba(30,41,59,0.2)' }} whileTap={{ scale: 0.96 }}
+            onClick={onRetry} 
+            style={{ flex: 1, padding: '18px', borderRadius: 20, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
+          >
+            <RotateCcw size={18} strokeWidth={2.5} /> Qayta
+          </motion.button>
         </div>
       </motion.div>
     </div>
@@ -466,7 +476,7 @@ export default function QuizPage() {
 
                   {/* Count options */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 28 }}>
-                    {[5, 10, 20, allQuizzes.length].filter((v, i, arr) => arr.indexOf(v) === i).map(n => (
+                    {[10, 30, 60, allQuizzes.length].filter((v, i, arr) => arr.indexOf(v) === i).map(n => (
                       <motion.button
                         key={n}
                         whileTap={{ scale: 0.96 }}

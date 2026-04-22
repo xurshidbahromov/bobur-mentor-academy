@@ -2,37 +2,30 @@
 // Fetches published lessons from Supabase
 // Only returns is_published = true lessons — spec requirement
 
-import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useQuery } from '@tanstack/react-query'
 
 /**
  * useLessons — fetches all published lessons for a course, ordered by order_index
  * @param {string} courseId
  */
 export function useLessons(courseId) {
-  const [lessons, setLessons] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (!courseId) return
-    const fetch = async () => {
-      setLoading(true)
+  const { data: lessons = [], isLoading: loading, error } = useQuery({
+    queryKey: ['lessons', courseId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('lessons')
         .select('*')
         .eq('course_id', courseId)
         .eq('is_published', true)
         .order('order_index', { ascending: true })
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!courseId
+  })
 
-      if (error) setError(error.message)
-      else setLessons(data || [])
-      setLoading(false)
-    }
-    fetch()
-  }, [courseId])
-
-  return { lessons, loading, error }
+  return { lessons, loading, error: error?.message }
 }
 
 /**
@@ -40,29 +33,22 @@ export function useLessons(courseId) {
  * @param {string} lessonId
  */
 export function useLesson(lessonId) {
-  const [lesson, setLesson] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (!lessonId) return
-    const fetch = async () => {
-      setLoading(true)
+  const { data: lesson = null, isLoading: loading, error } = useQuery({
+    queryKey: ['lesson', lessonId],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('lessons')
         .select('*')
         .eq('id', lessonId)
         .eq('is_published', true)
         .maybeSingle()
+      if (error) throw error
+      return data
+    },
+    enabled: !!lessonId
+  })
 
-      if (error) setError(error.message)
-      else setLesson(data)
-      setLoading(false)
-    }
-    fetch()
-  }, [lessonId])
-
-  return { lesson, loading, error }
+  return { lesson, loading, error: error?.message }
 }
 
 /**
@@ -71,24 +57,19 @@ export function useLesson(lessonId) {
  * @param {string} lessonId
  */
 export function useQuizzes(lessonId) {
-  const [quizzes, setQuizzes] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (!lessonId) return
-    const fetch = async () => {
-      setLoading(true)
-      const { data } = await supabase
+  const { data: quizzes = [], isLoading: loading } = useQuery({
+    queryKey: ['quizzes', lessonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('quizzes')
         .select('*')
         .eq('lesson_id', lessonId)
         .order('order_index', { ascending: true })
-
-      setQuizzes(data || [])
-      setLoading(false)
-    }
-    fetch()
-  }, [lessonId])
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!lessonId
+  })
 
   return { quizzes, loading }
 }

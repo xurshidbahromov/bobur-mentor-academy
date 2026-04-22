@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Play, Lock, Coins, MessageCircle, Info, BookOpen } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useQuery } from '@tanstack/react-query'
 import CommentSection from '../components/lesson/CommentSection'
 
 // ── Lesson Row Component ─────────────────────────────────────
@@ -75,14 +76,11 @@ export default function CourseDetailPage() {
   const navigate = useNavigate()
   const { user } = useAuth() // AuthContext dan user obyektini olamiz
 
-  const [course, setCourse] = useState(null)
-  const [lessons, setLessons] = useState([])
-  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('videos') // 'videos' | 'comments'
-  const [unlockedLessonIds, setUnlockedLessonIds] = useState(new Set()) // Bazadagi ruxsatlar
 
-  useEffect(() => {
-    async function loadData() {
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['course', courseId, user?.id],
+    queryFn: async () => {
       const promises = [
         supabase.from('courses').select('*').eq('id', courseId).single(),
         supabase.from('lessons').select('*').eq('course_id', courseId).eq('is_published', true).order('order_index')
@@ -100,16 +98,17 @@ export default function CourseDetailPage() {
       const lessonsRes = results[1]
       const accessRes = user ? results[2] : null
 
-      if (courseRes.data) setCourse(courseRes.data)
-      if (lessonsRes.data) setLessons(lessonsRes.data)
-      if (accessRes && accessRes.data) {
-        setUnlockedLessonIds(new Set(accessRes.data.map(d => d.lesson_id)))
+      return {
+        course: courseRes.data || null,
+        lessons: lessonsRes.data || [],
+        unlockedLessonIds: accessRes && accessRes.data ? new Set(accessRes.data.map(d => d.lesson_id)) : new Set()
       }
-
-      setLoading(false)
     }
-    loadData()
-  }, [courseId, user])
+  })
+
+  const course = data?.course
+  const lessons = data?.lessons || []
+  const unlockedLessonIds = data?.unlockedLessonIds || new Set()
 
   if (loading) {
     return (
@@ -138,35 +137,29 @@ export default function CourseDetailPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: 100 }}>
-      {/* ── Floating Navigator (Pill) ── */}
-      <div style={{ 
-        position: 'fixed', top: 20, left: 0, right: 0, zIndex: 100,
-        display: 'flex', justifyContent: 'center', pointerEvents: 'none'
-      }}>
-        <motion.button
-          initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          onClick={() => navigate('/dashboard')}
-          style={{
-            pointerEvents: 'auto',
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(20px) saturate(1.8)',
-            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-            border: '1px solid rgba(0, 0, 0, 0.05)',
-            color: '#0F172A', fontWeight: 800, fontSize: '0.875rem',
-            padding: '10px 20px 10px 16px', borderRadius: 100,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-            cursor: 'pointer', transition: 'all 0.2s',
-            WebkitTapHighlightColor: 'transparent'
-          }}
-          whileHover={{ scale: 1.05, background: 'rgba(255, 255, 255, 0.9)' }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <ArrowLeft size={18} strokeWidth={3} /> Orqaga
-        </motion.button>
-      </div>
-
-      <main style={{ maxWidth: 1040, margin: '0 auto', padding: '100px 24px 40px' }}>
+      <main style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px' }}>
+        
+        {/* ── Navigator (Pill) ── */}
+        <div style={{ display: 'flex', marginBottom: 24 }}>
+          <motion.button
+            initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+            onClick={() => navigate('/dashboard')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: 'white',
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              color: '#0F172A', fontWeight: 800, fontSize: '0.875rem',
+              padding: '10px 20px 10px 16px', borderRadius: 100,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              cursor: 'pointer', transition: 'all 0.2s',
+              WebkitTapHighlightColor: 'transparent'
+            }}
+            whileHover={{ scale: 1.02, background: '#F1F5F9' }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ArrowLeft size={18} strokeWidth={3} /> Orqaga
+          </motion.button>
+        </div>
 
         {/* Hero Section */}
         <motion.div 
@@ -194,7 +187,7 @@ export default function CourseDetailPage() {
         {/* Tabs Island */}
         <div style={{
           display: 'flex', background: '#EDF1F7', borderRadius: 100, padding: 4, marginBottom: 32,
-          maxWidth: 320, border: '1px solid rgba(0,0,0,0.05)'
+          width: '100%', maxWidth: 440, border: '1px solid rgba(0,0,0,0.05)'
         }}>
           {['videos', 'comments'].map((tab) => {
             const isActive = activeTab === tab
@@ -204,11 +197,11 @@ export default function CourseDetailPage() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 style={{
-                  flex: 1, padding: '10px', borderRadius: 100, border: 'none',
+                  flex: 1, padding: '12px 16px', borderRadius: 100, border: 'none',
                   background: isActive ? 'white' : 'transparent',
                   color: isActive ? '#3461FF' : '#64748B',
-                  fontWeight: 800, fontSize: '0.875rem',
-                  boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                  fontWeight: 800, fontSize: '0.9375rem',
+                  boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
                   cursor: 'pointer', transition: 'all 0.2s',
                   WebkitTapHighlightColor: 'transparent',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8

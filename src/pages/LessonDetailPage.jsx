@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Lock, Coins, CheckCircle2, Trophy, ClipboardList, ChevronRight, FileText, Download, Info, MessageCircle, Target, Paperclip, BookOpen } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { useLesson, useQuizzes } from '../hooks/useLessons'
 import { useAccess } from '../hooks/useAccess'
 import { useAuth } from '../context/AuthContext'
@@ -21,44 +22,42 @@ export default function LessonDetailPage() {
   const { user, profile, setProfile } = useAuth()
 
   // 2. Fetch all lessons in the course for the playlist
-  const [playlist, setPlaylist] = useState([])
-  const [playlistLoading, setPlaylistLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('info') // 'info' | 'comments' | 'quiz'
   const [isUnlocking, setIsUnlocking] = useState(false)
 
-  useEffect(() => {
-    if (lesson?.course_id) {
-      supabase
+  const { data: playlist = [], isLoading: playlistLoading } = useQuery({
+    queryKey: ['playlist', lesson?.course_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('lessons')
         .select('id, title, order_index, is_free, price')
         .eq('course_id', lesson.course_id)
         .eq('is_published', true)
         .order('order_index', { ascending: true })
-        .then(({ data }) => {
-          setPlaylist(data || [])
-          setPlaylistLoading(false)
-        })
-    }
-  }, [lesson?.course_id])
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!lesson?.course_id
+  })
 
   const { canWatch, loading: accessLoading, unlockWithCoins } = useAccess(lesson)
   const { quizzes } = useQuizzes(canWatch ? lessonId : null)
-  const [bestScore, setBestScore] = useState(null)
-
-  // Load best previous score
-  useEffect(() => {
-    if (!user || !canWatch) return
-    supabase
-      .from('quiz_attempts')
-      .select('score, total')
-      .eq('user_id', user.id)
-      .eq('lesson_id', lessonId)
-      .order('score', { ascending: false })
-      .limit(1)
-      .then(({ data }) => {
-        if (data && data.length > 0) setBestScore(data[0])
-      })
-  }, [user, canWatch, lessonId])
+  
+  const { data: bestScore = null } = useQuery({
+    queryKey: ['bestScore', lessonId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quiz_attempts')
+        .select('score, total')
+        .eq('user_id', user.id)
+        .eq('lesson_id', lessonId)
+        .order('score', { ascending: false })
+        .limit(1)
+      if (error) throw error
+      return data && data.length > 0 ? data[0] : null
+    },
+    enabled: !!user && !!canWatch
+  })
 
   if (loading || accessLoading) {
     return (
@@ -110,40 +109,34 @@ export default function LessonDetailPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: 100 }}>
-      {/* ── Floating Navigator (Pill) ── */}
-      <div style={{ 
-        position: 'fixed', top: 20, left: 0, right: 0, zIndex: 100,
-        display: 'flex', justifyContent: 'center', pointerEvents: 'none'
-      }}>
-        <motion.div
-          initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          style={{
-            pointerEvents: 'auto',
-            display: 'flex', alignItems: 'center', gap: 12,
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(20px) saturate(1.8)',
-            WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
-            border: '1px solid rgba(0, 0, 0, 0.05)',
-            padding: '6px 6px 6px 12px', borderRadius: 100,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-          }}
-        >
-          <span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 600 }}>Kurs:</span>
-          <button
-            onClick={() => navigate(`/courses/${lesson.course_id}`)}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 20px' }}>
+
+        {/* ── Navigator (Pill) ── */}
+        <div style={{ display: 'flex', marginBottom: 24 }}>
+          <motion.div
+            initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
             style={{
-              background: 'rgba(0,0,0,0.05)', border: 'none',
-              color: '#0F172A', fontWeight: 800, fontSize: '0.8125rem',
-              padding: '6px 14px', borderRadius: 100,
-              cursor: 'pointer', transition: 'all 0.2s',
+              display: 'flex', alignItems: 'center', gap: 12,
+              background: 'white',
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              padding: '6px 6px 6px 12px', borderRadius: 100,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
             }}
           >
-            Orqaga qaytish
-          </button>
-        </motion.div>
-      </div>
-
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 20px 40px' }}>
+            <span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 600 }}>Kurs:</span>
+            <button
+              onClick={() => navigate(`/courses/${lesson.course_id}`)}
+              style={{
+                background: 'rgba(0,0,0,0.04)', border: 'none',
+                color: '#0F172A', fontWeight: 800, fontSize: '0.8125rem',
+                padding: '8px 16px', borderRadius: 100,
+                cursor: 'pointer', transition: 'all 0.2s',
+              }}
+            >
+              Orqaga qaytish
+            </button>
+          </motion.div>
+        </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         

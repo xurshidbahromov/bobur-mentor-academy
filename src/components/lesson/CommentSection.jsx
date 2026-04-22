@@ -4,43 +4,37 @@ import { Send, Trash2, MessageCircle, Clock } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { toast } from 'sonner'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 export default function CommentSection({ courseId, lessonId = null, showLessonTag = false }) {
   const { user, profile } = useAuth()
-  const [comments, setComments] = useState([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
   const [content, setContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    fetchComments()
-  }, [courseId, lessonId])
+  const { data: comments = [], isLoading: loading } = useQuery({
+    queryKey: ['comments', courseId, lessonId],
+    queryFn: async () => {
+      let query = supabase
+        .from('comments')
+        .select(`
+          *,
+          profiles (full_name, avatar_url),
+          lessons (title)
+        `)
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: false })
 
-  const fetchComments = async () => {
-    setLoading(true)
-    let query = supabase
-      .from('comments')
-      .select(`
-        *,
-        profiles (full_name, avatar_url),
-        lessons (title)
-      `)
-      .eq('course_id', courseId)
-      .order('created_at', { ascending: false })
+      if (lessonId) {
+        query = query.eq('lesson_id', lessonId)
+      }
 
-    if (lessonId) {
-      query = query.eq('lesson_id', lessonId)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Error fetching comments:', error)
-    } else {
-      setComments(data || [])
-    }
-    setLoading(false)
-  }
+      const { data, error } = await query
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!courseId
+  })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -70,7 +64,8 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
       toast.error('Izoh yuborishda xatolik yuz berdi')
       console.error(error)
     } else {
-      setComments([data, ...comments])
+      // Optimizm orqali keshni yangilaymiz yoki invalidate qilamiz
+      queryClient.setQueryData(['comments', courseId, lessonId], (oldData) => [data, ...(oldData || [])])
       setContent('')
       toast.success('Izohingiz qabul qilindi')
     }
@@ -87,7 +82,7 @@ export default function CommentSection({ courseId, lessonId = null, showLessonTa
     if (error) {
       toast.error('O\'chirishda xatolik')
     } else {
-      setComments(comments.filter(c => c.id !== id))
+      queryClient.setQueryData(['comments', courseId, lessonId], (oldData) => (oldData || []).filter(c => c.id !== id))
       toast.success('O\'chirildi')
     }
   }
