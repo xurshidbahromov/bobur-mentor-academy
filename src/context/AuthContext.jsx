@@ -48,6 +48,25 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  // 3. Real-time subscription to profile changes (for instant coin updates)
+  useEffect(() => {
+    if (!user) return
+
+    const channel = supabase.channel('profile-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+        (payload) => {
+          setProfile(payload.new)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user])
+
   // ── Standard auth ──────────────────────────────────────────────
   const signUp = async ({ email, password, fullName }) => {
     const { data, error } = await supabase.auth.signUp({ email, password })
