@@ -13,16 +13,32 @@ const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supaba
 
 if (bot) {
   // ── 1. /start ──
-  bot.start((ctx) => {
-    ctx.reply(
-      `Assalomu alaykum, <b>${ctx.from.first_name}</b>! 👋\n\n<b>Bobur Mentor Academy</b> platformasiga xush kelibsiz.\nKerakli bo'limni tanlang:`,
+  bot.start(async (ctx) => {
+    const isAdmin = ADMIN_TG_IDS.includes(String(ctx.from.id));
+    const keyboardButtons = [
+      ['👤 Profil', '🎁 Taklifnoma'],
+      ['ℹ️ Yordam']
+    ];
+
+    // Faqat adminlarga Statistika tugmasini qo'shamiz
+    if (isAdmin) {
+      keyboardButtons.push(['📊 Statistika']);
+    }
+
+    // 1. Doimiy klaviaturani o'rnatish
+    await ctx.reply(
+      "Asosiy menyu aktivlashtirildi 👇", 
+      Markup.keyboard(keyboardButtons).resize()
+    );
+
+    // 2. Asosiy e'tiborni tortuvchi xabar va Inline Tugma
+    await ctx.reply(
+      `Assalomu alaykum, <b>${ctx.from.first_name}</b>! 👋\n\n<b>Bobur Mentor Academy</b> platformasiga xush kelibsiz.\n\nDarslarni davom ettirish va bilimlaringizni oshirish uchun pastdagi tugmani bosing:`,
       {
         parse_mode: 'HTML',
-        ...Markup.keyboard([
-          [Markup.button.webApp('🚀 Platformaga kirish', WEB_APP_URL)],
-          ['👤 Profil', '🎁 Taklifnoma'],
-          ['ℹ️ Yordam']
-        ]).resize()
+        ...Markup.inlineKeyboard([
+          [Markup.button.webApp("🚀 O'QISHNI BOSHLASH", WEB_APP_URL)]
+        ])
       }
     );
   });
@@ -90,8 +106,8 @@ if (bot) {
   bot.command('referral', handleReferral);
   bot.hears('🎁 Taklifnoma', handleReferral);
 
-  // ── 4. /stats (Faqat Admin) ──
-  bot.command('stats', async (ctx) => {
+  // ── 4. /stats va "📊 Statistika" tugmasi (Faqat Admin) ──
+  const handleStats = async (ctx) => {
     if (!ADMIN_TG_IDS.includes(String(ctx.from.id))) {
       return ctx.reply("Sizda bu buyruqni ishlatish huquqi yo'q.");
     }
@@ -112,7 +128,9 @@ if (bot) {
       console.error(err);
       ctx.reply("❌ Statistika olinmadi.");
     }
-  });
+  };
+  bot.command('stats', handleStats);
+  bot.hears('📊 Statistika', handleStats);
 
   const handleHelp = (ctx) => {
     ctx.reply(
