@@ -1,7 +1,8 @@
 // src/pages/QuizPage.jsx
 // Minimalist & Professional Quiz Page — Duolingo-inspired animations
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { ArrowLeft, CheckCircle2, XCircle, Trophy, RotateCcw, ChevronRight, HelpCircle, Star } from 'lucide-react'
@@ -202,8 +203,7 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
         style={{
-          background: 'rgba(255, 255, 255, 0.9)', 
-          backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+          background: 'rgba(255, 255, 255, 1)', 
           border: '1px solid rgba(0,0,0,0.06)',
           borderRadius: 36, padding: '48px 32px', textAlign: 'center',
           boxShadow: '0 24px 80px rgba(15,23,42,0.08)', marginBottom: 24,
@@ -298,11 +298,45 @@ export default function QuizPage() {
   const { lessonId } = useParams()
   const navigate     = useNavigate()
   const { user }     = useAuth()
+  const isGeneral = lessonId === 'general'
 
-  const [lesson,  setLesson]  = useState(null)
-  const [allQuizzes, setAllQuizzes] = useState([]) // All fetched quizzes (for general)
+  const { data: quizData, isLoading: loading } = useQuery({
+    queryKey: ['quiz', lessonId],
+    queryFn: async () => {
+      if (isGeneral) {
+        const { data: q, error } = await supabase
+          .from('quizzes').select('*').eq('is_general', true).order('created_at')
+        if (error) throw error
+        return { lesson: { title: 'Umumiy Test' }, allQuizzes: (q || []).sort(() => Math.random() - 0.5) }
+      } else {
+        const [{ data: l, error: lErr }, { data: q, error: qErr }] = await Promise.all([
+          supabase.from('lessons').select('id, title').eq('id', lessonId).single(),
+          supabase.from('quizzes').select('*').eq('lesson_id', lessonId).order('order_index'),
+        ])
+        if (lErr) throw lErr
+        if (qErr) throw qErr
+        return { lesson: l, quizzes: q || [] }
+      }
+    },
+    staleTime: 1000 * 60 * 10, // 10 minutes
+  })
+
+  // Local state for quiz progress (derived from query data)
   const [quizzes, setQuizzes] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [lesson, setLesson] = useState(null)
+  const [allQuizzes, setAllQuizzes] = useState([])
+
+  useEffect(() => {
+    if (quizData) {
+      setLesson(quizData.lesson)
+      if (isGeneral) {
+        setAllQuizzes(quizData.allQuizzes)
+      } else {
+        setQuizzes(quizData.quizzes)
+      }
+    }
+  }, [quizData, isGeneral])
+
   const [phase,     setPhase]     = useState('intro')
   const [current,   setCurrent]   = useState(0)
   const [selected,  setSelected]  = useState(null)
@@ -319,30 +353,6 @@ export default function QuizPage() {
   const timerRef      = useRef(null)
   const startTimeRef  = useRef(null)
   const savedRef      = useRef(false)
-
-  const isGeneral = lessonId === 'general'
-
-  useEffect(() => {
-    async function load() {
-      if (isGeneral) {
-        const { data: q } = await supabase
-          .from('quizzes').select('*').eq('is_general', true).order('created_at')
-        const shuffled = (q || []).sort(() => Math.random() - 0.5)
-        setLesson({ title: 'Umumiy Test' })
-        setAllQuizzes(shuffled) // Save all for slicing later
-        // Don't set quizzes yet — user picks count first
-      } else {
-        const [{ data: l }, { data: q }] = await Promise.all([
-          supabase.from('lessons').select('id, title').eq('id', lessonId).single(),
-          supabase.from('quizzes').select('*').eq('lesson_id', lessonId).order('order_index'),
-        ])
-        setLesson(l)
-        setQuizzes(q || [])
-      }
-      setLoading(false)
-    }
-    load()
-  }, [lessonId, isGeneral])
 
   const saveAttempt = useCallback(async (finAnswers, finScore, spent, completed = true) => {
     if (savedRef.current || !user) return
@@ -406,18 +416,18 @@ export default function QuizPage() {
   if (loading) return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
       <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid #F1F5F9' }}>
-        <div className="skeleton-loader" style={{ width: 28, height: 28, borderRadius: 8 }} />
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
         <div style={{ flex: 1 }}>
-          <div className="skeleton-loader" style={{ height: 11, width: 40, borderRadius: 6, marginBottom: 6 }} />
-          <div className="skeleton-loader" style={{ height: 16, width: 200, borderRadius: 8 }} />
+          <div style={{ height: 11, width: 40, borderRadius: 6, marginBottom: 6, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
+          <div style={{ height: 16, width: 200, borderRadius: 8, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
         </div>
       </div>
       <div style={{ padding: '40px 20px', maxWidth: 640, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-        <div className="skeleton-loader" style={{ width: 88, height: 88, borderRadius: 28 }} />
-        <div className="skeleton-loader" style={{ height: 32, width: '70%', borderRadius: 12 }} />
-        <div className="skeleton-loader" style={{ height: 18, width: '90%', borderRadius: 8 }} />
-        <div className="skeleton-loader" style={{ height: 18, width: '60%', borderRadius: 8 }} />
-        <div className="skeleton-loader" style={{ height: 56, width: '100%', borderRadius: 18, marginTop: 16 }} />
+        <div style={{ width: 88, height: 88, borderRadius: 28, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
+        <div style={{ height: 32, width: '70%', borderRadius: 12, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
+        <div style={{ height: 18, width: '90%', borderRadius: 8, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
+        <div style={{ height: 18, width: '60%', borderRadius: 8, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
+        <div style={{ height: 56, width: '100%', borderRadius: 18, marginTop: 16, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
       </div>
     </div>
   )
@@ -426,7 +436,7 @@ export default function QuizPage() {
     <div style={{ minHeight: '100vh', background: '#F8FAFC', color: '#1E293B', display: 'flex', flexDirection: 'column' }}>
 
       {/* ── Top Header ── */}
-      <header style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, background: 'rgba(248,250,252,0.85)', backdropFilter: 'blur(12px)', zIndex: 10, borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+      <header style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, background: 'rgba(248,250,252,0.98)', zIndex: 10, borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
         <button onClick={() => isGeneral ? navigate('/quizzes') : navigate(`/lessons/${lessonId}`)} style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: 4 }}>
           <ArrowLeft size={20} />
         </button>
@@ -548,7 +558,7 @@ export default function QuizPage() {
                   style={{ display: 'block', width: '100%', padding: 0, marginBottom: 20, borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', background: 'white', cursor: 'pointer', position: 'relative', outline: 'none' }}
                 >
                   <img src={quizzes[current].image_url} alt="Question diagram" style={{ width: '100%', height: 'auto', display: 'block' }} />
-                  <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(0,0,0,0.6)', color: 'white', padding: '6px 10px', borderRadius: 12, fontSize: '0.75rem', fontWeight: 600, backdropFilter: 'blur(4px)' }}>
+                  <div style={{ position: 'absolute', bottom: 12, right: 12, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '6px 10px', borderRadius: 12, fontSize: '0.75rem', fontWeight: 600 }}>
                     Kattalashtirish
                   </div>
                 </motion.button>

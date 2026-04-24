@@ -1,11 +1,12 @@
 // src/pages/LeaderboardPage.jsx
 // Top 50 o'quvchilar reytingi — coins & streak asosida.
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Trophy, Flame, Coins, Crown, Star, Sparkles } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useQuery } from '@tanstack/react-query'
 
 // ─── Minimalist avatar fallback ──────────────────────
 function Avatar({ user, size = 44 }) {
@@ -20,7 +21,7 @@ function Avatar({ user, size = 44 }) {
       fontSize: size >= 52 ? '1.375rem' : size >= 40 ? '1.125rem' : '0.875rem',
     }}>
       {user.avatar_url ? (
-        <img src={user.avatar_url} alt={user.full_name || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={user.avatar_url} alt={user.full_name || 'User'} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
         initial
       )}
@@ -51,9 +52,7 @@ function PodiumCard({ user, rank, isSelf, tab }) {
       className={`card-glow-hover ${glowClass}`}
       style={{
         flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-        background: isFirst ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.78)',
-        backdropFilter: 'blur(32px) saturate(2)',
-        WebkitBackdropFilter: 'blur(32px) saturate(2)',
+        background: isFirst ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.9)',
         border: isFirst ? '1.8px solid #FDE68A' : '1px solid var(--border-medium)',
         boxShadow: isFirst ? '0 16px 40px rgba(245,158,11,0.1)' : '0 8px 32px rgba(15,23,42,0.05)',
         borderTopLeftRadius: 24, borderTopRightRadius: 24,
@@ -64,9 +63,9 @@ function PodiumCard({ user, rank, isSelf, tab }) {
       }}
     >
       {isFirst && (
-        <motion.div animate={{ y: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}>
+        <div style={{ marginBottom: 4 }}>
           <Crown size={20} color="#F59E0B" style={{ filter: 'drop-shadow(0 2px 8px rgba(245,158,11,0.4))' }} />
-        </motion.div>
+        </div>
       )}
       <div style={{
         padding: isFirst ? 4 : 2, borderRadius: '50%',
@@ -115,9 +114,7 @@ function LeaderRow({ user, rank, isSelf, tab }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '12px 16px', borderRadius: 20,
-        background: 'rgba(255, 255, 255, 0.78)',
-        backdropFilter: 'blur(24px) saturate(2)',
-        WebkitBackdropFilter: 'blur(24px) saturate(2)',
+        background: '#FFFFFF',
         border: '1px solid var(--border-medium)',
         boxShadow: '0 4px 12px rgba(15,23,42,0.04)',
         marginBottom: 8,
@@ -195,32 +192,24 @@ function PodiumSkeleton() {
 // ─── Main component ────────────────────────────────
 export default function LeaderboardPage() {
   const { user } = useAuth()
-  const [leaders, setLeaders] = useState([])
-  const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('coins') // 'coins' | 'streak'
-  const [myRank, setMyRank] = useState(-1)
 
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
+  const { data: leaders = [], isLoading: loading } = useQuery({
+    queryKey: ['leaderboard', tab],
+    queryFn: async () => {
+      const col = tab === 'coins' ? 'coins' : 'streak_count'
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, coins, streak_count')
+        .order(col, { ascending: false })
+        .limit(50)
+      if (error) throw error
+      return data || []
+    },
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  })
 
-    const col = tab === 'coins' ? 'coins' : 'streak_count'
-    supabase
-      .from('profiles')
-      .select('id, full_name, avatar_url, coins, streak_count')
-      .order(col, { ascending: false })
-      .limit(50)
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (!error && data) {
-          setLeaders(data)
-          if (user) setMyRank(data.findIndex(l => l.id === user.id))
-        }
-        setLoading(false)
-      })
-
-    return () => { cancelled = true }
-  }, [tab, user])
+  const myRank = leaders.findIndex(l => l.id === user?.id)
 
   const top3 = leaders.slice(0, 3)
   const rest = leaders.slice(3)
@@ -262,19 +251,17 @@ export default function LeaderboardPage() {
 
           {/* Floating Icons (Matching pattern: One icon type per page) */}
           {[
-            { top: '15%', right: '10%', size: 48, delay: 0 },
-            { top: '55%', right: '25%', size: 28, delay: 0.4 },
-            { top: '25%', left: '8%', size: 36, delay: 0.2 },
-            { bottom: '25%', left: '20%', size: 22, delay: 0.6 },
+            { top: '15%', right: '10%', size: 48 },
+            { top: '55%', right: '25%', size: 28 },
+            { top: '25%', left: '8%', size: 36 },
+            { bottom: '25%', left: '20%', size: 22 },
           ].map((c, i) => (
-            <motion.div
+            <div
               key={i}
-              animate={{ y: [0, -12, 0], rotate: [0, 8, -8, 0] }}
-              transition={{ repeat: Infinity, duration: 4 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
               style={{ position: 'absolute', opacity: 0.12, pointerEvents: 'none', ...c }}
             >
               <Trophy size={c.size} color="white" />
-            </motion.div>
+            </div>
           ))}
 
           <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
@@ -300,7 +287,7 @@ export default function LeaderboardPage() {
                 {myRank >= 0 && (
                   <div style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(24px) saturate(2)',
+                    background: 'rgba(255, 255, 255, 0.15)',
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: 100, padding: '10px 24px',
                     boxShadow: '0 8px 32px rgba(15,23,42,0.1)',

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Target, Play, BookOpen, Lock, Sparkles, Brain, Lightbulb } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -49,30 +50,21 @@ function HubSkeleton() {
 export default function QuizzesHubPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [courses, setCourses] = useState([])
-  const [lessonsWithQuizzes, setLessonsWithQuizzes] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [unlockedLessonIds, setUnlockedLessonIds] = useState(new Set())
 
-  useEffect(() => {
-    async function fetchMap() {
-      const { data: cData } = await supabase
-        .from('courses').select('id, title').eq('is_published', true).order('created_at', { ascending: false })
-      const { data: lData } = await supabase
-        .from('lessons').select('id, course_id, title, is_free').eq('is_published', true).order('order_index', { ascending: true })
-      const { data: qData } = await supabase
-        .from('quizzes').select('id, lesson_id').not('lesson_id', 'is', null)
-
-      let unlockedSet = new Set()
-      if (user) {
-        const { data: accessData } = await supabase.from('user_access').select('lesson_id').eq('user_id', user.id)
-        if (accessData) unlockedSet = new Set(accessData.map(a => a.lesson_id))
-      }
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['quizzes-hub', user?.id],
+    queryFn: async () => {
+      const [cRes, lRes, qRes, aRes] = await Promise.all([
+        supabase.from('courses').select('id, title').eq('is_published', true).order('created_at', { ascending: false }),
+        supabase.from('lessons').select('id, course_id, title, is_free').eq('is_published', true).order('order_index', { ascending: true }),
+        supabase.from('quizzes').select('id, lesson_id').not('lesson_id', 'is', null),
+        user ? supabase.from('user_access').select('lesson_id').eq('user_id', user.id) : { data: [] }
+      ])
 
       const map = {}
-      if (lData && qData) {
-        lData.forEach(l => {
-          const count = qData.filter(q => q.lesson_id === l.id).length
+      if (lRes.data && qRes.data) {
+        lRes.data.forEach(l => {
+          const count = qRes.data.filter(q => q.lesson_id === l.id).length
           if (count > 0) {
             if (!map[l.course_id]) map[l.course_id] = []
             map[l.course_id].push({ ...l, quizCount: count })
@@ -80,13 +72,15 @@ export default function QuizzesHubPage() {
         })
       }
 
-      setUnlockedLessonIds(unlockedSet)
-      setCourses((cData || []).filter(c => map[c.id] && map[c.id].length > 0))
-      setLessonsWithQuizzes(map)
-      setLoading(false)
-    }
-    fetchMap()
-  }, [user])
+      const courses = (cRes.data || []).filter(c => map[c.id] && map[c.id].length > 0)
+      const unlockedSet = new Set((aRes.data || []).map(a => a.lesson_id))
+
+      return { courses, map, unlockedSet }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+
+  const { courses = [], map: lessonsWithQuizzes = {}, unlockedSet: unlockedLessonIds = new Set() } = data || {}
 
   return (
     <>
@@ -153,19 +147,17 @@ export default function QuizzesHubPage() {
 
               {/* Decorative floating icons */}
               {[
-                { top: '15%', right: '12%', size: 48, delay: 0 },
-                { top: '55%', right: '25%', size: 28, delay: 0.4 },
-                { top: '35%', left: '8%', size: 36, delay: 0.2 },
-                { bottom: '25%', left: '20%', size: 22, delay: 0.6 },
+                { top: '15%', right: '12%', size: 48 },
+                { top: '55%', right: '25%', size: 28 },
+                { top: '35%', left: '8%', size: 36 },
+                { bottom: '25%', left: '20%', size: 22 },
               ].map((c, i) => (
-                <motion.div
+                <div
                   key={i}
-                  animate={{ y: [0, -12, 0], rotate: [0, -5, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 3.5 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
                   style={{ position: 'absolute', opacity: 0.1, pointerEvents: 'none', ...c }}
                 >
                   <Brain size={c.size} color="white" strokeWidth={1.5} />
-                </motion.div>
+                </div>
               ))}
 
               <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
@@ -229,11 +221,8 @@ export default function QuizzesHubPage() {
                               const canAccess = lesson.is_free || unlockedLessonIds.has(lesson.id)
 
                               return (
-                                <motion.div
+                                <div
                                   key={lesson.id}
-                                  {...fadeUp(0.2 + (li * 0.05))}
-                                  whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(15,23,42,0.08)' }}
-                                  whileTap={canAccess ? { scale: 0.98 } : { scale: 0.99 }}
                                   onClick={() => {
                                     if (!canAccess) {
                                       toast.info('Dars qulflangan', { description: 'Bu testni ishlash uchun avval Kurslar bo\'limidan darsni qulfdan chiqaring.' })
@@ -242,18 +231,16 @@ export default function QuizzesHubPage() {
                                     navigate(`/quiz/${lesson.id}`)
                                   }}
                                   style={{
-                                    background: 'rgba(255, 255, 255, 0.65)', // Glassmorphism
-                                    backdropFilter: 'blur(32px) saturate(2)',
-                                    WebkitBackdropFilter: 'blur(32px) saturate(2)',
-                                    border: '1px solid rgba(255, 255, 255, 0.8)',
+                                    background: '#FFFFFF',
+                                    border: '1px solid rgba(15, 23, 42, 0.08)',
                                     padding: '24px',
                                     borderRadius: 32,
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'space-between',
-                                    boxShadow: '0 8px 32px rgba(15,23,42,0.04), inset 0 1px 0 rgba(255,255,255,1)',
+                                    boxShadow: '0 8px 32px rgba(15,23,42,0.04)',
                                     cursor: canAccess ? 'pointer' : 'not-allowed',
-                                    opacity: canAccess ? 1 : 0.75, // Slightly dim if locked
+                                    opacity: canAccess ? 1 : 0.75,
                                     WebkitTapHighlightColor: 'transparent',
                                     transition: 'all 0.3s ease',
                                   }}
@@ -294,7 +281,7 @@ export default function QuizzesHubPage() {
                                       </div>
                                     </div>
                                   </div>
-                                </motion.div>
+                                  </div>
                               )
                             })}
                           </div>
@@ -305,13 +292,13 @@ export default function QuizzesHubPage() {
                 </>
               ) : (
                 /* Empty state */
-                <motion.div {...fadeUp()} style={{ padding: '60px 40px', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(32px)', borderRadius: 32, textAlign: 'center', border: '1px solid white', boxShadow: '0 8px 32px rgba(15,23,42,0.05)' }}>
+                <div style={{ padding: '60px 40px', background: '#FFFFFF', borderRadius: 32, textAlign: 'center', border: '1px solid rgba(15,23,42,0.05)', boxShadow: '0 8px 32px rgba(15,23,42,0.05)' }}>
                   <div style={{ width: 64, height: 64, borderRadius: 20, background: '#EFF6FF', color: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                     <BookOpen size={28} />
                   </div>
                   <h3 className="outfit-font" style={{ margin: '0 0 8px', fontSize: '1.5rem', fontWeight: 800, color: '#0F172A' }}>Testlar tayyorlanmoqda</h3>
                   <p style={{ margin: 0, color: '#64748B', fontSize: '0.95rem' }}>Hozircha darslarga bog'langan testlar yaratilmagan.</p>
-                </motion.div>
+                </div>
               )}
             </div>
           </div>

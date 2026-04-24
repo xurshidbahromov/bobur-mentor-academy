@@ -370,11 +370,8 @@ export default function VideoPlayer({ videoId, lessonId }) {
             <div className="premium-play-bubble" style={{
               position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
               borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.12)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
               color: 'white', transition: 'transform 0.2s',
             }}>
               <Play className="play-icon" fill="white" strokeWidth={0} style={{ marginLeft: '4px' }} />
@@ -386,9 +383,8 @@ export default function VideoPlayer({ videoId, lessonId }) {
         <div
           style={{
             position: 'absolute', zIndex: 20,
-            background: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(20px) saturate(1.5)', WebkitBackdropFilter: 'blur(20px) saturate(1.5)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
+            background: 'rgba(15, 23, 42, 0.95)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             display: 'flex', flexDirection: 'column',
             opacity: showControls ? 1 : 0,
             transform: showControls ? 'translateY(0)' : 'translateY(10px)',

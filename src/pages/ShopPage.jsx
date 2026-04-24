@@ -65,7 +65,7 @@ export default function ShopPage() {
     <>
       <style>{`
         .shop-page-wrapper { width: 100%; padding-bottom: 60px; }
-        .shop-container { max-width: 1040px; margin: 0 auto; }
+        .shop-container { max-width: 1040px; margin: 0 auto; position: relative; z-index: 20; }
         
         .shop-hero {
           background: linear-gradient(145deg, #0F172A 0%, #1E293B 50%, #1a1040 100%);
@@ -153,19 +153,17 @@ export default function ShopPage() {
 
           {/* Floating Coins Animation */}
           {[
-            { top: '15%', right: '10%', size: 48, delay: 0 },
-            { top: '65%', right: '20%', size: 28, delay: 0.4 },
-            { top: '25%', left: '8%', size: 36, delay: 0.2 },
-            { bottom: '20%', left: '25%', size: 22, delay: 0.6 },
+            { top: '15%', right: '10%', size: 48 },
+            { top: '65%', right: '20%', size: 28 },
+            { top: '25%', left: '8%', size: 36 },
+            { bottom: '20%', left: '25%', size: 22 },
           ].map((c, i) => (
-            <motion.div
+            <div
               key={i}
-              animate={{ y: [0, -12, 0], rotate: [0, 5, -5, 0] }}
-              transition={{ repeat: Infinity, duration: 3.5 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
               style={{ position: 'absolute', opacity: 0.15, pointerEvents: 'none', ...c }}
             >
               <Coins size={c.size} color="white" />
-            </motion.div>
+            </div>
           ))}
 
           <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
@@ -186,8 +184,7 @@ export default function ShopPage() {
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 12,
-                background: 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+                background: 'rgba(255,255,255,0.15)',
                 border: '1px solid rgba(255,255,255,0.15)',
                 borderRadius: 100, padding: '8px 24px 8px 10px',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
@@ -234,9 +231,7 @@ export default function ShopPage() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedPkg(pkg)}
                     style={{
-                      background: isPro ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : 'rgba(255, 255, 255, 0.65)',
-                      backdropFilter: 'blur(32px) saturate(2)',
-                      WebkitBackdropFilter: 'blur(32px) saturate(2)',
+                      background: isPro ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : '#FFFFFF',
                       border: isPro ? 'none' : '1px solid rgba(255, 255, 255, 0.8)',
                       borderRadius: 32,
                       padding: isPro ? '36px 28px' : '28px 24px',

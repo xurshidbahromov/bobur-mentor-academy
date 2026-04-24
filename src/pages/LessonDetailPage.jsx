@@ -62,16 +62,10 @@ export default function LessonDetailPage() {
   if (loading || accessLoading) {
     return (
       <div style={{ padding: '24px 16px', maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ height: 38, width: 200, borderRadius: 100, background: '#FFFFFF', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 0%, rgba(241,245,249,0.8) 50%, transparent 100%)', animation: 'shimmer 1.5s infinite linear' }} />
-        </div>
+        <div style={{ height: 38, width: 200, borderRadius: 100, background: '#F1F5F9', marginBottom: 24, animation: 'pulse 1.5s infinite ease-in-out' }} />
         <div className="lesson-grid" style={{ gap: 24 }}>
-          <div style={{ height: 500, borderRadius: 24, background: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 0%, rgba(241,245,249,0.8) 50%, transparent 100%)', animation: 'shimmer 1.5s infinite linear' }} />
-          </div>
-          <div style={{ height: 500, borderRadius: 24, background: '#FFFFFF', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent 0%, rgba(241,245,249,0.8) 50%, transparent 100%)', animation: 'shimmer 1.5s infinite linear' }} />
-          </div>
+          <div style={{ height: 500, borderRadius: 24, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
+          <div style={{ height: 500, borderRadius: 24, background: '#F1F5F9', animation: 'pulse 1.5s infinite ease-in-out' }} />
         </div>
       </div>
     )
@@ -389,9 +383,8 @@ function LockScreen({ lesson, profile, onUnlock, onShop, isUnlocking }) {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: 'relative', zIndex: 10,
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.8)',
+          background: 'rgba(255, 255, 255, 1)',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
           borderRadius: 16, 
           padding: '12px 16px',
           display: 'flex', flexDirection: 'column', alignItems: 'center', 

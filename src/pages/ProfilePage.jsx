@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
@@ -21,72 +22,58 @@ const item = {
 }
 
 export default function ProfilePage() {
-  const { user, profile, loading, signOut, isAdmin } = useAuth()
+  const { user, profile, loading: authLoading, signOut, isAdmin } = useAuth()
   const navigate = useNavigate()
 
-  const [extStats, setExtStats] = useState({
-    lessonsDone: 0,
-    quizAvg: 0,
-    activityDays: [],
-    level: 1,
-    xp: 0
-  })
-
-  // Daily Reward Hook
+  // 1. Daily Reward Hook
   const { canClaim, claimDailyReward } = useStreak()
 
-  // Initialization & Data Fetch
-  useEffect(() => {
-    if (!user) return
+  // 1. Fetch Stats & Activity with React Query
+  const { data: extStats = { lessonsDone: 0, quizAvg: 0, activityDays: [], level: 1, xp: 0 }, isLoading: statsLoading } = useQuery({
+    queryKey: ['profile-stats', user?.id],
+    queryFn: async () => {
+      if (!user) return null
 
-    const fetchStats = async () => {
-      // 1. Lessons completed
-      const { count: lCount } = await supabase
-        .from('lesson_progress')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_completed', true)
-
-      // 2. Quiz performance
-      const { data: qData } = await supabase
-        .from('quiz_attempts')
-        .select('score, total')
-        .eq('user_id', user.id)
+      const [lRes, qRes, qActs, lActs] = await Promise.all([
+        supabase.from('lesson_progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_completed', true),
+        supabase.from('quiz_attempts').select('score, total').eq('user_id', user.id),
+        supabase.from('quiz_attempts').select('created_at').eq('user_id', user.id),
+        supabase.from('lesson_progress').select('updated_at').eq('user_id', user.id)
+      ])
 
       let avg = 0
-      if (qData && qData.length > 0) {
-        const sum = qData.reduce((acc, q) => acc + (q.score / (q.total || 1)), 0)
-        avg = Math.round((sum / qData.length) * 100)
+      if (qRes.data && qRes.data.length > 0) {
+        const sum = qRes.data.reduce((acc, q) => acc + (q.score / (q.total || 1)), 0)
+        avg = Math.round((sum / qRes.data.length) * 100)
       }
 
-      // 3. Activity (last 30 days)
-      const { data: qActs } = await supabase.from('quiz_attempts').select('created_at').eq('user_id', user.id)
-      const { data: lActs } = await supabase.from('lesson_progress').select('updated_at').eq('user_id', user.id)
-
       const dates = new Set()
-
       const toLocalDateStr = (utcString) => {
         const d = new Date(utcString)
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
       }
 
-      qActs?.forEach(d => dates.add(toLocalDateStr(d.created_at)))
-      lActs?.forEach(d => dates.add(toLocalDateStr(d.updated_at)))
+      qActs.data?.forEach(d => dates.add(toLocalDateStr(d.created_at)))
+      lActs.data?.forEach(d => dates.add(toLocalDateStr(d.updated_at)))
 
-      const totalXp = (lCount || 0) * 100 + avg * 5
+      const lCount = lRes.count || 0
+      const totalXp = lCount * 100 + avg * 5
       const currentLevel = Math.floor(totalXp / 1000) + 1
       const xpInCurrentLevel = totalXp % 1000
 
-      setExtStats({
-        lessonsDone: lCount || 0,
+      return {
+        lessonsDone: lCount,
         quizAvg: avg,
         activityDays: Array.from(dates),
         level: currentLevel,
         xp: xpInCurrentLevel
-      })
-    }
-    fetchStats()
-  }, [user])
+      }
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+
+  const loading = authLoading || statsLoading
 
   const handleSignOut = async () => {
     localStorage.removeItem('bma_tg_autologin')
@@ -100,21 +87,14 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '32px 16px' }}>
-        <style>{`@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
-        {[120, 80, 200, 160].map((h, i) => (
-          <div key={i} style={{
-            height: h, borderRadius: 24, background: '#F8FAFC',
-            marginBottom: 14, position: 'relative', overflow: 'hidden'
-          }}>
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%)',
-              backgroundSize: '200% 100%', animation: 'shimmer 2s infinite linear'
-            }} />
-          </div>
-        ))}
-      </div>
+    <div style={{ padding: '32px 16px' }}>
+      {[120, 80, 200, 160].map((h, i) => (
+        <div key={i} className="skeleton-loader" style={{
+          height: h, borderRadius: 24,
+          marginBottom: 14
+        }} />
+      ))}
+    </div>
     )
   }
 
@@ -253,9 +233,7 @@ export default function ProfilePage() {
 
               {/* ── Avatar Hero Card ── */}
               <motion.div variants={item} className="card-glow-hover" style={{
-                background: 'rgba(255, 255, 255, 0.78)',
-                backdropFilter: 'blur(24px) saturate(2)',
-                WebkitBackdropFilter: 'blur(24px) saturate(2)',
+                background: '#FFFFFF',
                 borderRadius: 28,
                 border: '1px solid var(--border-medium)',
                 boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
@@ -285,7 +263,7 @@ export default function ProfilePage() {
                   }}
                 >
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt={name} style={{
+                    <img src={avatarUrl} alt={name} loading="lazy" style={{
                       width: 88, height: 88, borderRadius: '50%', objectFit: 'cover',
                       border: '3px solid white', display: 'block',
                     }} />
@@ -398,9 +376,7 @@ export default function ProfilePage() {
                 }}>
                   {/* Progress Gauge */}
                   <motion.div variants={item} className="card-glow-hover glow-purple" style={{
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    backdropFilter: 'blur(30px) saturate(2)',
-                    WebkitBackdropFilter: 'blur(30px) saturate(2)',
+                    background: '#FFFFFF',
                     borderRadius: 32, padding: '24px',
                     display: 'flex', flexDirection: 'column',
                     border: '1.2px solid var(--border-medium)',
@@ -453,9 +429,7 @@ export default function ProfilePage() {
 
                   {/* Activity Calendar */}
                   <motion.div variants={item} className="card-glow-hover glow-green" style={{
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    backdropFilter: 'blur(30px) saturate(2)',
-                    WebkitBackdropFilter: 'blur(30px) saturate(2)',
+                    background: '#FFFFFF',
                     borderRadius: 32, padding: '24px',
                     border: '1.2px solid var(--border-medium)',
                     boxShadow: '0 12px 40px rgba(15, 23, 42, 0.05)',
@@ -530,9 +504,7 @@ export default function ProfilePage() {
                   <motion.div
                     key={i}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.85)',
-                      backdropFilter: 'blur(24px) saturate(2)',
-                      WebkitBackdropFilter: 'blur(24px) saturate(2)',
+                      background: '#FFFFFF',
                       borderRadius: 28, padding: '24px',
                       display: 'flex', flexDirection: 'column', gap: 20,
                       position: 'relative', overflow: 'hidden',
@@ -581,9 +553,7 @@ export default function ProfilePage() {
               {/* ── Menu Groups ── */}
               {MENU_GROUPS.map((group, gi) => (
                 <motion.div key={gi} className="card-glow-hover" style={{
-                  background: 'rgba(255, 255, 255, 0.85)', borderRadius: 24,
-                  backdropFilter: 'blur(32px) saturate(2)',
-                  WebkitBackdropFilter: 'blur(32px) saturate(2)',
+                  background: '#FFFFFF', borderRadius: 24,
                   border: '1.2px solid var(--border-medium)',
                   overflow: 'hidden', marginBottom: 12,
                   boxShadow: '0 8px 32px rgba(15,23,42,0.05)',

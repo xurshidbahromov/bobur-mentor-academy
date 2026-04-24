@@ -23,9 +23,8 @@ function LessonCard({ lesson, isUnlocked, onNavigate }) {
   }
 
   return (
-    <motion.div
+    <div
       onClick={handleClick}
-      whileTap={{ scale: 0.97 }}
       style={{
         display: 'flex', alignItems: 'center', gap: 14,
         width: '100%', maxWidth: '100%', padding: '16px', borderRadius: 20,
@@ -66,7 +65,7 @@ function LessonCard({ lesson, isUnlocked, onNavigate }) {
           {price} <Coins size={14} fill="#F59E0B" color="#F59E0B" />
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }
 
@@ -114,13 +113,8 @@ export default function CourseDetailPage() {
     return (
       <div style={{ padding: '20px 24px 80px', maxWidth: 1040, margin: '0 auto' }}>
         {/* Back button skeleton */}
-        <div className="skeleton-loader" style={{ height: 36, width: 120, borderRadius: 100, marginBottom: 32 }} />
-        {/* Hero banner skeleton */}
-        <div className="skeleton-loader" style={{ height: 240, borderRadius: 28, marginBottom: 32 }} />
-        {/* Lessons list skeleton */}
-        <div className="skeleton-loader" style={{ height: 24, width: 180, borderRadius: 8, marginBottom: 20 }} />
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="skeleton-loader" style={{ height: 72, borderRadius: 20, marginBottom: 12 }} />
+          <div key={i} className="skeleton-loader" style={{ height: 72, borderRadius: 20, marginBottom: 12, animation: 'pulse 1.5s infinite ease-in-out', background: '#F1F5F9' }} />
         ))}
       </div>
     )

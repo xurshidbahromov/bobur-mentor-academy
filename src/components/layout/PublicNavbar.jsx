@@ -29,10 +29,8 @@ export default function PublicNavbar() {
       top: 0,
       zIndex: 100,
       height: '72px',
-      background: 'rgba(238, 242, 255, 0.85)',
-      backdropFilter: 'var(--blur-glass)',
-      WebkitBackdropFilter: 'var(--blur-glass)',
-      borderBottom: '1px solid var(--border-glass)',
+      background: '#EEF2FF',
+      borderBottom: '1px solid rgba(100,120,255,0.1)',
       display: 'flex',
       alignItems: 'center',
       boxShadow: '0 1px 0 rgba(100,120,255,0.06)'

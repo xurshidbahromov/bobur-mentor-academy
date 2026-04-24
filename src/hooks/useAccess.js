@@ -2,9 +2,9 @@
 // Checks whether the current user can watch a specific lesson.
 // Encapsulates the access decision logic defined in the architecture spec.
 
-import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
  * useAccess — determines if the current user can watch a lesson
@@ -19,37 +19,25 @@ import { useAuth } from '../context/AuthContext'
  */
 export function useAccess(lesson) {
   const { user } = useAuth()
-  const [hasAccessRecord, setHasAccessRecord] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
 
-  const fetchAccess = async () => {
-    if (!lesson) { setLoading(false); return }
+  const { data: hasAccessRecord = false, isLoading: loading, refetch } = useQuery({
+    queryKey: ['access', lesson?.id, user?.id],
+    queryFn: async () => {
+      if (!lesson || !user || lesson.is_free) return false
 
-    // Free lessons — no DB check needed
-    if (lesson.is_free) {
-      setHasAccessRecord(false)   // irrelevant, but reset
-      setLoading(false)
-      return
-    }
+      const { data } = await supabase
+        .from('user_access')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('lesson_id', lesson.id)
+        .maybeSingle()
 
-    // Not logged in — can't have access
-    if (!user) {
-      setHasAccessRecord(false)
-      setLoading(false)
-      return
-    }
-
-    // Check user_access table
-    const { data } = await supabase
-      .from('user_access')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('lesson_id', lesson.id)
-      .maybeSingle()
-
-    setHasAccessRecord(!!data)
-    setLoading(false)
-  }
+      return !!data
+    },
+    enabled: !!lesson && !!user && !lesson.is_free,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
+  })
 
   const unlockWithCoins = async () => {
     if (!user || !lesson) return { success: false, error: 'User or lesson missing' }
@@ -64,17 +52,12 @@ export function useAccess(lesson) {
       return { success: false, error: error.message }
     }
 
-    // Success! Refresh local access state
-    setHasAccessRecord(true)
+    // Success! Invalidate access query to trigger refetch
+    queryClient.invalidateQueries({ queryKey: ['access', lesson.id, user.id] })
     return { success: true }
   }
 
-  useEffect(() => {
-    setLoading(true)
-    fetchAccess()
-  }, [lesson?.id, user?.id])
-
   const canWatch = lesson?.is_free || hasAccessRecord
 
-  return { canWatch, loading, refetch: fetchAccess, unlockWithCoins }
+  return { canWatch, loading, refetch, unlockWithCoins }
 }

@@ -1,8 +1,9 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Layers, ArrowRight } from 'lucide-react'
 import Badge from '../ui/Badge'
 
-export default function CourseCard({ course }) {
+function CourseCard({ course }) {
   if (!course) return null
 
   const subjects = ['Algebra', 'Geometriya', 'Trigonometriya', 'Analiz', 'Arifmetika']
@@ -17,9 +18,7 @@ export default function CourseCard({ course }) {
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
-          background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(20px) saturate(2)',
-          WebkitBackdropFilter: 'blur(20px) saturate(2)',
+          background: '#FFFFFF',
           border: '1.2px solid var(--border-medium)',
           borderRadius: 'var(--radius-card)',
           overflow: 'hidden',
@@ -93,3 +92,5 @@ export default function CourseCard({ course }) {
     </Link>
   )
 }
+
+export default memo(CourseCard)

@@ -71,8 +71,8 @@
   --transition-slow:   380ms cubic-bezier(0.22, 1, 0.36, 1);
   --spring:            0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* --- Blur --- */
-  --blur-glass: blur(24px) saturate(1.8);
+  /* --- Blur (Disabled for performance) --- */
+  --blur-glass: none;
 }
 
 /* === Base Reset === */
@@ -379,4 +379,30 @@ input, textarea {
 @keyframes pulse-dot {
   0%, 100% { transform: scale(1); opacity: 1; }
   50%       { transform: scale(1.4); opacity: 0.7; }
+}
+/* === Deep Performance Optimizations === */
+.leader-content, .profile-page-wrapper {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
+}
+
+.skeleton-loader {
+  animation: pulse-optimized 1.5s infinite ease-in-out;
+  background: #F1F5F9;
+}
+
+@keyframes pulse-optimized {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Hide heavy effects on low-power devices (simple heuristic) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

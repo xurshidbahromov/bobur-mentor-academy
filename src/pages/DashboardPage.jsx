@@ -122,7 +122,7 @@ function CourseCard({ course, index, onNavigate }) {
           flexShrink: 0, marginBottom: 16
         }}>
           {course.icon_url ? (
-            <img src={course.icon_url} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+            <img src={course.icon_url} alt="" loading="lazy" style={{ width: 32, height: 32, objectFit: 'contain' }} />
           ) : (
             <BookOpen size={28} color="#3461FF" />
           )}
@@ -148,7 +148,7 @@ function CourseCard({ course, index, onNavigate }) {
           {commentAvatars.length > 0 && (
             <div style={{ display: 'flex', marginLeft: 4 }}>
               {commentAvatars.map((url, i) => (
-                <img key={i} src={url} alt="avatar" style={{ 
+                <img key={i} src={url} alt="avatar" loading="lazy" style={{ 
                   width: 20, height: 20, borderRadius: '50%', 
                   border: '2px solid white', marginLeft: i > 0 ? -8 : 0,
                   objectFit: 'cover'
@@ -233,7 +233,7 @@ export default function DashboardPage() {
     <>
       <style>{`
         .dash-page-wrapper { width: 100%; padding-bottom: 60px; }
-        .dash-container { max-width: 1040px; margin: 0 auto; }
+        .dash-container { max-width: 1040px; margin: 0 auto; position: relative; z-index: 20; }
         
         .dash-hero {
           background: linear-gradient(135deg, #0F172A 0%, #262364ff 25%, #3c2f52ff 55%, #153283ff 80%, #025886ff 100%);
@@ -253,7 +253,7 @@ export default function DashboardPage() {
           }
         }
         
-        .dash-content { padding: 0 24px; position: relative; z-index: 20; }
+        .dash-content { padding: 0 24px; }
         @media (max-width: 768px) { .dash-content { padding: 0 16px; } }
       `}</style>
       
@@ -317,6 +317,7 @@ export default function DashboardPage() {
                       <img 
                         src={profile?.avatar_url || user?.user_metadata?.avatar_url} 
                         alt="Avatar" 
+                        loading="lazy"
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                       />
                     ) : (
@@ -518,9 +519,7 @@ export default function DashboardPage() {
             >
               <div className="card-glow-hover" style={{
                 display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
-                background: 'rgba(255, 255, 255, 0.78)', 
-                backdropFilter: 'blur(32px) saturate(2)',
-                WebkitBackdropFilter: 'blur(32px) saturate(2)',
+                background: '#F8FAFC',
                 border: '1px solid var(--border-medium)',
                 borderRadius: 24, padding: '20px 24px',
                 boxShadow: '0 12px 32px rgba(15,23,42,0.05)',
@@ -569,17 +568,11 @@ export default function DashboardPage() {
           // Soft Premium Skeleton
           Array.from({ length: 4 }).map((_, i) => (
             <div key={i} style={{
-              height: 180, borderRadius: 28, background: '#FFFFFF',
+              height: 180, borderRadius: 28, background: '#F1F5F9',
               border: '1px solid rgba(15,23,42,0.04)',
-              boxShadow: '0 8px 30px rgba(15,23,42,0.02)',
-              position: 'relative', overflow: 'hidden'
-            }}>
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(90deg, rgba(241,245,249,0) 0%, rgba(241,245,249,0.8) 50%, rgba(241,245,249,0) 100%)',
-                backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite linear'
-              }} />
-            </div>
+              position: 'relative', overflow: 'hidden',
+              animation: 'pulse 1.5s infinite ease-in-out'
+            }} />
           ))
         ) : filtered.length === 0 ? (
           <div style={{ 
@@ -589,11 +582,9 @@ export default function DashboardPage() {
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center',
-            background: 'rgba(255, 255, 255, 0.4)',
-            backdropFilter: 'blur(32px) saturate(2)',
-            WebkitBackdropFilter: 'blur(32px) saturate(2)',
+            background: '#F8FAFC',
             borderRadius: 32,
-            border: '1px solid rgba(255,255,255,0.6)',
+            border: '1px solid rgba(15,23,42,0.05)',
             boxShadow: '0 12px 40px rgba(15,23,42,0.03)'
           }}>
             <div style={{ 
@@ -612,15 +603,9 @@ export default function DashboardPage() {
             </p>
           </div>
         ) : filtered.map((course, i) => (
-          <motion.div
-            key={course.id}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            style={{ height: '100%' }}
-          >
+          <div key={course.id} style={{ height: '100%' }}>
             <CourseCard course={course} index={i} userCoins={coins} onNavigate={navigate} />
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -643,8 +628,7 @@ export default function DashboardPage() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               style={{
                 position: 'fixed', top: 100, right: 16, width: 300,
-                background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px) saturate(2.5)',
-                WebkitBackdropFilter: 'blur(24px) saturate(2.5)',
+                background: '#FFFFFF',
                 border: '1px solid rgba(52,97,255,0.15)', borderRadius: 24, padding: '20px 16px',
                 boxShadow: '0 12px 40px rgba(15,23,42,0.15)', zIndex: 9999,
                 maxHeight: 400, overflowY: 'auto'
@@ -686,9 +670,9 @@ export default function DashboardPage() {
       </AnimatePresence>
 
       <style>{`
-        @keyframes shimmer {
+        @keyframes pulse {
           0%   { opacity: 1; }
-          50%  { opacity: 0.5; }
+          50%  { opacity: 0.6; }
           100% { opacity: 1; }
         }
       `}</style>
