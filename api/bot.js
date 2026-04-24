@@ -84,7 +84,7 @@ if (bot) {
       }
       
       const userId = profile[0].id;
-      const shareText = encodeURIComponent(`Men "Bobur Mentor Academy" da dasturlash o'rganyapman! 🎉\n\nQuyidagi ssilka orqali o'tib, o'qishni boshla va bonuslarga ega bo'l!`);
+      const shareText = encodeURIComponent(`Men "Bobur Mentor Academy" platformasida bilim olyapman! 🎉\n\nQuyidagi ssilka orqali o'tib, o'qishni boshla va bonuslarga ega bo'l!`);
       const referralLink = `https://t.me/share/url?url=${WEB_APP_URL}?startapp=ref_${userId}&text=${shareText}`;
 
       ctx.reply(
