@@ -58,8 +58,8 @@ function CorrectParticles() {
 // ── Option Button ─────────────────────────────────────────────
 function OptionBtn({ opt, value, selected, submitted, correct, onClick }) {
   const isCorrect = submitted && opt === correct
-  const isWrong   = submitted && opt === selected && opt !== correct
-  const controls  = useAnimation()
+  const isWrong = submitted && opt === selected && opt !== correct
+  const controls = useAnimation()
   const hasShaken = useRef(false)
 
   // Shake on wrong answer (once)
@@ -73,9 +73,9 @@ function OptionBtn({ opt, value, selected, submitted, correct, onClick }) {
     }
   }, [isWrong])
 
-  let bg     = 'white'
+  let bg = 'white'
   let border = 'rgba(0,0,0,0.08)'
-  let color  = '#1E293B'
+  let color = '#1E293B'
   let shadow = '0 1px 3px rgba(0,0,0,0.02)'
 
   if (submitted) {
@@ -186,13 +186,13 @@ function FeedbackBanner({ isCorrect }) {
 
 // ── Result Statistics ───────────────────────────────────────
 function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
-  const pct  = Math.round((score / total) * 100)
+  const pct = Math.round((score / total) * 100)
   const mins = Math.floor(timeSpent / 60)
   const secs = timeSpent % 60
 
   // Grade color
   const gradeColor = pct >= 80 ? '#10B981' : pct >= 50 ? '#F59E0B' : '#EF4444'
-  const gradeText  = pct >= 80 ? 'Ajoyib natija!' : pct >= 50 ? 'Yaxshi harakat!' : 'Yana urinib ko\'ring'
+  const gradeText = pct >= 80 ? 'Ajoyib natija!' : pct >= 50 ? 'Yaxshi harakat!' : 'Yana urinib ko\'ring'
 
   const stars = pct >= 80 ? 3 : pct >= 50 ? 2 : 1
 
@@ -203,7 +203,7 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
         style={{
-          background: 'rgba(255, 255, 255, 1)', 
+          background: 'rgba(255, 255, 255, 1)',
           border: '1px solid rgba(0,0,0,0.06)',
           borderRadius: 36, padding: '48px 32px', textAlign: 'center',
           boxShadow: '0 24px 80px rgba(15,23,42,0.08)', marginBottom: 24,
@@ -265,22 +265,22 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
             <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>To'g'ri</p>
           </div>
           <div style={{ padding: '20px', borderRadius: 24, background: '#F8FAFC', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>
-            <p style={{ margin: '0 0 6px', fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{mins}:{String(secs).padStart(2,'0')}</p>
+            <p style={{ margin: '0 0 6px', fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{mins}:{String(secs).padStart(2, '0')}</p>
             <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Vaqt</p>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: 16 }}>
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }}
-            onClick={onBack} 
+            onClick={onBack}
             style={{ flex: 1, padding: '18px', borderRadius: 20, background: '#F1F5F9', color: '#475569', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s' }}
           >
             Darsga qaytish
           </motion.button>
-          <motion.button 
+          <motion.button
             whileHover={{ scale: 1.02, boxShadow: '0 8px 24px rgba(30,41,59,0.2)' }} whileTap={{ scale: 0.96 }}
-            onClick={onRetry} 
+            onClick={onRetry}
             style={{ flex: 1, padding: '18px', borderRadius: 20, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
           >
             <RotateCcw size={18} strokeWidth={2.5} /> Qayta
@@ -296,8 +296,8 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
 // ════════════════════════════════════════════════════════════════
 export default function QuizPage() {
   const { lessonId } = useParams()
-  const navigate     = useNavigate()
-  const { user }     = useAuth()
+  const navigate = useNavigate()
+  const { user } = useAuth()
   const isGeneral = lessonId === 'general'
 
   const { data: quizData, isLoading: loading } = useQuery({
@@ -337,22 +337,22 @@ export default function QuizPage() {
     }
   }, [quizData, isGeneral])
 
-  const [phase,     setPhase]     = useState('intro')
-  const [current,   setCurrent]   = useState(0)
-  const [selected,  setSelected]  = useState(null)
+  const [phase, setPhase] = useState('intro')
+  const [current, setCurrent] = useState(0)
+  const [selected, setSelected] = useState(null)
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const [showParticles, setShowParticles] = useState(false)
-  const [answers,   setAnswers]   = useState({})
-  const [score,     setScore]     = useState(0)
+  const [answers, setAnswers] = useState({})
+  const [score, setScore] = useState(0)
   const [zoomedImage, setZoomedImage] = useState(null)
   const [countChoice, setCountChoice] = useState(10) // General quiz: how many questions
 
-  const [timeLeft,    setTimeLeft]  = useState(SECONDS_PER_QUESTION)
-  const [timeSpent,   setTimeSpent] = useState(0)
-  const timerRef      = useRef(null)
-  const startTimeRef  = useRef(null)
-  const savedRef      = useRef(false)
+  const [timeLeft, setTimeLeft] = useState(SECONDS_PER_QUESTION)
+  const [timeSpent, setTimeSpent] = useState(0)
+  const timerRef = useRef(null)
+  const startTimeRef = useRef(null)
+  const savedRef = useRef(false)
 
   const saveAttempt = useCallback(async (finAnswers, finScore, spent, completed = true) => {
     if (savedRef.current || !user) return

@@ -132,7 +132,7 @@ export default function CourseDetailPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: 100 }}>
       <main style={{ maxWidth: 1040, margin: '0 auto', padding: '40px 24px' }}>
-        
+
         {/* ── Navigator (Pill) ── */}
         <div style={{ display: 'flex', marginBottom: 24 }}>
           <motion.button
@@ -156,17 +156,17 @@ export default function CourseDetailPage() {
         </div>
 
         {/* Hero Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{ 
+          style={{
             background: 'white', borderRadius: 32, padding: '40px 32px',
             boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.03)',
             marginBottom: 32
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-             <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#3461FF', background: 'rgba(52,97,255,0.08)', padding: '4px 12px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.06em' }}>O'quv Rejasi</span>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#3461FF', background: 'rgba(52,97,255,0.08)', padding: '4px 12px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.06em' }}>O'quv Rejasi</span>
           </div>
           <h1 className="outfit-font" style={{ margin: '0 0 16px', fontSize: 'clamp(2rem, 5vw, 2.75rem)', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.04em', lineHeight: 1.15 }}>
             {course.title}
