@@ -105,10 +105,11 @@ export function AuthProvider({ children }) {
       
       // Update profile with latest Telegram data
       await supabase.from('profiles').upsert({
-        id:         signInData.user.id,
-        full_name:  fullName,
-        avatar_url: tgUser.photoUrl || null,
-        updated_at: new Date().toISOString(),
+        id:          signInData.user.id,
+        full_name:   fullName,
+        avatar_url:  tgUser.photoUrl || null,
+        telegram_id: String(tgUser.id),
+        updated_at:  new Date().toISOString(),
       }, { onConflict: 'id' })
       return { data: signInData, error: null }
     }
