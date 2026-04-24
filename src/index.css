@@ -116,6 +116,43 @@ body {
   max-width: 100vw;
 }
 
+/* === Performance: GPU Compositing & Paint Containment === */
+
+/* Prevent scroll chaining in Telegram Mini App (stops bounce lag) */
+html, body {
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+}
+
+/* Animated elements get their own GPU layer — smoother 60fps */
+[data-framer-component-type], /* framer-motion elements */
+.dash-hero, .leader-hero,
+[style*="animation"],
+[style*="transform"] {
+  will-change: transform;
+  transform: translateZ(0); /* Force GPU compositing */
+}
+
+/* Large page content areas — skip paint for off-screen regions */
+.auth-main-content > main {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+/* Card hover animations — only set will-change on hover to save memory */
+.card-glow-hover {
+  will-change: auto;
+}
+.card-glow-hover:hover {
+  will-change: transform, box-shadow;
+}
+
+/* Bottom nav — always composited since it's fixed */
+.bottom-tab-nav, [class*="bottom-nav"] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
 /* CLS Fix: Reserve dimensions for images before they load */
 img, video {
   height: auto;

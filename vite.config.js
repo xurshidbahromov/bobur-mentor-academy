@@ -10,9 +10,39 @@ export default defineConfig({
   ],
   build: {
     chunkSizeWarningLimit: 600,
-    minify: true,
+    // Vite 8 uses Oxc/rolldown by default — fastest minifier, no config needed
     target: 'es2020',
     sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // React core — most stable, longest cache life
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('node_modules/scheduler/')) {
+            return 'react-vendor'
+          }
+          // Framer motion — large animation library, rarely changes
+          if (id.includes('node_modules/framer-motion')) {
+            return 'motion'
+          }
+          // Supabase — auth + DB client
+          if (id.includes('node_modules/@supabase')) {
+            return 'supabase'
+          }
+          // React Query — data fetching
+          if (id.includes('node_modules/@tanstack')) {
+            return 'query'
+          }
+          // React Router
+          if (id.includes('node_modules/react-router') || id.includes('node_modules/react-router-dom')) {
+            return 'router'
+          }
+          // Lucide icons — large icon set
+          if (id.includes('node_modules/lucide-react')) {
+            return 'icons'
+          }
+        }
+      }
+    }
   },
   optimizeDeps: {
     include: [

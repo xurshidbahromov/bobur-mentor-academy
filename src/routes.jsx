@@ -2,7 +2,7 @@
 // Clean route map — two zones, no legacy bloat.
 
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import { Suspense, lazy } from 'react'
 import PageSkeleton from './components/ui/PageSkeleton'
 import AdminProtectedRoute from './components/auth/AdminProtectedRoute'
@@ -41,18 +41,19 @@ const pageVariants = {
 }
 
 const PW = ({ children }) => (
-  <motion.div variants={pageVariants} initial="initial" animate="enter" exit="exit" style={{ width: '100%' }}>
+  <m.div variants={pageVariants} initial="initial" animate="enter" exit="exit" style={{ width: '100%' }}>
     {children}
-  </motion.div>
+  </m.div>
 )
 
 export default function AppRoutes() {
   const location = useLocation()
 
   return (
-    <AnimatePresence mode="wait">
-      <Suspense fallback={<PageSkeleton />}>
-        <Routes location={location} key={location.pathname}>
+    <LazyMotion features={domAnimation} strict>
+      <AnimatePresence mode="wait">
+        <Suspense fallback={<PageSkeleton />}>
+          <Routes location={location} key={location.pathname}>
 
           {/* ── Public ── */}
           <Route path="/" element={<PW><LandingPage /></PW>} />
@@ -83,8 +84,9 @@ export default function AppRoutes() {
 
           {/* ── 404 ── */}
           <Route path="*" element={<PW><NotFoundPage /></PW>} />
-        </Routes>
-      </Suspense>
-    </AnimatePresence>
+          </Routes>
+        </Suspense>
+      </AnimatePresence>
+    </LazyMotion>
   )
 }
