@@ -87,7 +87,7 @@ export default function AdminPayments() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+      <div className="admin-header-row" style={{ marginBottom: 32 }}>
         <div>
           <h1 style={{ margin: '0 0 8px', fontSize: '2rem', fontWeight: 800 }}>To'lov So'rovlari</h1>
           <p style={{ margin: 0, color: '#94A3B8' }}>Foydalanuvchilarning kartaga o'tkazgan to'lovlarini tasdiqlang</p>
@@ -95,7 +95,7 @@ export default function AdminPayments() {
       </div>
 
 
-      <div style={{ background: '#1E293B', borderRadius: 24, padding: 24, border: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="admin-card" style={{ background: '#1E293B', borderRadius: 24, padding: 24, border: '1px solid rgba(255,255,255,0.05)' }}>
         {requests.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <FileText size={48} color="#334155" style={{ marginBottom: 16 }} />

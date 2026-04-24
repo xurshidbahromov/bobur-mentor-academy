@@ -280,7 +280,7 @@ export default function AdminContent() {
             </span>
           ))}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <div className="admin-header-row">
           <div>
             <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 800 }}>
               {view === 'courses' ? 'Dars Boshqaruvi' : view === 'lessons' ? selCourse?.title : selLesson?.title}
@@ -289,7 +289,7 @@ export default function AdminContent() {
               {view === 'courses' ? 'Mavzularni va darslarni boshqaring.' : view === 'lessons' ? `${filteredLessons.length} ta dars` : `${filteredQuizzes.length} ta savol`}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             {view !== 'courses' && (
               <button onClick={goBack} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)', padding: '10px 18px', borderRadius: 12, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
                 <ChevronLeft size={16} /> Orqaga

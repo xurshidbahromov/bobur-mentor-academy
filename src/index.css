@@ -406,3 +406,69 @@ input, textarea {
     scroll-behavior: auto !important;
   }
 }
+
+/* === Admin Panel Responsiveness === */
+.admin-grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .admin-grid-2-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .admin-header-row > div:last-child {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .admin-card {
+    padding: 20px !important;
+    border-radius: 20px !important;
+  }
+
+  .admin-stat-value {
+    font-size: 1.5rem !important;
+  }
+
+  .admin-chart-container {
+    height: 180px !important;
+  }
+
+  .admin-title {
+    font-size: 1.5rem !important;
+  }
+  
+  .admin-subtitle {
+    font-size: 0.8125rem !important;
+  }
+}
+
+.admin-title {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.admin-subtitle {
+  margin: 0;
+  color: #94A3B8;
+  font-size: 0.875rem;
+}

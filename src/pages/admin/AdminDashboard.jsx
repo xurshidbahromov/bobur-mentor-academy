@@ -58,9 +58,9 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{ margin: '0 0 8px', fontSize: '2rem', fontWeight: 800 }}>Xush kelibsiz, Admin!</h1>
-        <p style={{ margin: 0, color: '#94A3B8' }}>Bugun platformadagi asosiy ko'rsatkichlar bilan tanishing.</p>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 className="admin-title">Xush kelibsiz, Admin!</h1>
+        <p className="admin-subtitle">Bugun platformadagi asosiy ko'rsatkichlar bilan tanishing.</p>
       </div>
 
       {/* Stats Grid */}
@@ -95,14 +95,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Revenue Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '24px', marginBottom: '48px' }}>
-        <div style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <div className="admin-grid-2-1" style={{ marginBottom: '48px' }}>
+        <div className="admin-card" style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
+          <div className="admin-header-row" style={{ marginBottom: '32px' }}>
             <div>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0 0 4px' }}>Daromad Dinamikasi</h2>
               <p style={{ margin: 0, color: '#94A3B8', fontSize: '0.875rem' }}>Barcha kurslardan tushgan jami daromad</p>
             </div>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '12px', flexShrink: 0 }}>
               {['weekly', 'monthly', 'yearly'].map(t => (
                 <button
                   key={t}
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Simple SVG Chart */}
-          <div style={{ height: '240px', width: '100%', position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
+          <div className="admin-chart-container" style={{ height: '240px', width: '100%', position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
             {(stats?.[`revenue_${timeframe}`] || []).map((val, i, arr) => {
               const max = Math.max(...arr, 1000)
               const height = (val / max) * 100
@@ -136,13 +136,13 @@ export default function AdminDashboard() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', flex: 1 }}>
+          <div className="admin-card" style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', flex: 1 }}>
             <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(16,185,129,0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
               <TrendingUp size={24} />
             </div>
             <h3 style={{ margin: '0 0 4px', fontSize: '0.875rem', color: '#94A3B8', fontWeight: 500 }}>Jami Tushum</h3>
-            <p style={{ margin: 0, fontSize: '2rem', fontWeight: 800 }}>{stats?.total_revenue?.toLocaleString() || 0} UZS</p>
-            <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: 6, color: '#10B981', fontSize: '0.8125rem', fontWeight: 700 }}>
+            <p className="admin-stat-value" style={{ margin: 0, fontSize: '2rem', fontWeight: 800 }}>{stats?.total_revenue?.toLocaleString() || 0} UZS</p>
+            <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: 6, color: '#10B981', fontSize: '0.8125rem', fontWeight: 700, flexWrap: 'wrap' }}>
               <ArrowUpRight size={16} /> +24% o'tgan oyga nisbatan
             </div>
           </div>
