@@ -24,8 +24,8 @@ const SOCIAL = [
   {
     icon: <InstagramIcon size={22} />,
     label: 'Instagram',
-    handle: '@bobur_mentor',
-    href: 'https://instagram.com/bobur_mentor',
+    handle: '@bobur_tursunaxmedov',
+    href: 'https://instagram.com/bobur_tursunaxmedov?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
     color: '#E1306C',
     bg: 'rgba(225,48,108,0.08)',
   },
