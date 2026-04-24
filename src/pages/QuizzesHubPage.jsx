@@ -147,17 +147,19 @@ export default function QuizzesHubPage() {
 
               {/* Decorative floating icons */}
               {[
-                { top: '15%', right: '12%', size: 48 },
-                { top: '55%', right: '25%', size: 28 },
-                { top: '35%', left: '8%', size: 36 },
-                { bottom: '25%', left: '20%', size: 22 },
+                { top: '15%', right: '12%', size: 48, delay: 0 },
+                { top: '55%', right: '25%', size: 28, delay: 0.4 },
+                { top: '35%', left: '8%', size: 36, delay: 0.2 },
+                { bottom: '25%', left: '20%', size: 22, delay: 0.6 },
               ].map((c, i) => (
-                <div
+                <motion.div
                   key={i}
+                  animate={{ y: [0, -12, 0], rotate: [0, 8, -8, 0] }}
+                  transition={{ repeat: Infinity, duration: 4 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
                   style={{ position: 'absolute', opacity: 0.1, pointerEvents: 'none', ...c }}
                 >
                   <Brain size={c.size} color="white" strokeWidth={1.5} />
-                </div>
+                </motion.div>
               ))}
 
               <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>

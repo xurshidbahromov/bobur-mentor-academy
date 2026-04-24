@@ -63,9 +63,13 @@ function PodiumCard({ user, rank, isSelf, tab }) {
       }}
     >
       {isFirst && (
-        <div style={{ marginBottom: 4 }}>
-          <Crown size={20} color="#F59E0B" style={{ filter: 'drop-shadow(0 2px 8px rgba(245,158,11,0.4))' }} />
-        </div>
+        <motion.div 
+          animate={{ y: [0, -6, 0], rotate: [0, -5, 5, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ position: 'absolute', top: -14, zIndex: 20 }}
+        >
+          <Crown size={28} color="#F59E0B" style={{ filter: 'drop-shadow(0 4px 12px rgba(245,158,11,0.5))' }} />
+        </motion.div>
       )}
       <div style={{
         padding: isFirst ? 4 : 2, borderRadius: '50%',
@@ -223,6 +227,7 @@ export default function LeaderboardPage() {
         .leader-hero {
           background: linear-gradient(145deg, #1E1B4B 0%, #78350F 50%, #D97706 100%);
           position: relative;
+          z-index: 1;
           overflow: hidden;
           padding: 60px 0 160px;
           border-radius: 0 0 40px 40px;
@@ -238,7 +243,7 @@ export default function LeaderboardPage() {
           }
         }
         
-        .leader-content { padding: 0 24px; position: relative; zIndex: 2; }
+        .leader-content { padding: 0 24px; position: relative; z-index: 10; }
         @media (max-width: 768px) { .leader-content { padding: 0 16px; } }
       `}</style>
 
@@ -251,17 +256,19 @@ export default function LeaderboardPage() {
 
           {/* Floating Icons (Matching pattern: One icon type per page) */}
           {[
-            { top: '15%', right: '10%', size: 48 },
-            { top: '55%', right: '25%', size: 28 },
-            { top: '25%', left: '8%', size: 36 },
-            { bottom: '25%', left: '20%', size: 22 },
+            { top: '15%', right: '10%', size: 48, delay: 0 },
+            { top: '55%', right: '25%', size: 28, delay: 0.4 },
+            { top: '25%', left: '8%', size: 36, delay: 0.2 },
+            { bottom: '25%', left: '20%', size: 22, delay: 0.6 },
           ].map((c, i) => (
-            <div
+            <motion.div
               key={i}
+              animate={{ y: [0, -12, 0], rotate: [0, 8, -8, 0] }}
+              transition={{ repeat: Infinity, duration: 4 + i * 0.5, delay: c.delay, ease: 'easeInOut' }}
               style={{ position: 'absolute', opacity: 0.12, pointerEvents: 'none', ...c }}
             >
               <Trophy size={c.size} color="white" />
-            </div>
+            </motion.div>
           ))}
 
           <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
@@ -356,7 +363,7 @@ export default function LeaderboardPage() {
                 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   background: 'transparent',
-                  marginBottom: 20, paddingTop: 20,
+                  marginBottom: 20, paddingTop: 48,
                   display: 'flex', alignItems: 'flex-end', gap: 12, justifyContent: 'center'
                 }}
               >
