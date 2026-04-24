@@ -185,7 +185,7 @@ function FeedbackBanner({ isCorrect }) {
 }
 
 // ── Result Statistics ───────────────────────────────────────
-function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
+function ResultCard({ score, total, timeSpent, onRetry, onBack, onAnalyze }) {
   const pct = Math.round((score / total) * 100)
   const mins = Math.floor(timeSpent / 60)
   const secs = timeSpent % 60
@@ -270,22 +270,29 @@ function ResultCard({ score, total, timeSpent, onRetry, onBack }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <motion.button
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }}
-            onClick={onBack}
-            style={{ flex: 1, padding: '18px', borderRadius: 20, background: '#F1F5F9', color: '#475569', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s' }}
+            onClick={onAnalyze}
+            style={{ padding: '16px', borderRadius: 18, background: '#EFF6FF', color: '#2563EB', border: 'none', fontWeight: 800, fontSize: '0.9375rem', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
-            Darsga qaytish
+            Tahlilni ko'rish
           </motion.button>
           <motion.button
-            whileHover={{ scale: 1.02, boxShadow: '0 8px 24px rgba(30,41,59,0.2)' }} whileTap={{ scale: 0.96 }}
+            whileHover={{ scale: 1.02, boxShadow: '0 8px 24px rgba(30,41,59,0.15)' }} whileTap={{ scale: 0.96 }}
             onClick={onRetry}
-            style={{ flex: 1, padding: '18px', borderRadius: 20, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
+            style={{ padding: '16px', borderRadius: 18, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '0.9375rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
           >
-            <RotateCcw size={18} strokeWidth={2.5} /> Qayta
+            <RotateCcw size={18} strokeWidth={2.5} /> Qayta yechish
           </motion.button>
         </div>
+        <motion.button
+          whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+          onClick={onBack}
+          style={{ width: '100%', padding: '16px', borderRadius: 18, background: '#F1F5F9', color: '#475569', border: 'none', fontWeight: 700, fontSize: '0.9375rem', cursor: 'pointer', transition: 'all 0.2s' }}
+        >
+          Darsga qaytish
+        </motion.button>
       </motion.div>
     </div>
   )
@@ -627,6 +634,7 @@ export default function QuizPage() {
           {phase === 'result' && (
             <ResultCard
               score={score} total={quizzes.length} timeSpent={timeSpent}
+              onAnalyze={() => setPhase('analysis')}
               onRetry={() => {
                 savedRef.current = false
                 // Re-shuffle for general quizzes
@@ -639,6 +647,97 @@ export default function QuizPage() {
               }}
               onBack={() => isGeneral ? navigate('/quizzes') : navigate(`/lessons/${lessonId}`)}
             />
+          )}
+
+          {/* ANALYSIS */}
+          {phase === 'analysis' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                <h2 className="outfit-font" style={{ margin: 0, fontSize: '1.75rem', fontWeight: 900, color: '#0F172A' }}>Test Tahlili</h2>
+                <button
+                  onClick={() => setPhase('result')}
+                  style={{ background: '#F1F5F9', border: 'none', color: '#475569', padding: '10px 16px', borderRadius: 14, fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer' }}
+                >
+                  Orqaga
+                </button>
+              </div>
+
+              {quizzes.map((q, i) => {
+                const userAns = answers[q.id]
+                const isCorrect = userAns === q.correct_option
+                
+                return (
+                  <div key={q.id} style={{ background: 'white', borderRadius: 24, padding: '24px 28px', marginBottom: 20, border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 12px 32px rgba(15,23,42,0.03)' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 20 }}>
+                      <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: 12, background: isCorrect ? '#F0FDF4' : '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {isCorrect ? <CheckCircle2 size={20} color="#22C55E" /> : <XCircle size={20} color="#EF4444" />}
+                      </div>
+                      <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.5, paddingTop: 4 }}>
+                        {i + 1}. {q.question}
+                      </h3>
+                    </div>
+
+                    {q.image_url && (
+                      <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', background: '#F8FAFC' }}>
+                        <img src={q.image_url} alt="Question diagram" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {['a', 'b', 'c', 'd'].filter(o => q[`option_${o}`]).map(opt => {
+                        const isUserAnswer = userAns === opt
+                        const isCorrectAnswer = q.correct_option === opt
+                        
+                        let bg = '#F8FAFC', border = 'transparent', color = '#475569', icon = null
+                        if (isCorrectAnswer) {
+                          bg = '#F0FDF4'; border = '#22C55E'; color = '#166534'
+                          icon = <CheckCircle2 size={18} color="#22C55E" />
+                        } else if (isUserAnswer && !isCorrectAnswer) {
+                          bg = '#FEF2F2'; border = '#EF4444'; color = '#991B1B'
+                          icon = <XCircle size={18} color="#EF4444" />
+                        }
+
+                        return (
+                          <div key={opt} style={{ padding: '14px 18px', borderRadius: 14, background: bg, border: `1.5px solid ${border || 'rgba(0,0,0,0.04)'}`, display: 'flex', alignItems: 'center', gap: 16 }}>
+                            <span style={{ width: 28, height: 28, borderRadius: 8, background: isCorrectAnswer ? 'rgba(34,197,94,0.15)' : isUserAnswer ? 'rgba(239,68,68,0.1)' : 'rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8125rem', color: isCorrectAnswer ? '#166534' : isUserAnswer ? '#991B1B' : '#64748B' }}>
+                              {opt.toUpperCase()}
+                            </span>
+                            <span style={{ flex: 1, fontWeight: 600, fontSize: '0.9375rem', color }}>{q[`option_${opt}`]}</span>
+                            {icon}
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    {q.explanation && (
+                      <div style={{ marginTop: 24, padding: '16px 20px', background: '#EFF6FF', borderRadius: 16, border: '1px solid rgba(37,99,235,0.1)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                          <HelpCircle size={16} color="#2563EB" />
+                          <strong style={{ fontWeight: 800, fontSize: '0.8125rem', color: '#1E40AF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tushuntirish</strong>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '0.9375rem', color: '#1E3A8A', lineHeight: 1.6, fontWeight: 500 }}>
+                          {q.explanation}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+
+              <motion.button
+                whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setPhase('result')}
+                style={{ width: '100%', padding: '18px', borderRadius: 20, background: '#1E293B', color: 'white', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', marginTop: 12, marginBottom: 40 }}
+              >
+                Natijaga qaytish
+              </motion.button>
+            </motion.div>
           )}
 
         </AnimatePresence>

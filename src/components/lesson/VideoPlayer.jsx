@@ -238,15 +238,35 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
     }
   }
 
-  const toggleFullscreen = (e) => {
+  const toggleFullscreen = async (e) => {
     if (e) e.stopPropagation()
     if (!isFullscreen) {
       const el = containerRef.current
-      if (el.requestFullscreen) el.requestFullscreen()
-      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen()
+      try {
+        if (el.requestFullscreen) {
+          await el.requestFullscreen()
+        } else if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen()
+        } else {
+          setIsFullscreen(true)
+        }
+      } catch (err) {
+        // Fallback for Telegram Mini Apps or restricted browsers
+        setIsFullscreen(true)
+      }
     } else {
-      if (document.exitFullscreen) document.exitFullscreen()
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen()
+      try {
+        if (document.exitFullscreen && document.fullscreenElement) {
+          await document.exitFullscreen()
+        } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
+          document.webkitExitFullscreen()
+        } else {
+          setIsFullscreen(false)
+        }
+      } catch (err) {
+        setIsFullscreen(false)
+      }
+      setIsFullscreen(false) // Ensure state resets on fallback
     }
   }
 
@@ -292,9 +312,14 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
       onMouseMove={wakeControls}
       onClick={handleVideoAreaClick}
       style={{
-        position: 'relative', width: '100%',
-        aspectRatio: isFullscreen ? 'auto' : '16/9',
-        height: isFullscreen ? '100%' : 'auto',
+        ...(isFullscreen ? {
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          zIndex: 99999, width: '100vw', height: '100dvh',
+          aspectRatio: 'auto'
+        } : {
+          position: 'relative', width: '100%',
+          aspectRatio: '16/9', height: 'auto'
+        }),
         background: '#000', overflow: 'hidden',
         userSelect: 'none', WebkitTapHighlightColor: 'transparent',
       }}
