@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const bot = BOT_TOKEN ? new Telegraf(BOT_TOKEN) : null;
 const WEB_APP_URL = 'https://bobur-mentor-academy.vercel.app/';
-const ADMIN_TG_ID = '2064830631'; // Admin Telegram ID
+const ADMIN_TG_IDS = ['2064830631', '930430910']; // Admin Telegram IDs
 
 // Initialize Supabase
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -15,18 +15,20 @@ if (bot) {
   // ── 1. /start ──
   bot.start((ctx) => {
     ctx.reply(
-      `Assalomu alaykum, <b>${ctx.from.first_name}</b>! 👋\n\n<b>Bobur Mentor Academy</b> platformasiga xush kelibsiz.\nBilimlaringizni oshirish uchun quyidagi tugmani bosing:`,
+      `Assalomu alaykum, <b>${ctx.from.first_name}</b>! 👋\n\n<b>Bobur Mentor Academy</b> platformasiga xush kelibsiz.\nKerakli bo'limni tanlang:`,
       {
         parse_mode: 'HTML',
-        ...Markup.inlineKeyboard([
-          Markup.button.webApp('🚀 Platformaga kirish', WEB_APP_URL)
-        ])
+        ...Markup.keyboard([
+          [Markup.button.webApp('🚀 Platformaga kirish', WEB_APP_URL)],
+          ['👤 Profil', '🎁 Taklifnoma'],
+          ['ℹ️ Yordam']
+        ]).resize()
       }
     );
   });
 
-  // ── 2. /profile ──
-  bot.command('profile', async (ctx) => {
+  // ── 2. /profile va "👤 Profil" tugmasi ──
+  const handleProfile = async (ctx) => {
     if (!supabase) return ctx.reply("❌ Tizimda xatolik (Baza ulanmagan).");
     const tgId = String(ctx.from.id);
     
@@ -35,7 +37,7 @@ if (bot) {
       
       if (error) throw error;
       if (!profile || profile.length === 0) {
-        return ctx.reply("Siz hali platformaga kirmagansiz yoki profilingiz Telegramingizga ulanmagan. Iltimos, /start orqali platformaga kiring.");
+        return ctx.reply("Siz hali platformaga kirmagansiz yoki profilingiz Telegramingizga ulanmagan. Iltimos, '🚀 Platformaga kirish' tugmasi orqali platformaga kiring.");
       }
 
       const p = profile[0];
@@ -50,10 +52,12 @@ if (bot) {
       console.error(err);
       ctx.reply("❌ Ma'lumotlarni olishda xatolik yuz berdi.");
     }
-  });
+  };
+  bot.command('profile', handleProfile);
+  bot.hears('👤 Profil', handleProfile);
 
-  // ── 3. /referral ──
-  bot.command('referral', async (ctx) => {
+  // ── 3. /referral va "🎁 Taklifnoma" tugmasi ──
+  const handleReferral = async (ctx) => {
     if (!supabase) return;
     const tgId = String(ctx.from.id);
     
@@ -64,7 +68,6 @@ if (bot) {
       }
       
       const userId = profile[0].id;
-      // Telegram format for URL sharing
       const shareText = encodeURIComponent(`Men "Bobur Mentor Academy" da dasturlash o'rganyapman! 🎉\n\nQuyidagi ssilka orqali o'tib, o'qishni boshla va bonuslarga ega bo'l!`);
       const referralLink = `https://t.me/share/url?url=${WEB_APP_URL}?startapp=ref_${userId}&text=${shareText}`;
 
@@ -83,11 +86,13 @@ if (bot) {
       console.error(err);
       ctx.reply("❌ Xatolik yuz berdi.");
     }
-  });
+  };
+  bot.command('referral', handleReferral);
+  bot.hears('🎁 Taklifnoma', handleReferral);
 
   // ── 4. /stats (Faqat Admin) ──
   bot.command('stats', async (ctx) => {
-    if (String(ctx.from.id) !== ADMIN_TG_ID) {
+    if (!ADMIN_TG_IDS.includes(String(ctx.from.id))) {
       return ctx.reply("Sizda bu buyruqni ishlatish huquqi yo'q.");
     }
 
@@ -109,14 +114,16 @@ if (bot) {
     }
   });
 
-  bot.help((ctx) => {
+  const handleHelp = (ctx) => {
     ctx.reply(
-      `Mavjud buyruqlar:\n` +
-      `/profile - Shaxsiy ma'lumotlar va tangalar\n` +
-      `/referral - Do'stlarni taklif qilish\n` +
-      `/help - Yordam xabari`
+      `Mavjud tugmalar va buyruqlar:\n` +
+      `👤 Profil - Shaxsiy ma'lumotlar va tangalar\n` +
+      `🎁 Taklifnoma - Do'stlarni taklif qilish\n` +
+      `/stats - Platforma statistikasi (Faqat Adminlar uchun)`
     );
-  });
+  };
+  bot.help(handleHelp);
+  bot.hears('ℹ️ Yordam', handleHelp);
 }
 
 export default async function handler(req, res) {
