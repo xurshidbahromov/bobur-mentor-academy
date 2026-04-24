@@ -25,12 +25,17 @@ export function useStreak() {
   const [claiming, setClaiming]       = useState(false)
   const [canClaim, setCanClaim]       = useState(false)
   const [justClaimed, setJustClaimed] = useState(false)
-  const checkedRef = useRef(false)
+  
+  // Track which userId we've already processed streak for (not just mounted)
+  const streakCheckedForRef = useRef(null) // stores userId that was processed
 
   // 1. Automatic Streak Management on mount (Visit)
   useEffect(() => {
-    if (!user || !profile || checkedRef.current) return
-    checkedRef.current = true
+    // Must have both user and profile loaded
+    if (!user || !profile) return
+    // Only run once per user session (not per render)
+    if (streakCheckedForRef.current === user.id) return
+    streakCheckedForRef.current = user.id
 
     const today = getUzDate()
     const yesterday = getUzDate(-1)
@@ -40,8 +45,8 @@ export function useStreak() {
     // A. Visual Claim Availability
     setCanClaim(lastClaim !== today)
 
-    // B. Automatic Streak Update
-    if (lastVisit === today) return // Already visited today, no changes needed
+    // B. Automatic Streak Update — skip if already visited today
+    if (lastVisit === today) return
 
     const isConsecutive = lastVisit === yesterday
     const newStreak = isConsecutive ? (profile.streak_count || 0) + 1 : 1
@@ -62,9 +67,12 @@ export function useStreak() {
       .then(({ data }) => {
         if (data && setProfile) setProfile(data)
       })
-  }, [user, profile])
+  }, [user?.id, profile?.id]) // Depend on IDs only — avoids re-running on every profile field update
 
-  useEffect(() => { checkedRef.current = false }, [user])
+  // Reset when user logs out
+  useEffect(() => {
+    if (!user) streakCheckedForRef.current = null
+  }, [user])
 
   // 2. Manual Claim Function (Coins only)
   const claimDailyReward = async () => {
