@@ -105,38 +105,24 @@ body {
   min-height: 100vh;
   /* Basic iOS TMA scrolling improvements */
   -webkit-text-size-adjust: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
 }
 
 #root {
-  overflow-x: clip;
+  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
 }
 
 /* === Performance: GPU Compositing & Paint Containment === */
 
-/* Prevent scroll chaining in Telegram Mini App (stops bounce lag) */
-html, body {
-  overscroll-behavior: none;
-  overscroll-behavior-y: none;
-}
-
 /* Animated elements get their own GPU layer — smoother 60fps */
 [data-framer-component-type], /* framer-motion elements */
-.dash-hero, .leader-hero,
-[style*="animation"],
-[style*="transform"] {
+.dash-hero, .leader-hero, .shop-hero {
   will-change: transform;
   transform: translateZ(0); /* Force GPU compositing */
-}
-
-/* Large page content areas — skip paint for off-screen regions */
-.auth-main-content > main {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 600px;
 }
 
 /* Card hover animations — only set will-change on hover to save memory */

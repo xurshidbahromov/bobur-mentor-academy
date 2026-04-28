@@ -94,7 +94,7 @@ export default function ShopPage() {
           font-size: clamp(2rem, 6vw, 3rem);
         }
 
-        .shop-content { padding: 0 24px; position: relative; zIndex: 2; }
+        .shop-content { padding: 0 24px; position: relative; z-index: 2; }
         @media (max-width: 768px) { .shop-content { padding: 0 16px; } }
 
         .packages-grid {

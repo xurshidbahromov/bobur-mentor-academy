@@ -184,7 +184,7 @@ export default function ProfilePage() {
           font-size: clamp(2rem, 6vw, 3rem);
         }
 
-        .profile-content { padding: 0 24px; position: relative; zIndex: 2; }
+        .profile-content { padding: 0 24px; position: relative; z-index: 2; }
         @media (max-width: 768px) { .profile-content { padding: 0 16px; } }
       `}</style>
 

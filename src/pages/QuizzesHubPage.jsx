@@ -115,7 +115,7 @@ export default function QuizzesHubPage() {
           font-size: clamp(2.5rem, 7vw, 3.5rem);
         }
 
-        .hub-content { padding: 0 24px; position: relative; zIndex: 2; }
+        .hub-content { padding: 0 24px; position: relative; z-index: 2; }
         @media (max-width: 768px) { .hub-content { padding: 0 16px; } }
 
         .lessons-grid {
