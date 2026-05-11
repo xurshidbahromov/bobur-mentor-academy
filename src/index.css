@@ -428,17 +428,25 @@ textarea {
   }
 }
 
-/* === NProgress Customization === */
+/* === NProgress Customization — Minimalist Diamond Loader === */
 #nprogress .bar {
   background: #FFFFFF !important;
-  height: 4px !important;
-  border-radius: 0 100px 100px 0 !important;
+  height: 3px !important;
   z-index: 999999 !important;
-  box-shadow: none !important;
+  border-radius: 0 100px 100px 0 !important;
+  /* Soft blue glow makes the white bar visible even on white backgrounds */
+  box-shadow: 0 0 8px rgba(52, 97, 255, 0.4), 0 0 2px rgba(52, 97, 255, 0.2) !important;
 }
 
 #nprogress .peg {
-  display: none !important;
+  display: block !important;
+  position: absolute !important;
+  right: 0px !important;
+  width: 100px !important;
+  height: 100% !important;
+  box-shadow: 0 0 12px #3461FF, 0 0 4px #3461FF !important;
+  opacity: 0.8 !important;
+  transform: rotate(3deg) translate(0px, -4px) !important;
 }
 
 /* High-end Text Gradients */
