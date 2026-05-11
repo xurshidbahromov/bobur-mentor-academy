@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Edit2, Trash2, Search, Clock, Target, Loader2, Image as ImageIcon } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
+import MathRenderer from '../../components/ui/MathRenderer'
+import MathTextInput from '../../components/ui/MathTextInput'
 
 export default function AdminGeneralQuizzes() {
   const [quizzes, setQuizzes] = useState([])
@@ -118,14 +120,14 @@ export default function AdminGeneralQuizzes() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 800 }}>Umumiy Testlar (General Quizzes)</h1>
+          <h1 style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800 }}>Umumiy Testlar (General Quizzes)</h1>
           <p style={{ margin: '4px 0 0', color: '#94A3B8' }}>Darslarga bog'liq bo'lmagan, aralash tushuvchi testlar bazasi.</p>
         </div>
         <button 
           onClick={() => openModal()}
-          style={{ background: '#10B981', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+          style={{ background: '#10B981', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}
         >
           <Plus size={20} /> Yangi Umumiy Savol
         </button>
@@ -140,84 +142,51 @@ export default function AdminGeneralQuizzes() {
       </div>
 
       {loading ? (
-        <div style={{ background: '#1E293B', borderRadius: 20, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94A3B8', fontSize: '0.875rem' }}>
-                <th style={{ padding: '20px' }}>Savol</th>
-                <th style={{ padding: '20px' }}>Vaqti</th>
-                <th style={{ padding: '20px', textAlign: 'right' }}>Amallar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[1,2,3,4,5].map(i => (
-                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                  <td style={{ padding: '16px 20px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div className="skeleton-loader" style={{ width: 36, height: 36, borderRadius: 10, background: '#334155', flexShrink: 0 }} />
-                      <div>
-                        <div className="skeleton-loader" style={{ height: 15, width: 260, borderRadius: 6, marginBottom: 8, background: '#334155' }} />
-                        <div className="skeleton-loader" style={{ height: 12, width: 100, borderRadius: 6, background: '#334155' }} />
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ padding: '16px 20px' }}>
-                    <div className="skeleton-loader" style={{ height: 16, width: 50, borderRadius: 6, background: '#334155' }} />
-                  </td>
-                  <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                      <div className="skeleton-loader" style={{ width: 34, height: 34, borderRadius: 8, background: '#334155' }} />
-                      <div className="skeleton-loader" style={{ width: 34, height: 34, borderRadius: 8, background: '#334155' }} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {[1,2,3,4,5].map(i => (
+            <div key={i} style={{ background: '#1E293B', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div className="skeleton-loader" style={{ width: 36, height: 36, borderRadius: 10, background: '#334155', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div className="skeleton-loader" style={{ height: 14, width: '60%', borderRadius: 6, marginBottom: 8, background: '#334155' }} />
+                <div className="skeleton-loader" style={{ height: 12, width: '30%', borderRadius: 6, background: '#334155' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div className="skeleton-loader" style={{ width: 34, height: 34, borderRadius: 8, background: '#334155' }} />
+                <div className="skeleton-loader" style={{ width: 34, height: 34, borderRadius: 8, background: '#334155' }} />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
-        <div style={{ background: '#1E293B', borderRadius: 20, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94A3B8', fontSize: '0.875rem' }}>
-                <th style={{ padding: '20px' }}>Savol</th>
-                <th style={{ padding: '20px' }}>Vaqti</th>
-                <th style={{ padding: '20px', textAlign: 'right' }}>Amallar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredQuizzes.length === 0 ? (
-                <tr><td colSpan="3" style={{ padding: 40, textAlign: 'center', color: '#64748B' }}>Hozircha testlar yo'q yoki qidiruvga topilmadi.</td></tr>
-              ) : (
-                filteredQuizzes.map(quiz => (
-                  <tr key={quiz.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                    <td style={{ padding: '20px' }}>
-                      <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Target size={18} />
-                        </div>
-                        <div>
-                          <p style={{ margin: '0 0 4px', fontSize: '1rem', color: '#F8FAFC' }}>{quiz.question}</p>
-                          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B' }}>To'g'ri javob: <span style={{ textTransform: 'uppercase', color: '#10B981', fontWeight: 800 }}>{quiz.correct_option}</span></p>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '20px', color: '#F59E0B', fontWeight: 700, fontSize: '0.9375rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={16} /> {quiz.time_limit}s</div>
-                    </td>
-                    <td style={{ padding: '20px', textAlign: 'right' }}>
-                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                          <button onClick={() => openModal(quiz)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#3461FF', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}><Edit2 size={16} /></button>
-                          <button onClick={() => deleteQuiz(quiz.id)} style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: '#EF4444', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}><Trash2 size={16} /></button>
-                       </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {filteredQuizzes.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 40, background: '#1E293B', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.07)', color: '#64748B' }}>
+              Hozircha testlar yo'q yoki qidiruvga topilmadi.
+            </div>
+          ) : (
+            filteredQuizzes.map(quiz => (
+              <div key={quiz.id} style={{ background: '#1E293B', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(16,185,129,0.1)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Target size={18} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.9375rem', color: '#F8FAFC', fontWeight: 600, wordBreak: 'break-word', lineHeight: 1.5 }}>
+                    <MathRenderer math={quiz.question} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8125rem', color: '#64748B' }}>To'g'ri javob: <span style={{ textTransform: 'uppercase', color: '#10B981', fontWeight: 800 }}>{quiz.correct_option}</span></span>
+                    <span style={{ fontSize: '0.8125rem', color: '#F59E0B', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Clock size={12} /> {quiz.time_limit}s
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  <button onClick={() => openModal(quiz)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#3461FF', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}><Edit2 size={16} /></button>
+                  <button onClick={() => deleteQuiz(quiz.id)} style={{ background: 'rgba(239,68,68,0.1)', border: 'none', color: '#EF4444', padding: '8px', borderRadius: '8px', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -231,18 +200,34 @@ export default function AdminGeneralQuizzes() {
               </h2>
               
               <form onSubmit={saveQuiz} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <textarea required placeholder="Savol matni" value={quizForm.question} onChange={e => setQuizForm({...quizForm, question: e.target.value})} rows={2} style={modalInputStyle} />
+                <div>
+                  <label style={{ fontSize: '0.875rem', marginBottom: 8, display: 'block', color: '#94A3B8' }}>Savol matni</label>
+                  <MathTextInput required rows={2} placeholder="Savol matni (formula uchun π tugmasini bosing)" value={quizForm.question} onChange={val => setQuizForm({...quizForm, question: val})} />
+                </div>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
                   <div>
-                    <label style={{ fontSize: '0.75rem', color: '#94A3B8' }}>Vaqti (sekund)</label>
+                    <label style={{ fontSize: '0.75rem', color: '#94A3B8', marginBottom: 4, display: 'block' }}>Vaqti (sekund)</label>
                     <input required type="number" placeholder="Vaqti (sekund)" value={quizForm.time_limit} onChange={e => setQuizForm({...quizForm, time_limit: parseInt(e.target.value)})} style={modalInputStyle} />
                   </div>
                   <div />
-                  <input required placeholder="Variant A" value={quizForm.option_a} onChange={e => setQuizForm({...quizForm, option_a: e.target.value})} style={modalInputStyle} />
-                  <input required placeholder="Variant B" value={quizForm.option_b} onChange={e => setQuizForm({...quizForm, option_b: e.target.value})} style={modalInputStyle} />
-                  <input placeholder="Variant C (ixtiyoriy)" value={quizForm.option_c} onChange={e => setQuizForm({...quizForm, option_c: e.target.value})} style={modalInputStyle} />
-                  <input placeholder="Variant D (ixtiyoriy)" value={quizForm.option_d} onChange={e => setQuizForm({...quizForm, option_d: e.target.value})} style={modalInputStyle} />
+
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: '#94A3B8', marginBottom: 4, display: 'block' }}>Variant A</label>
+                    <MathTextInput required placeholder="Variant A" value={quizForm.option_a} onChange={val => setQuizForm({...quizForm, option_a: val})} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: '#94A3B8', marginBottom: 4, display: 'block' }}>Variant B</label>
+                    <MathTextInput required placeholder="Variant B" value={quizForm.option_b} onChange={val => setQuizForm({...quizForm, option_b: val})} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: '#94A3B8', marginBottom: 4, display: 'block' }}>Variant C (ixtiyoriy)</label>
+                    <MathTextInput placeholder="Variant C" value={quizForm.option_c} onChange={val => setQuizForm({...quizForm, option_c: val})} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: '#94A3B8', marginBottom: 4, display: 'block' }}>Variant D (ixtiyoriy)</label>
+                    <MathTextInput placeholder="Variant D" value={quizForm.option_d} onChange={val => setQuizForm({...quizForm, option_d: val})} />
+                  </div>
                 </div>
 
                 <div>

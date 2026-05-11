@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTelegram } from '../context/TelegramProvider'
 import { supabase } from '../lib/supabase'
 import { useQuery } from '@tanstack/react-query'
-import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target, Info, Sparkles, GraduationCap } from 'lucide-react'
+import { Coins, Lock, Play, ChevronDown, BookOpen, CheckCircle2, Flame, Search, AlertCircle, MessageCircle, ArrowRight, Gift, Bell, X, Target, Info, Sparkles, GraduationCap, HelpCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUnreadNotifications } from '../context/useUnreadNotifications'
 import { useStreak } from '../hooks/useStreak'
@@ -18,23 +18,8 @@ import { useStreak } from '../hooks/useStreak'
 // Sub-components
 // ─────────────────────────────────────────────────────
 
-function CoinBadge({ coins }) {
-  return (
-    <Link to="/shop" style={{ textDecoration: 'none' }}>
-      <div style={{
-        display: 'inline-flex', alignItems: 'center', gap: 6,
-        background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-        color: 'white', padding: '6px 14px', borderRadius: 100,
-        fontWeight: 700, fontSize: '0.9375rem',
-        boxShadow: '0 4px 14px rgba(245,158,11,0.3)',
-        cursor: 'pointer',
-      }}>
-        <Coins size={16} />
-        <span>{coins ?? 0}</span>
-      </div>
-    </Link>
-  )
-}
+
+
 
 function CourseCard({ course, index, onNavigate }) {
   const { user } = useAuth()
@@ -88,20 +73,16 @@ function CourseCard({ course, index, onNavigate }) {
 
   return (
     <motion.button
-      className={`card-glow-hover ${glowClass}`}
+      className={`glass-card-premium card-glow-hover ${glowClass}`}
       whileTap={{ scale: 0.96 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       onClick={() => onNavigate(`/courses/${course.id}`)}
       style={{
         position: 'relative', width: '100%', height: '100%',
-        background: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-        border: '1px solid rgba(0, 0, 0, 0.04)',
         cursor: 'pointer',
-        padding: '24px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
-        display: 'flex', flexDirection: 'column', gap: 16,
-        borderRadius: 32, boxShadow: '0 12px 40px rgba(0,0,0,0.06)',
+        padding: '24px 20px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
+        display: 'flex', flexDirection: 'column', gap: 14,
         overflow: 'hidden'
       }}
     >
@@ -116,57 +97,61 @@ function CourseCard({ course, index, onNavigate }) {
       {/* Top icon and title */}
       <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 16,
+          width: 48, height: 48, borderRadius: 14,
           background: 'rgba(52, 97, 255, 0.08)', border: '1px solid rgba(52, 97, 255, 0.1)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0, marginBottom: 16
+          flexShrink: 0, marginBottom: 12
         }}>
           {course.icon_url ? (
-            <img src={course.icon_url} alt="" loading="lazy" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+            <img src={course.icon_url} alt="" loading="lazy" style={{ width: 28, height: 28, objectFit: 'contain' }} />
           ) : (
-            <BookOpen size={28} color="#3461FF" />
+            <BookOpen size={24} color="#3461FF" />
           )}
         </div>
 
-        <h3 className="outfit-font" style={{ margin: '0 0 6px', fontSize: '1.375rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+        <h3 className="outfit-font" style={{ margin: '0 0 4px', fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
           {course.title}
         </h3>
         {course.description && (
-          <p style={{ margin: 0, color: '#64748B', fontSize: '0.9375rem', lineHeight: 1.5, fontWeight: 500 }}>
+          <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', lineHeight: 1.5, fontWeight: 500 }}>
             {course.description}
           </p>
         )}
       </div>
 
       {/* Bottom actions (Left: comments, Right: Progress Arrow) */}
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingTop: 16, borderTop: '1px solid rgba(15,23,42,0.06)' }}>
+      <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+        {/* Rounded Separator Line */}
+        <div style={{ height: 2, width: '100%', background: 'rgba(255, 255, 255, 0.47)', borderRadius: 100, marginBottom: 16 }} />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94A3B8' }}>
-          <MessageCircle size={18} />
-          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{commentCount} izoh</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94A3B8' }}>
+            <MessageCircle size={18} />
+            <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{commentCount} izoh</span>
 
-          {commentAvatars.length > 0 && (
-            <div style={{ display: 'flex', marginLeft: 4 }}>
-              {commentAvatars.map((url, i) => (
-                <img key={i} src={url} alt="avatar" loading="lazy" style={{
-                  width: 20, height: 20, borderRadius: '50%',
-                  border: '2px solid white', marginLeft: i > 0 ? -8 : 0,
-                  objectFit: 'cover'
-                }} />
-              ))}
-            </div>
-          )}
-        </div>
+            {commentAvatars.length > 0 && (
+              <div style={{ display: 'flex', marginLeft: 4 }}>
+                {commentAvatars.map((url, i) => (
+                  <img key={i} src={url} alt="avatar" loading="lazy" style={{
+                    width: 20, height: 20, borderRadius: '50%',
+                    border: '2px solid white', marginLeft: i > 0 ? -8 : 0,
+                    objectFit: 'cover'
+                  }} />
+                ))}
+              </div>
+            )}
+          </div>
 
-        <div style={{ position: 'relative', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#3461FF', borderRadius: '50%', boxShadow: '0 4px 12px rgba(52,97,255,0.2)' }}>
-          <svg width="44" height="44" viewBox="0 0 44 44" style={{ transform: 'rotate(-90deg)', position: 'absolute', inset: 0 }}>
-            <circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
-            <circle cx="22" cy="22" r="20" fill="none" stroke="white" strokeWidth="2.5"
-              strokeDasharray={`${2 * Math.PI * 20 * (progressPct / 100)} ${2 * Math.PI * 20}`} strokeLinecap="round"
+        <div style={{ position: 'relative', width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#3461FF', borderRadius: '50%', boxShadow: '0 4px 12px rgba(52,97,255,0.2)' }}>
+          <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: 'rotate(-90deg)', position: 'absolute', inset: 0 }}>
+            <circle cx="19" cy="19" r="17" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
+            <circle cx="19" cy="19" r="17" fill="none" stroke="white" strokeWidth="2.5"
+              strokeDasharray={`${2 * Math.PI * 17 * (progressPct / 100)} ${2 * Math.PI * 17}`} strokeLinecap="round"
               style={{ transition: 'stroke-dasharray 0.5s ease' }}
             />
           </svg>
-          <ArrowRight size={20} color="white" />
+          <ArrowRight size={18} color="white" />
+        </div>
         </div>
       </div>
     </motion.button>
@@ -201,6 +186,24 @@ export default function DashboardPage() {
     }
   })
 
+  // Fetch Daily Quiz for banner
+  const { data: dailyData } = useQuery({
+    queryKey: ['dashboard-daily-quiz', user?.id],
+    queryFn: async () => {
+      const d = new Date()
+      const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      const { data: qData, error: qErr } = await supabase.from('daily_quizzes').select('*').eq('is_active', true).order('quiz_date', { ascending: false }).limit(1)
+      const quiz = qData?.[0] || null
+      let attempt = null;
+      if (user && quiz) {
+        const { data: attData } = await supabase.from('daily_quiz_attempts').select('id, score, total_questions').eq('user_id', user.id).eq('daily_quiz_id', quiz.id).limit(1)
+        attempt = attData?.[0] || null
+      }
+      return { quiz, attempt }
+    },
+    staleTime: 0
+  })
+
   useEffect(() => {
     if (isNotificationsOpen && user?.id) {
       supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(6)
@@ -221,6 +224,7 @@ export default function DashboardPage() {
   }
 
   const coins = profile?.coins ?? 0
+  const xp = profile?.rating_score ?? 0
   const name = profile?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'O\'quvchi'
   const firstName = name.split(' ')[0]
   const streak = profile?.streak_count ?? 0
@@ -234,27 +238,73 @@ export default function DashboardPage() {
       <style>{`
         .dash-page-wrapper { width: 100%; padding-bottom: 60px; }
         .dash-container { max-width: 1040px; margin: 0 auto; position: relative; z-index: 20; }
-        
         .dash-hero {
           background: linear-gradient(135deg, #0F172A 0%, #262364ff 25%, #3c2f52ff 55%, #153283ff 80%, #025886ff 100%);
-          position: relative;
-          z-index: 10;
-          padding: 48px 0 100px;
+          position: relative; z-index: 10;
+          padding: 40px 0 100px;
           border-radius: 0 0 40px 40px;
           margin-bottom: -60px;
           box-shadow: 0 20px 40px rgba(13,13,43,0.25);
         }
-        
-        @media (max-width: 768px) {
-          .dash-hero {
-            padding: 32px 0 90px;
-            border-radius: 0 0 32px 32px;
-            margin-bottom: -50px;
-          }
+        .dash-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; padding-bottom:32px; border-bottom:1px solid rgba(255,255,255,0.08); }
+        .dash-topbar-left { display:flex; align-items:center; gap:14px; }
+        .dash-topbar-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        .dash-avatar-ring {
+          width:52px; height:52px; border-radius:50%; background:white;
+          flex-shrink:0; padding:3px; position:relative;
+          box-shadow: 0 4px 16px rgba(15,23,42,0.2);
+          display:flex; align-items:center; justify-content:center;
         }
-        
-        .dash-content { padding: 0 24px; }
-        @media (max-width: 768px) { .dash-content { padding: 0 16px; } }
+        .dash-avatar-inner {
+          width:100%; height:100%; border-radius:50%; overflow:hidden;
+          background:#F1F5F9; display:flex; align-items:center;
+          justify-content:center; color:#3461FF; font-weight:800; font-size:1.375rem;
+        }
+        .dash-greeting p { margin:0; font-size:0.875rem; font-weight:700; color:rgba(255,255,255,0.6); }
+        .dash-greeting h2 { margin:0; font-size:1.75rem; font-weight:900; color:white; letter-spacing:-0.03em; line-height:1; }
+        .dash-stats-pill {
+          display:inline-flex; align-items:center;
+          background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.22);
+          border-radius:100px; padding:3px; gap:3px;
+          backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+        }
+        .dash-stat-chip {
+          display:flex; align-items:center; gap:5px;
+          padding:5px 12px; border-radius:100px;
+          font-size:0.875rem; font-weight:800; color:white;
+          text-decoration:none; white-space:nowrap;
+        }
+        .dash-stat-xp  { background:linear-gradient(135deg,#3461FF,#254EDC); box-shadow:0 3px 10px rgba(52,97,255,0.4); }
+        .dash-stat-coin{ background:linear-gradient(135deg,#F59E0B,#D97706); box-shadow:0 3px 10px rgba(245,158,11,0.4); }
+        .dash-bell {
+          width:42px; height:42px; border-radius:50%; position:relative;
+          background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+          display:flex; align-items:center; justify-content:center;
+          cursor:pointer; -webkit-tap-highlight-color:transparent;
+        }
+        .dash-section-bar { display:flex; align-items:center; justify-content:space-between; position:relative; height:48px; margin-bottom:24px; }
+        .dash-section-title { margin:0; font-weight:900; color:white; letter-spacing:-0.04em; line-height:1.05; font-size:clamp(2.25rem,7vw,3.75rem); }
+        .dash-quick-row { display:flex; gap:10px; margin-top:18px; overflow-x:auto; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
+        .dash-quick-row::-webkit-scrollbar { display:none; }
+        .dash-quick-chip {
+          display:inline-flex; align-items:center; gap:8px; flex-shrink:0;
+          background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+          border-radius:100px; padding:9px 18px 9px 12px;
+          cursor:pointer; color:white; white-space:nowrap;
+        }
+        @media (max-width: 640px) {
+          .dash-hero { padding:18px 0 74px; border-radius:0 0 26px 26px; margin-bottom:-38px; }
+          .dash-topbar { margin-bottom:24px; padding-bottom:24px; }
+          .dash-avatar-ring { width:40px; height:40px; padding:2px; }
+          .dash-avatar-inner { font-size:1.1rem; }
+          .dash-greeting h2 { font-size:1.125rem; }
+          .dash-stat-chip { padding:4px 8px; font-size:0.6875rem; gap:3px; }
+          .dash-stats-pill { padding:2px; gap:2px; }
+          .dash-bell { width:36px; height:36px; }
+          .dash-quick-chip { padding:7px 12px 7px 9px; font-size:0.8125rem; }
+        }
+        .dash-content { padding:0 24px; }
+        @media (max-width: 768px) { .dash-content { padding:0 16px; } }
       `}</style>
 
       <div className="dash-page-wrapper">
@@ -286,81 +336,49 @@ export default function DashboardPage() {
 
           <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
 
-            {/* ── Header ── */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 24 }}>
+            {/* ── Topbar ── */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
               <AnimatePresence>
                 {!isSearchOpen && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    animate={{ opacity: 1, height: 'auto', marginBottom: 28 }}
-                    exit={{ opacity: 0, height: 0, marginBottom: 0, overflow: 'hidden' }}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                    className="dash-topbar"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      {/* Avatar with Glassy Ring */}
-                      <div style={{
-                        width: 64, height: 64, borderRadius: '50%',
-                        background: 'white', flexShrink: 0,
-                        padding: 4,
-                        boxShadow: '0 8px 24px rgba(15,23,42,0.06)',
-                        border: '1px solid var(--border-soft)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        position: 'relative'
-                      }}>
-                        <div style={{
-                          width: '100%', height: '100%', borderRadius: '50%',
-                          overflow: 'hidden', background: '#F1F5F9',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: 'var(--color-primary)', fontWeight: 800, fontSize: '1.75rem'
-                        }}>
-                          {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
-                            <img
-                              src={profile?.avatar_url || user?.user_metadata?.avatar_url}
-                              alt="Avatar"
-                              loading="lazy"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            />
-                          ) : (
-                            firstName[0]?.toUpperCase()
-                          )}
+                    {/* LEFT */}
+                    <div className="dash-topbar-left">
+                      <Link to="/profile" style={{ textDecoration: 'none' }}>
+                        <div className="dash-avatar-ring">
+                          <div className="dash-avatar-inner">
+                            {profile?.avatar_url || user?.user_metadata?.avatar_url
+                              ? <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="avatar" loading="lazy" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                              : firstName[0]?.toUpperCase()
+                            }
+                          </div>
+                          <div style={{ position:'absolute', bottom:1, right:1, width:12, height:12, borderRadius:'50%', background:'#10B981', border:'2.5px solid white' }} />
                         </div>
-                        {/* Active dot */}
-                        <div style={{ position: 'absolute', bottom: 2, right: 2, width: 14, height: 14, borderRadius: '50%', background: '#10B981', border: '3px solid white' }} />
-                      </div>
-
-                      {/* Greeting */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <span style={{
-                          margin: 0, fontSize: '0.8125rem', fontWeight: 700,
-                          color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.01em'
-                        }}>
-                          Assalomu alaykum,
-                        </span>
-                        <h2 className="outfit-font" style={{
-                          margin: 0, fontSize: 'min(7vw, 1.75rem)', color: 'white',
-                          fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1
-                        }}>
-                          {firstName}
-                        </h2>
+                      </Link>
+                      <div className="dash-greeting">
+                        <p>Assalomu alaykum,</p>
+                        <h2 className="outfit-font">{firstName}</h2>
                       </div>
                     </div>
 
-                    {/* Right Actions */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <CoinBadge coins={coins} />
-
-                      <div style={{ position: 'relative' }}>
-                        <button
-                          onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                          style={{ position: 'relative', width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', backdropFilter: 'blur(8px)' }}
-                        >
-                          <div className={unreadCount > 0 ? 'bell-ring' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Bell size={20} color="white" />
+                    {/* RIGHT */}
+                    <div className="dash-topbar-right">
+                      <div className="dash-stats-pill">
+                        <Link to="/leaderboard" className="dash-stat-chip dash-stat-xp">
+                          <Sparkles size={13} /> {xp ?? 0}
+                        </Link>
+                        <Link to="/shop" className="dash-stat-chip dash-stat-coin">
+                          <Coins size={13} /> {coins ?? 0}
+                        </Link>
+                      </div>
+                      <div style={{ position:'relative' }}>
+                        <button className="dash-bell" onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}>
+                          <div className={unreadCount > 0 ? 'bell-ring' : ''} style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
+                            <Bell size={19} color="white" />
                           </div>
-                          {/* Unread Indicator */}
-                          {unreadCount > 0 && (
-                            <div style={{ position: 'absolute', top: 8, right: 8, width: 9, height: 9, background: '#EF4444', borderRadius: '50%', border: '2px solid white', animation: 'pulse-dot 1.8s ease-in-out infinite' }} />
-                          )}
+                          {unreadCount > 0 && <div style={{ position:'absolute', top:7, right:7, width:9, height:9, background:'#EF4444', borderRadius:'50%', border:'2px solid white', animation:'pulse-dot 1.8s ease-in-out infinite' }} />}
                         </button>
                       </div>
                     </div>
@@ -368,31 +386,24 @@ export default function DashboardPage() {
                 )}
               </AnimatePresence>
 
-              {/* Badge Pill */}
-              <AnimatePresence>
-                {!isSearchOpen && (
-                  <motion.div
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    style={{ marginBottom: 12 }}
+              <div className="dash-section-bar">
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                  <motion.h1
+                    initial={false}
+                    animate={{ opacity: isSearchOpen ? 0 : 1 }}
+                    className="outfit-font dash-section-title"
+                    style={{ pointerEvents: isSearchOpen ? 'none' : 'auto' }}
                   >
-                    <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      <BookOpen size={14} color="#A5F3FC" />
-                      <span style={{ color: '#E0F2FE', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>O'quv Dasturlari</span>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative', height: 44 }}>
-                {/* Title */}
-                <motion.h1
-                  initial={false}
-                  animate={{ opacity: isSearchOpen ? 0 : 1 }}
-                  className="outfit-font"
-                  style={{ margin: 0, fontSize: '2.5rem', color: 'white', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, pointerEvents: isSearchOpen ? 'none' : 'auto' }}
-                >
-                  Darslar
-                </motion.h1>
+                    Darslar
+                  </motion.h1>
+                  <motion.p 
+                    initial={false}
+                    animate={{ opacity: isSearchOpen ? 0 : 1 }}
+                    style={{ margin: 0, color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.8125rem, 2.5vw, 1rem)', fontWeight: 500, pointerEvents: isSearchOpen ? 'none' : 'auto', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  >
+                    O'quv dasturlari va darslar
+                  </motion.p>
+                </div>
 
                 {/* Expandable Search */}
                 <motion.div
@@ -462,42 +473,28 @@ export default function DashboardPage() {
               </div>
             </motion.div>
 
-            {/* ── Test Markazi Quick Access (inside hero) ── */}
+            {/* ── Quick Access ── */}
             <AnimatePresence>
               {!isSearchOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  style={{ marginTop: 20 }}
+                  className="dash-quick-row"
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
                 >
-                  <motion.button
-                    onClick={() => navigate('/quizzes')}
-                    whileTap={{ scale: 0.97 }}
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 10,
-                      background: 'rgba(255,255,255,0.12)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      borderRadius: 100, padding: '10px 20px 10px 14px',
-                      cursor: 'pointer', color: 'white',
-                      boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    <div style={{
-                      width: 28, height: 28, borderRadius: '50%',
-                      background: 'rgba(16,185,129,0.9)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <Target size={14} color="white" />
-                    </div>
-                    <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Testlar Markazi</span>
-                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)' }} />
-                    <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>Bilimingizni sinab ko'ring →</span>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/quizzes')} className="dash-quick-chip">
+                    <div style={{ width:28, height:28, borderRadius:'50%', background:'rgba(16,185,129,0.9)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Target size={14} color="white" /></div>
+                    <span style={{ fontWeight:700, fontSize:'0.9375rem' }}>Testlar Markazi</span>
                   </motion.button>
+                  {dailyData?.quiz && (
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => dailyData.attempt ? navigate('/daily-leaderboard') : navigate(`/daily-quiz/${dailyData.quiz.id}`)} className="dash-quick-chip" style={{ background:'rgba(52,97,255,0.2)', border:'1px solid rgba(52,97,255,0.4)' }}>
+                      <div style={{ width:28, height:28, borderRadius:'50%', background:'#3461FF', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Flame size={14} color="white" /></div>
+                      <span style={{ fontWeight:700, fontSize:'0.9375rem' }}>Kunlik Test</span>
+                      <div style={{ width:1, height:16, background:'rgba(255,255,255,0.2)' }} />
+                      <span style={{ fontSize:'0.8125rem', color:'rgba(255,255,255,0.7)', fontWeight:500 }}>
+                        {dailyData.attempt ? `Natija: ${dailyData.attempt.score}` : (dailyData.quiz.entry_fee_coins > 0 ? `${dailyData.quiz.entry_fee_coins} Coin` : 'Bepul')}
+                      </span>
+                    </motion.button>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

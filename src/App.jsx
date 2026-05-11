@@ -214,7 +214,7 @@ function AppShell() {
   const isAuthPage = AUTH_ROUTES.includes(path)
   const isAuthAppPage = isAuthAppRoute(path)
   const isAdminPage = path.startsWith('/admin')
-  const isQuizPage = path === '/quiz' || path.startsWith('/quiz/')  // fullscreen — no sidebar
+  const isQuizPage = path.startsWith('/quiz/') // fullscreen — no sidebar
 
   // ── Auth / Login / Signup pages — fullscreen no shell ──
   if (isAuthPage) {
@@ -236,9 +236,9 @@ function AppShell() {
   if (isAuthAppPage || (path === '/about' && user)) {
     return (
       <>
-        <div className="auth-layout" style={{ 
-          minHeight: '100vh', 
-          background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)', 
+        <div className="auth-layout" style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)',
           position: 'relative'
         }}>
           {/* Subtle Light Aura Orbs — isolation:isolate prevents filter from breaking fixed children */}
@@ -246,7 +246,7 @@ function AppShell() {
             <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.07) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'floatOrb 20s ease-in-out infinite' }} />
             <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'floatOrbReverse 25s ease-in-out infinite' }} />
           </div>
-          
+
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', width: '100%', minHeight: '100vh' }}>
             <AuthSidebar />
             {/* Main content area — naturally scrolls with body */}
@@ -275,12 +275,14 @@ function AppShell() {
     </div>
   )
 }
+import TopProgressBar from './components/ui/TopProgressBar'
 
 // ── Root ───────────────────────────────────────────────
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <TopProgressBar />
         <TelegramProvider>
           <AuthProvider>
             <TelegramAutoLogin />

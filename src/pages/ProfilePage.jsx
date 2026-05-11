@@ -56,17 +56,10 @@ export default function ProfilePage() {
       qActs.data?.forEach(d => dates.add(toLocalDateStr(d.created_at)))
       lActs.data?.forEach(d => dates.add(toLocalDateStr(d.updated_at)))
 
-      const lCount = lRes.count || 0
-      const totalXp = lCount * 100 + avg * 5
-      const currentLevel = Math.floor(totalXp / 1000) + 1
-      const xpInCurrentLevel = totalXp % 1000
-
       return {
-        lessonsDone: lCount,
+        lessonsDone: lRes.count || 0,
         quizAvg: avg,
-        activityDays: Array.from(dates),
-        level: currentLevel,
-        xp: xpInCurrentLevel
+        activityDays: Array.from(dates)
       }
     },
     enabled: !!user,
@@ -108,6 +101,10 @@ export default function ProfilePage() {
   const email = user?.email || ''
   const coins = profile?.coins ?? 0
   const streak = profile?.streak_count ?? 0
+  
+  const ratingScore = profile?.rating_score ?? 0
+  const currentLevel = Math.floor(ratingScore / 100) + 1
+  const xpInCurrentLevel = ratingScore % 100
 
   const STATS = [
     {
@@ -116,7 +113,7 @@ export default function ProfilePage() {
       accentColor: '#059669'
     },
     {
-      label: 'Quizlar', value: extStats.quizAvg + '%', icon: <CheckCircle2 size={18} color="#D97706" />,
+      label: 'Reyting XP', value: ratingScore.toLocaleString(), icon: <Sparkles size={18} color="#D97706" />,
       bg: '#FEF3C7', labelColor: '#78350F', iconBg: 'white',
       accentColor: '#D97706'
     },
@@ -154,24 +151,24 @@ export default function ProfilePage() {
   return (
     <>
       <style>{`
-        .profile-page-wrapper { width: 100%; padding-bottom: 60px; }
-        .profile-container { max-width: 1040px; margin: 0 auto; }
+        .profile-page-wrapper { width: 100%; padding-bottom: 60px; background: #F8FAFC; min-height: 100vh; }
+        .profile-container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 2; }
         
         .profile-hero {
           background: linear-gradient(145deg, #0F172A 0%, #1e3a8a 50%, #172554 100%);
           position: relative;
           overflow: hidden;
-          padding: 60px 0 160px;
+          padding: 60px 0 140px;
           border-radius: 0 0 40px 40px;
-          margin-bottom: -100px;
+          margin-bottom: -80px;
           box-shadow: 0 20px 40px rgba(15,23,42,0.1);
         }
         
         @media (max-width: 768px) {
           .profile-hero {
-            padding: 40px 0 140px;
+            padding: 40px 0 120px;
             border-radius: 0 0 32px 32px;
-            margin-bottom: -80px;
+            margin-bottom: -60px;
           }
         }
         
@@ -181,25 +178,58 @@ export default function ProfilePage() {
           color: white;
           letter-spacing: -0.04em;
           line-height: 1.1;
-          font-size: clamp(2rem, 6vw, 3rem);
+          font-size: clamp(2.25rem, 7vw, 3.75rem);
+        }
+        
+        .bento-grid {
+          display: grid;
+          grid-template-columns: repeat(12, 1fr);
+          gap: 24px;
+        }
+        
+        .bento-item {
+          padding: 28px;
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .bento-item:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
         }
 
-        .profile-content { padding: 0 24px; position: relative; z-index: 2; }
-        @media (max-width: 768px) { .profile-content { padding: 0 16px; } }
+        .col-span-4 { grid-column: span 12; }
+        .col-span-8 { grid-column: span 12; }
+        .col-span-6 { grid-column: span 12; }
+        .col-span-12 { grid-column: span 12; }
+
+        @media (min-width: 900px) {
+          .col-span-4 { grid-column: span 4; }
+          .col-span-8 { grid-column: span 8; }
+          .col-span-6 { grid-column: span 6; }
+        }
+
+        @media (max-width: 768px) {
+          .profile-container { padding: 24px 16px; }
+          .bento-grid { gap: 16px; }
+          .bento-item { padding: 20px; border-radius: 24px; border-width: 3px; }
+        }
       `}</style>
 
       <div className="profile-page-wrapper">
-        {/* ── FULL WIDTH HERO ── */}
+        
+        {/* ── FULL WIDTH HERO BANNER ── */}
         <div className="profile-hero">
           {/* Ambient Glows */}
           <div style={{ position: 'absolute', top: -50, right: -50, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: -50, left: -50, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
-          {/* Floating Icons (Matching pattern: One icon type per page) */}
+          
+          {/* Floating Icons */}
           {[
             { top: '15%', right: '12%', size: 48, delay: 0 },
             { top: '55%', right: '25%', size: 28, delay: 0.4 },
             { top: '25%', left: '8%', size: 36, delay: 0.2 },
-            { bottom: '25%', left: '20%', size: 22, delay: 0.6 },
           ].map((c, i) => (
             <motion.div
               key={i}
@@ -211,423 +241,293 @@ export default function ProfilePage() {
             </motion.div>
           ))}
 
-          <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
             <div style={{ maxWidth: 800 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <ShieldCheck size={14} color="#60A5FA" />
-                  <span style={{ color: '#DBEAFE', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Hisob Ma'lumotlari</span>
+                  <span style={{ color: '#DBEAFE', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Profil Markazi</span>
                 </div>
               </div>
               <h1 className="outfit-font profile-hero-title">
-                Sizning Profilingiz
+                Mening Profilim
               </h1>
+              <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '1rem', fontWeight: 500 }}>
+                Platformadagi shaxsiy yutuqlaringiz va holatingiz
+              </p>
             </div>
           </div>
         </div>
 
-        {/* ── 1040px CONSTRAINED CONTENT ── */}
         <div className="profile-container">
-          <div className="profile-content">
-            <motion.div variants={container} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <motion.div variants={container} initial="hidden" animate="show" className="bento-grid">
 
-              {/* ── Avatar Hero Card ── */}
-              <motion.div variants={item} className="card-glow-hover" style={{
-                background: '#FFFFFF',
-                borderRadius: 28,
-                border: '1px solid var(--border-medium)',
-                boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
-                padding: '32px 24px', marginBottom: 16,
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                textAlign: 'center', position: 'relative', overflow: 'hidden',
+            {/* ── BENTO: Avatar & Info (Col 4) ── */}
+            <motion.div variants={item} className="bento-item col-span-4 glass-card-premium card-glow-hover glow-sky" style={{ 
+              display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', justifyContent: 'center',
+              marginTop: -60, // OVERLAP EFFECT
+              zIndex: 10, background: 'rgba(255, 255, 255, 0.95)'
+            }}>
+              <div style={{
+                position: 'relative', marginBottom: 20, padding: 6, borderRadius: '50%',
+                background: 'linear-gradient(135deg, rgba(52,97,255,0.1), rgba(139,92,246,0.1))',
               }}>
-                {/* Subtle gradient orb background */}
-                <div style={{
-                  position: 'absolute', top: -40, left: '50%', transform: 'translateX(-50%)',
-                  width: 220, height: 180, borderRadius: '50%',
-                  background: avatarUrl
-                    ? 'radial-gradient(circle, rgba(52,97,255,0.05) 0%, transparent 70%)'
-                    : 'radial-gradient(circle, rgba(52,97,255,0.06) 0%, transparent 70%)',
-                  pointerEvents: 'none',
-                }} />
-
-                {/* Avatar */}
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                  style={{
-                    position: 'relative', marginBottom: 16,
-                    padding: 4, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(52,97,255,0.15), rgba(139,92,246,0.1))',
-                  }}
-                >
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt={name} loading="lazy" style={{
-                      width: 88, height: 88, borderRadius: '50%', objectFit: 'cover',
-                      border: '3px solid white', display: 'block',
-                    }} />
-                  ) : (
-                    <div style={{
-                      width: 88, height: 88, borderRadius: '50%',
-                      background: '#F1F5F9', border: '3px solid white',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '2.25rem', fontWeight: 900, color: '#475569',
-                    }}>
-                      {name[0]?.toUpperCase() || 'U'}
-                    </div>
-                  )}
-                  {/* Online dot */}
-                  <div style={{
-                    position: 'absolute', bottom: 6, right: 6,
-                    width: 16, height: 16, borderRadius: '50%',
-                    background: '#10B981', border: '3px solid white',
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={name} loading="lazy" style={{
+                    width: 100, height: 100, borderRadius: '50%', objectFit: 'cover',
+                    border: '4px solid white', display: 'block', backgroundColor: '#F8FAFC'
                   }} />
-                </motion.div>
-
-                {/* Name */}
-                <h1 className="outfit-font" style={{
-                  margin: '0 0 4px', fontSize: '1.625rem', fontWeight: 900,
-                  color: '#0F172A', letterSpacing: '-0.03em'
-                }}>
-                  {name}
-                </h1>
-
-                {/* Email */}
-                <p style={{ margin: '0 0 10px', color: '#94A3B8', fontSize: '0.875rem', fontWeight: 500 }}>
-                  {email}
-                </p>
-
-                {/* Admin badge */}
-                {isAdmin && (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    background: '#EFF6FF', color: '#3461FF',
-                    padding: '4px 12px', borderRadius: 100,
-                    fontSize: '0.8125rem', fontWeight: 700,
-                    border: '1px solid rgba(52,97,255,0.15)',
-                  }}>
-                    <ShieldCheck size={12} /> Admin
-                  </span>
-                )}
-              </motion.div>
-
-              {/* ── Daily Reward Box (Permanent Home) ── */}
-              <motion.div variants={item} className="card-glow-hover glow-amber" style={{
-                display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
-                background: 'rgba(255, 255, 255, 0.85)',
-                backdropFilter: 'blur(24px) saturate(2.2)',
-                WebkitBackdropFilter: 'blur(24px) saturate(2.2)',
-                border: '1.2px solid var(--border-medium)',
-                borderRadius: 24, padding: '20px 24px',
-                boxShadow: '0 12px 32px rgba(15,23,42,0.05)',
-                marginBottom: 16
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: '1 1 200px' }}>
+                ) : (
                   <div style={{
-                    width: 52, height: 52, borderRadius: 16, flexShrink: 0,
-                    background: !canClaim ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)',
+                    width: 100, height: 100, borderRadius: '50%',
+                    background: '#F1F5F9', border: '4px solid white',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: !canClaim ? 'none' : 'inset 0 2px 4px rgba(255,255,255,0.4)',
-                    border: !canClaim ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(245,158,11,0.3)'
+                    fontSize: '2.5rem', fontWeight: 900, color: '#475569',
                   }}>
-                    {!canClaim ? (
-                      <CheckCircle2 color="#10B981" size={26} strokeWidth={2.5} />
-                    ) : (
-                      <Zap color="#F59E0B" size={26} fill="#F59E0B" />
-                    )}
+                    {name[0]?.toUpperCase() || 'U'}
+                  </div>
+                )}
+                {/* Online Indicator */}
+                <div style={{
+                  position: 'absolute', bottom: 8, right: 8, width: 18, height: 18,
+                  borderRadius: '50%', background: '#10B981', border: '3px solid white',
+                }} />
+              </div>
+
+              <h2 className="outfit-font" style={{ margin: '0 0 6px', fontSize: '1.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                {name}
+              </h2>
+              <p style={{ margin: '0 0 16px', color: '#64748B', fontSize: '0.9375rem', fontWeight: 500 }}>
+                {email}
+              </p>
+
+              {isAdmin && (
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6, background: '#EFF6FF',
+                  color: '#3461FF', padding: '6px 14px', borderRadius: 100, fontSize: '0.8125rem', fontWeight: 700,
+                }}>
+                  <ShieldCheck size={14} /> Administrator
+                </div>
+              )}
+            </motion.div>
+
+            {/* ── BENTO: Level Ring & XP (Col 8) ── */}
+            <motion.div variants={item} className="bento-item col-span-8 glass-card-premium card-glow-hover glow-purple" style={{ display: 'flex', alignItems: 'center', gap: 32, flexWrap: 'wrap' }}>
+              
+              <div style={{ flex: '1 1 200px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(139, 92, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Sparkles size={20} color="#8B5CF6" />
                   </div>
                   <div>
-                    <p className="outfit-font" style={{ margin: '0 0 4px', fontWeight: 800, fontSize: '1.0625rem', color: '#0F172A', letterSpacing: '-0.01em' }}>
-                      {!canClaim ? "Kunlik mukofotingiz olindi" : "Kunlik mukofot mavjud!"}
-                    </p>
-                    <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', fontWeight: 500 }}>
-                      {!canClaim ? "Ertaga qaytib keling, biz sizni kutamiz!" : "Hoziroq olib coinlar sonini ko'paytiring"}
-                    </p>
+                    <h3 className="outfit-font" style={{ margin: 0, fontWeight: 800, color: '#0F172A', fontSize: '1.25rem' }}>Akademik Daraja</h3>
+                    <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', fontWeight: 500 }}>Platformadagi umumiy reytingingiz</p>
                   </div>
                 </div>
+                
+                <p style={{ color: '#475569', fontSize: '0.9375rem', lineHeight: 1.6, marginBottom: 20 }}>
+                  Testlar ishlash, darslarni yakunlash va kunlik mukofotlarni yig'ish orqali o'z darajangizni oshiring. Keyingi darajaga o'tish uchun <b>{100 - xpInCurrentLevel} XP</b> qoldi.
+                </p>
 
-                <motion.button
-                  whileTap={canClaim ? { scale: 0.95 } : {}}
-                  onClick={handleClaimReward}
-                  disabled={!canClaim}
-                  style={{
-                    padding: '12px 24px', borderRadius: 14, border: 'none', cursor: !canClaim ? 'default' : 'pointer',
-                    background: !canClaim ? 'rgba(15,23,42,0.04)' : 'linear-gradient(135deg, #F59E0B, #D97706)',
-                    color: !canClaim ? '#94A3B8' : 'white',
-                    fontWeight: 800, fontSize: '0.9375rem', fontFamily: 'inherit',
-                    boxShadow: !canClaim ? 'none' : '0 6px 16px rgba(245,158,11,0.3)',
-                    WebkitTapHighlightColor: 'transparent', flex: '1 1 auto', minWidth: 120,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}
-                >
-                  {!canClaim ? "Olindi" : "Olish"}
-                </motion.button>
-              </motion.div>
-
-              {/* ── Progress Section ── */}
-              <div style={{
-                display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 16,
-                marginBottom: 16
-              }}>
-                {/* Row 1: Gauge & Calendar */}
-                <div style={{
-                  display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 16
-                }}>
-                  {/* Progress Gauge */}
-                  <motion.div variants={item} className="card-glow-hover glow-purple" style={{
-                    background: '#FFFFFF',
-                    borderRadius: 32, padding: '24px',
-                    display: 'flex', flexDirection: 'column',
-                    border: '1.2px solid var(--border-medium)',
-                    boxShadow: '0 12px 40px rgba(15, 23, 42, 0.05)',
-                    position: 'relative', overflow: 'hidden'
-                  }}>
-                    {/* Decorative background tint */}
-                    <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, background: 'rgba(139, 92, 246, 0.05)', borderRadius: '50%', filter: 'blur(40px)' }} />
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)' }}>
-                          <Sparkles size={16} color="#8B5CF6" />
-                        </div>
-                        <span className="outfit-font" style={{ fontWeight: 800, color: '#4C1D95', fontSize: '1.1875rem', letterSpacing: '-0.01em' }}>Daraja & XP</span>
-                      </div>
-                      <div style={{ background: 'rgba(139, 92, 246, 0.12)', color: '#8B5CF6', padding: '4px 10px', borderRadius: 100, fontSize: '0.75rem', fontWeight: 800 }}>
-                        {extStats.xp} / 1000 XP
-                      </div>
-                    </div>
-
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px 0', position: 'relative', zIndex: 1 }}>
-                      <div style={{ position: 'relative', width: 220, height: 140 }}>
-                        <svg viewBox="0 0 100 60" style={{ width: '100%', height: '100%' }}>
-                          <path
-                            d="M 10 50 A 40 40 0 0 1 90 50"
-                            fill="none" stroke="rgba(139, 92, 246, 0.08)" strokeWidth="10" strokeLinecap="round"
-                          />
-                          <motion.path
-                            initial={{ pathLength: 0 }}
-                            animate={{ pathLength: extStats.xp / 1000 }}
-                            transition={{ duration: 1.8, ease: "easeOut" }}
-                            d="M 10 50 A 40 40 0 0 1 90 50"
-                            fill="none" stroke="url(#gaugeGradient)" strokeWidth="10" strokeLinecap="round"
-                          />
-                          <defs>
-                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                              <stop offset="0%" stopColor="#8B5CF6" />
-                              <stop offset="100%" stopColor="#3461FF" />
-                            </linearGradient>
-                          </defs>
-                        </svg>
-                        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 15 }}>
-                          <span className="outfit-font" style={{ fontSize: '2.5rem', fontWeight: 900, color: '#1E1B4B', lineHeight: 1, letterSpacing: '-0.04em' }}>{extStats.level}</span>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#8B5CF6', opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Daraja</span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Activity Calendar */}
-                  <motion.div variants={item} className="card-glow-hover glow-green" style={{
-                    background: '#FFFFFF',
-                    borderRadius: 32, padding: '24px',
-                    border: '1.2px solid var(--border-medium)',
-                    boxShadow: '0 12px 40px rgba(15, 23, 42, 0.05)',
-                    display: 'flex', flexDirection: 'column',
-                    position: 'relative', overflow: 'hidden'
-                  }}>
-                    {/* Decorative background tint */}
-                    <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, background: 'rgba(16, 185, 129, 0.05)', borderRadius: '50%', filter: 'blur(40px)' }} />
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)' }}>
-                          <CalendarIcon size={16} color="#10B981" />
-                        </div>
-                        <span className="outfit-font" style={{ fontWeight: 800, color: '#064E3B', fontSize: '1.1875rem', letterSpacing: '-0.01em' }}>Aktivlik</span>
-                      </div>
-                      <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#10B981' }}>{["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"][new Date().getMonth()]}</span>
-                    </div>
-
-                    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, padding: '4px', position: 'relative', zIndex: 1 }}>
-                      {['D', 'S', 'C', 'P', 'J', 'S', 'Y'].map(day => (
-                        <div key={day} style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#10B981', opacity: 0.5 }}>{day}</div>
-                      ))}
-                      {(() => {
-                        const now = new Date()
-                        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay()
-                        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-                        const padding = (firstDay + 6) % 7
-
-                        return (
-                          <>
-                            {Array.from({ length: padding }).map((_, i) => <div key={`p-${i}`} />)}
-                            {Array.from({ length: daysInMonth }).map((_, i) => {
-                              const day = i + 1
-                              const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-                              const isActive = extStats.activityDays.includes(dateStr)
-                              const isToday = day === now.getDate()
-                              const isPast = day < now.getDate()
-
-                              return (
-                                <div key={day} style={{
-                                  aspectRatio: '1', borderRadius: '50%',
-                                  background: isActive ? '#10B981' : 'transparent',
-                                  color: isActive ? 'white' : (isPast ? '#94A3B8' : '#CBD5E1'),
-                                  border: isToday && !isActive ? '2px solid #10B981' : (isActive ? '2px solid #10B981' : 'none'),
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                  fontSize: '0.8rem', fontWeight: isActive || isToday ? 800 : 500,
-                                  boxShadow: isActive ? '0 4px 10px rgba(16, 185, 129, 0.3)' : 'none',
-                                  transition: 'all 0.24s cubic-bezier(0.22, 1, 0.36, 1)',
-                                  cursor: 'default'
-                                }}>
-                                  {day}
-                                </div>
-                              )
-                            })}
-                          </>
-                        )
-                      })()}
-                    </div>
-                  </motion.div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{ flex: 1, height: 8, borderRadius: 100, background: '#F1F5F9', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${xpInCurrentLevel}%`, borderRadius: 100, background: 'linear-gradient(90deg, #8B5CF6, #3461FF)', transition: 'width 1s ease-out' }} />
+                  </div>
+                  <span style={{ fontWeight: 800, color: '#8B5CF6', fontSize: '0.875rem' }}>{xpInCurrentLevel} / 100 XP</span>
                 </div>
               </div>
 
-              {/* ── Stats Grid (Premium) ── */}
-              <motion.div variants={item} style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 16,
-                marginBottom: 16
-              }}>
-                {STATS.map((s, i) => (
-                  <motion.div
-                    key={i}
-                    style={{
-                      background: '#FFFFFF',
-                      borderRadius: 28, padding: '24px',
-                      display: 'flex', flexDirection: 'column', gap: 20,
-                      position: 'relative', overflow: 'hidden',
-                      border: '1.2px solid var(--border-medium)',
-                      boxShadow: '0 12px 40px rgba(15, 23, 42, 0.05)'
-                    }}
-                  >
-                    {/* Subtle background color tint */}
-                    <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, background: s.bg, opacity: 0.15, borderRadius: '50%', filter: 'blur(34px)' }} />
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, position: 'relative', zIndex: 1 }}>
-                      <div style={{
-                        width: 38, height: 38, borderRadius: '50%', background: 'white',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
-                        border: '1px solid rgba(15, 23, 42, 0.03)'
-                      }}>
-                        {s.icon}
-                      </div>
-                      <span style={{ fontWeight: 800, color: '#64748B', fontSize: '0.875rem', letterSpacing: '0.01em', textTransform: 'uppercase' }}>
-                        {s.label}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
-                      <span className="outfit-font" style={{
-                        fontSize: '2.5rem', fontWeight: 900, color: '#0F172A',
-                        letterSpacing: '-0.04em', lineHeight: 1
-                      }}>
-                        {s.value}
-                      </span>
-                      <div style={{
-                        width: 44, height: 44, borderRadius: '50%', background: 'white',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)',
-                        border: '1px solid rgba(15, 23, 42, 0.04)',
-                        cursor: 'pointer'
-                      }}>
-                        <ArrowUpRight size={20} color={s.accentColor} strokeWidth={2.5} />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* ── Menu Groups ── */}
-              {MENU_GROUPS.map((group, gi) => (
-                <motion.div key={gi} className="card-glow-hover" style={{
-                  background: '#FFFFFF', borderRadius: 24,
-                  border: '1.2px solid var(--border-medium)',
-                  overflow: 'hidden', marginBottom: 12,
-                  boxShadow: '0 8px 32px rgba(15,23,42,0.05)',
-                }}>
-                  {group.items.map((m, j) => (
-                    <Link
-                      key={j}
-                      to={m.to}
-                      style={{
-                        padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16,
-                        textDecoration: 'none',
-                        borderBottom: j < group.items.length - 1 ? '1px solid rgba(100,120,255,0.08)' : 'none',
-                        WebkitTapHighlightColor: 'transparent',
-                        transition: 'background 0.2s ease',
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(52,97,255,0.04)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <div style={{
-                        width: 38, height: 38, borderRadius: 11, background: m.iconBg,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                      }}>
-                        {m.icon}
-                      </div>
-                      <p style={{
-                        margin: 0, flex: 1,
-                        fontWeight: m.bold ? 800 : 600,
-                        color: m.labelColor || '#334155',
-                        fontSize: '0.9375rem',
-                      }}>
-                        {m.label}
-                      </p>
-                      <ChevronRight size={18} color={m.labelColor || '#CBD5E1'} />
-                    </Link>
-                  ))}
-                </motion.div>
-              ))}
-
-              {/* ── Sign Out ── */}
-              <motion.div variants={item}>
-                <motion.div
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSignOut}
-                  className="card-glow-hover glow-red"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.85)', borderRadius: 24,
-                    backdropFilter: 'blur(32px) saturate(2)',
-                    WebkitBackdropFilter: 'blur(32px) saturate(2)',
-                    border: '1.2px solid var(--border-medium)',
-                    padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16,
-                    cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-                    boxShadow: '0 8px 32px rgba(239,68,68,0.08)',
-                    transition: 'background 0.2s, transform 0.2s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.04)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <div style={{
-                    width: 38, height: 38, borderRadius: 11,
-                    background: 'rgba(239,68,68,0.08)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <LogOut size={18} color="#EF4444" />
-                  </div>
-                  <p style={{ margin: 0, flex: 1, fontWeight: 700, color: '#EF4444', fontSize: '0.9375rem' }}>
-                    Tizimdan chiqish
-                  </p>
-                </motion.div>
-              </motion.div>
-
-
+              {/* High-Performance SVG Ring */}
+              <div style={{ position: 'relative', width: 140, height: 140, flexShrink: 0, margin: '0 auto' }}>
+                <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="#F1F5F9" strokeWidth="12" />
+                  <motion.circle
+                    initial={{ strokeDasharray: "0 264" }}
+                    animate={{ strokeDasharray: `${(xpInCurrentLevel / 100) * 264} 264` }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    cx="50" cy="50" r="42" fill="none" stroke="url(#ringGradient)" strokeWidth="12" strokeLinecap="round"
+                  />
+                  <defs>
+                    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#8B5CF6" />
+                      <stop offset="100%" stopColor="#3461FF" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="outfit-font" style={{ fontSize: '2.5rem', fontWeight: 900, color: '#0F172A', lineHeight: 1, letterSpacing: '-0.04em' }}>{currentLevel}</span>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 2 }}>Level</span>
+                </div>
+              </div>
 
             </motion.div>
-          </div>
+
+            {/* ── BENTO: Daily Reward (Col 12) ── */}
+            <motion.div variants={item} className="bento-item col-span-12 glass-card-premium card-glow-hover glow-amber" style={{
+              display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 20
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+                  background: canClaim ? '#F59E0B' : '#E2E8F0',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {canClaim ? <Zap color="white" size={24} fill="white" /> : <CheckCircle2 color="#94A3B8" size={24} />}
+                </div>
+                <div>
+                  <h3 className="outfit-font" style={{ margin: '0 0 4px', fontWeight: 800, fontSize: '1.25rem', color: '#0F172A' }}>
+                    {canClaim ? "Kunlik mukofot kutmoqda!" : "Bugungi mukofot olingan"}
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '0.9375rem', color: '#64748B', fontWeight: 500 }}>
+                    {canClaim ? "Coinlaringizni hoziroq yig'ib oling." : "Ertaga qaytib keling, ketma-ketlikni buzmang!"}
+                  </p>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleClaimReward}
+                disabled={!canClaim}
+                style={{
+                  padding: '12px 28px', borderRadius: 100, border: 'none',
+                  background: canClaim ? '#F59E0B' : '#F1F5F9',
+                  color: canClaim ? 'white' : '#94A3B8',
+                  fontWeight: 800, fontSize: '0.9375rem', cursor: canClaim ? 'pointer' : 'default',
+                  transition: 'transform 0.2s',
+                  boxShadow: canClaim ? '0 8px 20px rgba(245,158,11,0.3)' : 'none'
+                }}
+              >
+                {canClaim ? "Olish" : "Olindi"}
+              </button>
+            </motion.div>
+
+            {/* ── BENTO: Stats Grid (Col 6) ── */}
+            <motion.div variants={item} className="col-span-6" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'inherit'
+            }}>
+              {STATS.map((s, i) => {
+                let glowClass = 'glow-sky'
+                if (i === 0) glowClass = 'glow-green'
+                if (i === 1) glowClass = 'glow-sky'
+                if (i === 2) glowClass = 'glow-purple'
+                if (i === 3) glowClass = 'glow-red'
+                
+                return (
+                <div key={i} className={`bento-item glass-card-premium card-glow-hover ${glowClass}`} style={{ padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {s.icon}
+                    </div>
+                    <span style={{ fontWeight: 700, color: '#64748B', fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                      {s.label}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '2rem', fontWeight: 900, color: '#0F172A', lineHeight: 1, fontFamily: '"Outfit", sans-serif' }}>
+                    {s.value}
+                  </div>
+                </div>
+              )})}
+            </motion.div>
+
+            {/* ── BENTO: Activity Calendar (Col 6) ── */}
+            <motion.div variants={item} className="bento-item col-span-6 glass-card-premium card-glow-hover glow-green" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CalendarIcon size={18} color="#10B981" />
+                  </div>
+                  <h3 className="outfit-font" style={{ margin: 0, fontWeight: 800, color: '#0F172A', fontSize: '1.25rem' }}>Aktivlik</h3>
+                </div>
+                <span style={{ background: '#F1F5F9', color: '#475569', padding: '4px 12px', borderRadius: 100, fontSize: '0.8125rem', fontWeight: 700 }}>
+                  {["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"][new Date().getMonth()]}
+                </span>
+              </div>
+
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8 }}>
+                {['D', 'S', 'C', 'P', 'J', 'S', 'Y'].map(day => (
+                  <div key={day} style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8' }}>{day}</div>
+                ))}
+                {(() => {
+                  const now = new Date()
+                  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay()
+                  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+                  const padding = (firstDay + 6) % 7
+
+                  return (
+                    <>
+                      {Array.from({ length: padding }).map((_, i) => <div key={`p-${i}`} />)}
+                      {Array.from({ length: daysInMonth }).map((_, i) => {
+                        const day = i + 1
+                        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                        const isActive = extStats.activityDays.includes(dateStr)
+                        const isToday = day === now.getDate()
+
+                        return (
+                          <div key={day} style={{
+                            aspectRatio: '1', borderRadius: '50%',
+                            background: isActive ? '#10B981' : (isToday ? '#F1F5F9' : 'transparent'),
+                            color: isActive ? 'white' : (isToday ? '#10B981' : '#94A3B8'),
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '0.8125rem', fontWeight: isActive || isToday ? 800 : 500,
+                            border: isToday && !isActive ? '2px dashed #10B981' : 'none'
+                          }}>
+                            {day}
+                          </div>
+                        )
+                      })}
+                    </>
+                  )
+                })()}
+              </div>
+            </motion.div>
+
+            {/* ── BENTO: Menu Actions (Col 12) ── */}
+            <motion.div variants={item} className="bento-item col-span-12 glass-card-premium card-glow-hover glow-sky" style={{ padding: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {MENU_GROUPS[0].items.map((m, j) => (
+                  <Link
+                    key={j}
+                    to={m.to}
+                    style={{
+                      padding: '16px', display: 'flex', alignItems: 'center', gap: 16,
+                      textDecoration: 'none', borderRadius: 16,
+                      transition: 'background 0.2s ease',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: m.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {m.icon}
+                    </div>
+                    <span style={{ flex: 1, fontWeight: m.bold ? 800 : 600, color: m.labelColor || '#0F172A', fontSize: '1rem' }}>
+                      {m.label}
+                    </span>
+                    <ChevronRight size={20} color="#94A3B8" />
+                  </Link>
+                ))}
+                
+                <div style={{ height: 1, background: '#F1F5F9', margin: '8px 16px' }} />
+
+                <button
+                  onClick={handleSignOut}
+                  style={{
+                    padding: '16px', display: 'flex', alignItems: 'center', gap: 16,
+                    border: 'none', background: 'transparent', width: '100%', textAlign: 'left',
+                    borderRadius: 16, cursor: 'pointer', transition: 'background 0.2s ease'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <LogOut size={20} color="#EF4444" />
+                  </div>
+                  <span style={{ flex: 1, fontWeight: 700, color: '#EF4444', fontSize: '1rem' }}>
+                    Tizimdan chiqish
+                  </span>
+                </button>
+              </div>
+            </motion.div>
+
+          </motion.div>
         </div>
       </div>
     </>

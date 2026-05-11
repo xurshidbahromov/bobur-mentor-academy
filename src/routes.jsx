@@ -23,12 +23,15 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const QuizPage = lazy(() => import('./pages/QuizPage'))
 const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
 const QuizzesHubPage = lazy(() => import('./pages/QuizzesHubPage'))
+// DailyQuizPage and DailyQuizLeaderboard are removed - unified into QuizPage and main Leaderboard
 
 // ── Admin pages ───────────────────────────────────────
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminContent = lazy(() => import('./pages/admin/AdminContent'))
 const AdminGeneralQuizzes = lazy(() => import('./pages/admin/AdminGeneralQuizzes'))
+const AdminDailyQuizzes = lazy(() => import('./pages/admin/AdminDailyQuizzes'))
+const AdminDailyQuizQuestions = lazy(() => import('./pages/admin/AdminDailyQuizQuestions'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 const AdminPayments = lazy(() => import('./pages/admin/AdminPayments'))
 const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications'))
@@ -77,6 +80,8 @@ export default function AppRoutes() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="content" element={<AdminContent />} />
             <Route path="general-quizzes" element={<AdminGeneralQuizzes />} />
+            <Route path="daily-quizzes" element={<AdminDailyQuizzes />} />
+            <Route path="daily-quizzes/:quizId" element={<AdminDailyQuizQuestions />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="payments" element={<AdminPayments />} />
             <Route path="notifications" element={<AdminNotifications />} />

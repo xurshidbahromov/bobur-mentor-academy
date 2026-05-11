@@ -97,7 +97,7 @@ function PodiumCard({ user, rank, isSelf, tab }) {
       }}>
         {tab === 'streak'
           ? <><Flame size={12} color={isFirst ? '#D97706' : '#64748B'} /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.8125rem', color: isFirst ? '#92400E' : '#334155' }}>{user.streak_count}</span></>
-          : <><Coins size={12} color={isFirst ? '#D97706' : '#64748B'} /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.8125rem', color: isFirst ? '#92400E' : '#334155' }}>{user.coins?.toLocaleString()}</span></>
+          : <><Sparkles size={12} color={isFirst ? '#D97706' : '#64748B'} /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.8125rem', color: isFirst ? '#92400E' : '#334155' }}>{user.rating_score?.toLocaleString() || 0}</span></>
         }
       </div>
     </motion.div>
@@ -121,7 +121,6 @@ function LeaderRow({ user, rank, isSelf, tab }) {
         background: '#FFFFFF',
         border: '1px solid var(--border-medium)',
         boxShadow: '0 4px 12px rgba(15,23,42,0.04)',
-        marginBottom: 8,
         position: 'relative', cursor: 'pointer'
       }}
     >
@@ -157,7 +156,7 @@ function LeaderRow({ user, rank, isSelf, tab }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: '#F8FAFC', padding: '6px 10px', borderRadius: 100 }}>
         {tab === 'streak'
           ? <><Flame size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.streak_count}</span></>
-          : <><Coins size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.coins?.toLocaleString()}</span></>
+          : <><Sparkles size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.rating_score?.toLocaleString() || 0}</span></>
         }
       </div>
     </motion.div>
@@ -196,15 +195,15 @@ function PodiumSkeleton() {
 // ─── Main component ────────────────────────────────
 export default function LeaderboardPage() {
   const { user } = useAuth()
-  const [tab, setTab] = useState('coins') // 'coins' | 'streak'
+  const [tab, setTab] = useState('rating') // 'rating' | 'streak'
 
   const { data: leaders = [], isLoading: loading } = useQuery({
     queryKey: ['leaderboard', tab],
     queryFn: async () => {
-      const col = tab === 'coins' ? 'coins' : 'streak_count'
+      const col = tab === 'rating' ? 'rating_score' : 'streak_count'
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, coins, streak_count')
+        .select('id, full_name, avatar_url, rating_score, streak_count')
         .order(col, { ascending: false })
         .limit(50)
       if (error) throw error
@@ -283,7 +282,7 @@ export default function LeaderboardPage() {
                       <span style={{ color: '#FEF3C7', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Peshqadamlar</span>
                     </div>
                   </div>
-                  <h1 className="outfit-font" style={{ margin: '0 0 8px', fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, color: 'white', letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+                  <h1 className="outfit-font" style={{ margin: '0 0 8px', fontSize: 'clamp(2.25rem, 7vw, 3.75rem)', fontWeight: 900, color: 'white', letterSpacing: '-0.04em', lineHeight: 1.05 }}>
                     Reyting
                   </h1>
                   <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '1rem', fontWeight: 500 }}>
@@ -317,7 +316,7 @@ export default function LeaderboardPage() {
               }}
             >
               {[
-                { key: 'coins', icon: <Coins size={16} />, label: 'Coinlar' },
+                { key: 'rating', icon: <Sparkles size={16} />, label: 'Reyting Balli' },
                 { key: 'streak', icon: <Flame size={16} />, label: 'Streak' },
               ].map(t => {
                 const isActive = tab === t.key
@@ -380,20 +379,17 @@ export default function LeaderboardPage() {
             )}
 
             {/* List */}
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.78)',
-              backdropFilter: 'blur(32px) saturate(2)',
-              WebkitBackdropFilter: 'blur(32px) saturate(2)',
-              borderRadius: 32, padding: '20px',
-              border: '1px solid var(--border-medium)',
-              boxShadow: '0 12px 40px rgba(15, 23, 42, 0.05)',
-            }}>
+            <div style={{ marginTop: 24 }}>
               {loading ? (
                 <SkeletonRows />
               ) : leaders.length === 0 ? (
                 <div style={{
                   padding: '80px 20px', textAlign: 'center',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center'
+                  display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  background: 'rgba(255, 255, 255, 0.78)',
+                  backdropFilter: 'blur(32px)',
+                  borderRadius: 32,
+                  border: '1px solid var(--border-medium)',
                 }}>
                   <div style={{
                     width: 64, height: 64, borderRadius: '50%',
@@ -411,13 +407,13 @@ export default function LeaderboardPage() {
                   </p>
                 </div>
               ) : (
-                <>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {/* If podium shown, only render ranks 4+ in list */}
                   {top3.length < 3
                     ? leaders.map((u, i) => <LeaderRow key={u.id} user={u} rank={i} isSelf={u.id === user?.id} tab={tab} />)
                     : rest.map((u, i) => <LeaderRow key={u.id} user={u} rank={i + 3} isSelf={u.id === user?.id} tab={tab} />)
                   }
-                </>
+                </div>
               )}
             </div>
 

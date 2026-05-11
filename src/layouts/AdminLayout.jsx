@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext'
 const MENU = [
   { name: 'Statistika', path: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Dars Boshqaruvi', path: '/admin/content', icon: BookOpen },
+  { name: 'Kunlik Testlar', path: '/admin/daily-quizzes', icon: Target },
   { name: 'Umumiy Testlar', path: '/admin/general-quizzes', icon: Target },
   { name: 'Foydalanuvchilar', path: '/admin/users', icon: Users },
   { name: 'To\'lovlar', path: '/admin/payments', icon: Coins },
