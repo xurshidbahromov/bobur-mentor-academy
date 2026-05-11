@@ -142,16 +142,16 @@ function CourseCard({ course, index, onNavigate }) {
             )}
           </div>
 
-        <div style={{ position: 'relative', width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#3461FF', borderRadius: '50%', boxShadow: '0 4px 12px rgba(52,97,255,0.2)' }}>
-          <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: 'rotate(-90deg)', position: 'absolute', inset: 0 }}>
-            <circle cx="19" cy="19" r="17" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
-            <circle cx="19" cy="19" r="17" fill="none" stroke="white" strokeWidth="2.5"
-              strokeDasharray={`${2 * Math.PI * 17 * (progressPct / 100)} ${2 * Math.PI * 17}`} strokeLinecap="round"
-              style={{ transition: 'stroke-dasharray 0.5s ease' }}
-            />
-          </svg>
-          <ArrowRight size={18} color="white" />
-        </div>
+          <div style={{ position: 'relative', width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#3461FF', borderRadius: '50%', boxShadow: '0 4px 12px rgba(52,97,255,0.2)' }}>
+            <svg width="38" height="38" viewBox="0 0 38 38" style={{ transform: 'rotate(-90deg)', position: 'absolute', inset: 0 }}>
+              <circle cx="19" cy="19" r="17" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" />
+              <circle cx="19" cy="19" r="17" fill="none" stroke="white" strokeWidth="2.5"
+                strokeDasharray={`${2 * Math.PI * 17 * (progressPct / 100)} ${2 * Math.PI * 17}`} strokeLinecap="round"
+                style={{ transition: 'stroke-dasharray 0.5s ease' }}
+              />
+            </svg>
+            <ArrowRight size={18} color="white" />
+          </div>
         </div>
       </div>
     </motion.button>
@@ -350,11 +350,11 @@ export default function DashboardPage() {
                         <div className="dash-avatar-ring">
                           <div className="dash-avatar-inner">
                             {profile?.avatar_url || user?.user_metadata?.avatar_url
-                              ? <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="avatar" loading="lazy" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                              ? <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="avatar" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                               : firstName[0]?.toUpperCase()
                             }
                           </div>
-                          <div style={{ position:'absolute', bottom:1, right:1, width:12, height:12, borderRadius:'50%', background:'#10B981', border:'2.5px solid white' }} />
+                          <div style={{ position: 'absolute', bottom: 1, right: 1, width: 12, height: 12, borderRadius: '50%', background: '#10B981', border: '2.5px solid white' }} />
                         </div>
                       </Link>
                       <div className="dash-greeting">
@@ -373,12 +373,12 @@ export default function DashboardPage() {
                           <Coins size={13} /> {coins ?? 0}
                         </Link>
                       </div>
-                      <div style={{ position:'relative' }}>
+                      <div style={{ position: 'relative' }}>
                         <button className="dash-bell" onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}>
-                          <div className={unreadCount > 0 ? 'bell-ring' : ''} style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
+                          <div className={unreadCount > 0 ? 'bell-ring' : ''} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Bell size={19} color="white" />
                           </div>
-                          {unreadCount > 0 && <div style={{ position:'absolute', top:7, right:7, width:9, height:9, background:'#EF4444', borderRadius:'50%', border:'2px solid white', animation:'pulse-dot 1.8s ease-in-out infinite' }} />}
+                          {unreadCount > 0 && <div style={{ position: 'absolute', top: 7, right: 7, width: 9, height: 9, background: '#EF4444', borderRadius: '50%', border: '2px solid white', animation: 'pulse-dot 1.8s ease-in-out infinite' }} />}
                         </button>
                       </div>
                     </div>
@@ -396,7 +396,7 @@ export default function DashboardPage() {
                   >
                     Darslar
                   </motion.h1>
-                  <motion.p 
+                  <motion.p
                     initial={false}
                     animate={{ opacity: isSearchOpen ? 0 : 1 }}
                     style={{ margin: 0, color: 'rgba(255,255,255,0.6)', fontSize: 'clamp(0.8125rem, 2.5vw, 1rem)', fontWeight: 500, pointerEvents: isSearchOpen ? 'none' : 'auto', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
@@ -482,15 +482,15 @@ export default function DashboardPage() {
                   exit={{ opacity: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
                 >
                   <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/quizzes')} className="dash-quick-chip">
-                    <div style={{ width:28, height:28, borderRadius:'50%', background:'rgba(16,185,129,0.9)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Target size={14} color="white" /></div>
-                    <span style={{ fontWeight:700, fontSize:'0.9375rem' }}>Testlar Markazi</span>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(16,185,129,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Target size={14} color="white" /></div>
+                    <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Testlar Markazi</span>
                   </motion.button>
                   {dailyData?.quiz && (
-                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => dailyData.attempt ? navigate('/daily-leaderboard') : navigate(`/daily-quiz/${dailyData.quiz.id}`)} className="dash-quick-chip" style={{ background:'rgba(52,97,255,0.2)', border:'1px solid rgba(52,97,255,0.4)' }}>
-                      <div style={{ width:28, height:28, borderRadius:'50%', background:'#3461FF', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Flame size={14} color="white" /></div>
-                      <span style={{ fontWeight:700, fontSize:'0.9375rem' }}>Kunlik Test</span>
-                      <div style={{ width:1, height:16, background:'rgba(255,255,255,0.2)' }} />
-                      <span style={{ fontSize:'0.8125rem', color:'rgba(255,255,255,0.7)', fontWeight:500 }}>
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => dailyData.attempt ? navigate('/daily-leaderboard') : navigate(`/daily-quiz/${dailyData.quiz.id}`)} className="dash-quick-chip" style={{ background: 'rgba(52,97,255,0.2)', border: '1px solid rgba(52,97,255,0.4)' }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Flame size={14} color="white" /></div>
+                      <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Kunlik Test</span>
+                      <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)' }} />
+                      <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
                         {dailyData.attempt ? `Natija: ${dailyData.attempt.score}` : (dailyData.quiz.entry_fee_coins > 0 ? `${dailyData.quiz.entry_fee_coins} Coin` : 'Bepul')}
                       </span>
                     </motion.button>

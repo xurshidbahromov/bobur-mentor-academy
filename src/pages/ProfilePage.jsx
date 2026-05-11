@@ -34,11 +34,12 @@ export default function ProfilePage() {
     queryFn: async () => {
       if (!user) return null
 
-      const [lRes, qRes, qActs, lActs] = await Promise.all([
+      const [lRes, qRes, qActs, lActs, dActs] = await Promise.all([
         supabase.from('lesson_progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_completed', true),
         supabase.from('quiz_attempts').select('score, total').eq('user_id', user.id),
         supabase.from('quiz_attempts').select('created_at').eq('user_id', user.id),
-        supabase.from('lesson_progress').select('updated_at').eq('user_id', user.id)
+        supabase.from('lesson_progress').select('updated_at').eq('user_id', user.id),
+        supabase.from('daily_quiz_attempts').select('created_at').eq('user_id', user.id).not('score', 'is', null),
       ])
 
       let avg = 0
@@ -55,6 +56,7 @@ export default function ProfilePage() {
 
       qActs.data?.forEach(d => dates.add(toLocalDateStr(d.created_at)))
       lActs.data?.forEach(d => dates.add(toLocalDateStr(d.updated_at)))
+      dActs.data?.forEach(d => dates.add(toLocalDateStr(d.created_at)))
 
       return {
         lessonsDone: lRes.count || 0,

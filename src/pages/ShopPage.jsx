@@ -36,11 +36,7 @@ const STEPS = [
 ]
 
 // ── Animation variants ──────────────────────────────────────
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay, duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-})
+// (Removed per-element fade-up — page already has route-level transition)
 
 export default function ShopPage() {
   const { profile } = useAuth()
@@ -142,10 +138,7 @@ export default function ShopPage() {
 
       <div className="shop-page-wrapper">
         {/* ── FULL WIDTH HERO ── */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="shop-hero"
-        >
+          <div className="shop-hero">
           {/* Ambient Glows */}
           <div style={{ position: 'absolute', top: -100, right: -50, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(52,97,255,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: -50, left: -50, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -210,14 +203,14 @@ export default function ShopPage() {
               </motion.div>
             </div>
           </div>
-        </motion.div>
+          </div>
 
         {/* ── 1040px CONSTRAINED CONTENT ── */}
         <div className="shop-container">
           <div className="shop-content">
 
             {/* Section Indicator */}
-            <motion.div {...fadeUp(0.1)} style={{ maxWidth: 1040, margin: '0 auto' }}>
+            <div style={{ maxWidth: 1040, margin: '0 auto' }}>
               <p style={{ margin: '0 0 16px', fontWeight: 800, fontSize: '0.75rem', color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                 Coin Paketlari
               </p>
@@ -231,7 +224,6 @@ export default function ShopPage() {
                   return (
                     <motion.div
                       key={pkg.id}
-                      {...fadeUp(0.15 + (i * 0.1))}
                       whileHover={{ y: -4, boxShadow: isPro ? '0 24px 48px rgba(245,158,11,0.3)' : '0 16px 32px rgba(15,23,42,0.12)' }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedPkg(pkg)}
@@ -309,8 +301,7 @@ export default function ShopPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
                 {/* Custom Input */}
-                <motion.div
-                  {...fadeUp(0.4)}
+                <div
                   style={{
                     background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px) saturate(2)', WebkitBackdropFilter: 'blur(32px) saturate(2)',
                     border: '1px solid rgba(15,23,42,0.06)', borderRadius: 32, padding: '32px',
@@ -361,11 +352,10 @@ export default function ShopPage() {
                       </motion.button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
 
                 {/* How to Buy Guide */}
-                <motion.div
-                  {...fadeUp(0.5)}
+                <div
                   style={{
                     background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)',
                     border: '1px solid rgba(15,23,42,0.04)', borderRadius: 32, padding: '32px',
@@ -394,9 +384,9 @@ export default function ShopPage() {
                       )
                     })}
                   </div>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
 // src/pages/LeaderboardPage.jsx
 // Top 50 o'quvchilar reytingi — coins & streak asosida.
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Trophy, Flame, Coins, Crown, Star, Sparkles } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 // ─── Minimalist avatar fallback ──────────────────────
 function Avatar({ user, size = 44 }) {
@@ -45,10 +45,8 @@ function PodiumCard({ user, rank, isSelf, tab }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
       whileTap={{ scale: 0.97 }}
-      transition={{ delay: 0.15 + rank * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className={`card-glow-hover ${glowClass}`}
       style={{
         flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
@@ -63,7 +61,7 @@ function PodiumCard({ user, rank, isSelf, tab }) {
       }}
     >
       {isFirst && (
-        <motion.div 
+        <motion.div
           animate={{ y: [0, -6, 0], rotate: [0, -5, 5, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           style={{ position: 'absolute', top: -14, zIndex: 20 }}
@@ -110,10 +108,8 @@ function LeaderRow({ user, rank, isSelf, tab }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
       whileTap={{ scale: 0.98 }}
-      transition={{ delay: Math.min((rank - 3) * 0.05 + 0.3, 0.8), duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className={`card-glow-hover ${glowClass}`}
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
@@ -153,11 +149,18 @@ function LeaderRow({ user, rank, isSelf, tab }) {
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: '#F8FAFC', padding: '6px 10px', borderRadius: 100 }}>
-        {tab === 'streak'
-          ? <><Flame size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.streak_count}</span></>
-          : <><Sparkles size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.rating_score?.toLocaleString() || 0}</span></>
-        }
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0, background: '#F8FAFC', padding: '6px 12px', borderRadius: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {tab === 'streak'
+            ? <><Flame size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.streak_count}</span></>
+            : <><Sparkles size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.rating_score?.toLocaleString() || 0}</span></>
+          }
+        </div>
+        {tab === 'daily' && user.time_ms != null && (
+          <span style={{ fontSize: '0.6875rem', color: '#94A3B8', fontWeight: 600 }}>
+            {Math.floor(user.time_ms / 1000)}s
+          </span>
+        )}
       </div>
     </motion.div>
   )
@@ -195,11 +198,67 @@ function PodiumSkeleton() {
 // ─── Main component ────────────────────────────────
 export default function LeaderboardPage() {
   const { user } = useAuth()
-  const [tab, setTab] = useState('rating') // 'rating' | 'streak'
+  const queryClient = useQueryClient()
+  const [tab, setTab] = useState('daily') // 'daily' | 'rating' | 'streak'
+
+  // ── Real-time subscription ─────────────────────────
+  useEffect(() => {
+    // Listen to profile rating/streak changes (rating & streak tabs)
+    const profileChannel = supabase.channel('leaderboard-profiles')
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'profiles'
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['leaderboard', 'rating'] })
+        queryClient.invalidateQueries({ queryKey: ['leaderboard', 'streak'] })
+      })
+      .subscribe()
+
+    // Listen to daily quiz attempt changes (daily tab)
+    const attemptChannel = supabase.channel('leaderboard-attempts')
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'daily_quiz_attempts'
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['leaderboard', 'daily'] })
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(profileChannel)
+      supabase.removeChannel(attemptChannel)
+    }
+  }, [queryClient])
 
   const { data: leaders = [], isLoading: loading } = useQuery({
     queryKey: ['leaderboard', tab],
     queryFn: async () => {
+      if (tab === 'daily') {
+        // Fetch today's (or latest active) daily quiz
+        const { data: quiz } = await supabase
+          .from('daily_quizzes')
+          .select('id')
+          .eq('is_active', true)
+          .order('quiz_date', { ascending: false })
+          .limit(1)
+          .single()
+        if (!quiz) return []
+
+        // Fetch attempts: sorted by score DESC, then fastest time ASC
+        const { data, error } = await supabase
+          .from('daily_quiz_attempts')
+          .select('score, time_ms, profiles(id, full_name, avatar_url, streak_count)')
+          .eq('daily_quiz_id', quiz.id)
+          .not('score', 'is', null)
+          .order('score', { ascending: false })
+          .order('time_ms', { ascending: true })
+          .limit(50)
+        if (error) throw error
+        return (data || []).map(a => ({
+          ...a.profiles,
+          rating_score: a.score,
+          time_ms: a.time_ms,
+        }))
+      }
+
       const col = tab === 'rating' ? 'rating_score' : 'streak_count'
       const { data, error } = await supabase
         .from('profiles')
@@ -209,7 +268,8 @@ export default function LeaderboardPage() {
       if (error) throw error
       return data || []
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 0,
+    refetchInterval: 30_000, // fallback: refresh every 30s
   })
 
   const myRank = leaders.findIndex(l => l.id === user?.id)
@@ -244,6 +304,44 @@ export default function LeaderboardPage() {
         
         .leader-content { padding: 0 24px; position: relative; z-index: 10; }
         @media (max-width: 768px) { .leader-content { padding: 0 16px; } }
+
+        .leader-tab-bar {
+          display: flex;
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-radius: 100px;
+          padding: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          position: relative;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+          margin-bottom: 24px;
+          max-width: 500px;
+        }
+        .leader-tab-bar::-webkit-scrollbar { display: none; }
+        
+        .leader-tab-btn {
+          flex: 1 0 auto;
+          padding: 10px 20px;
+          border: none;
+          background: transparent;
+          color: rgba(255, 255, 255, 0.6);
+          font-weight: 600;
+          font-size: 0.9375rem;
+          cursor: pointer;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: color 0.3s ease;
+          font-family: inherit;
+          -webkit-tap-highlight-color: transparent;
+          z-index: 1;
+          white-space: nowrap;
+        }
       `}</style>
 
       <div className="leader-page-wrapper">
@@ -273,7 +371,7 @@ export default function LeaderboardPage() {
           <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
 
             {/* ── Header ── */}
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ marginBottom: 32 }}>
+            <div style={{ marginBottom: 32 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -303,20 +401,13 @@ export default function LeaderboardPage() {
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
 
-            {/* ── Segmented Control (Apple style) ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                display: 'flex', marginBottom: 20,
-                background: 'rgba(0,0,0,0.15)', borderRadius: 100, padding: 4,
-                border: '1px solid rgba(255,255,255,0.1)',
-                maxWidth: 400
-              }}
-            >
+            {/* ── Tab Switcher (Responsive Apple style) ── */}
+            <div className="leader-tab-bar">
               {[
-                { key: 'rating', icon: <Sparkles size={16} />, label: 'Reyting Balli' },
+                { key: 'daily', icon: <Trophy size={16} />, label: 'Kunlik' },
+                { key: 'rating', icon: <Sparkles size={16} />, label: 'Reyting' },
                 { key: 'streak', icon: <Flame size={16} />, label: 'Streak' },
               ].map(t => {
                 const isActive = tab === t.key
@@ -324,13 +415,8 @@ export default function LeaderboardPage() {
                   <button
                     key={t.key}
                     onClick={() => setTab(t.key)}
-                    style={{
-                      flex: 1, padding: '10px 12px', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                      fontWeight: isActive ? 800 : 600, fontSize: '0.9375rem', position: 'relative',
-                      background: 'transparent', color: isActive ? '#78350F' : 'rgba(255,255,255,0.6)',
-                      WebkitTapHighlightColor: 'transparent', transition: 'color 0.3s ease',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, zIndex: 1
-                    }}
+                    className="leader-tab-btn"
+                    style={{ color: isActive ? '#78350F' : undefined }}
                   >
                     {isActive && (
                       <motion.div
@@ -345,7 +431,7 @@ export default function LeaderboardPage() {
                   </button>
                 )
               })}
-            </motion.div>
+            </div>
 
           </div>
         </div>
@@ -358,8 +444,7 @@ export default function LeaderboardPage() {
             {loading ? (
               <PodiumSkeleton />
             ) : !loading && top3.length === 3 && (
-              <motion.div
-                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              <div
                 style={{
                   background: 'transparent',
                   marginBottom: 20, paddingTop: 48,
@@ -375,7 +460,7 @@ export default function LeaderboardPage() {
                     tab={tab}
                   />
                 ))}
-              </motion.div>
+              </div>
             )}
 
             {/* List */}

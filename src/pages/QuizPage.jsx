@@ -293,9 +293,13 @@ export default function QuizPage() {
     } else {
       await supabase.from('quiz_attempts').insert({ user_id: user.id, lesson_id: lessonId, score: finScore, total: quizzes.length, time_spent_sec: spent, answers: finAnswers, completed })
     }
-    // Real-time update for Hub and Dashboard
+    // Real-time update for Hub, Dashboard, Profile and Leaderboard
     queryClient.invalidateQueries({ queryKey: ['quizzes-hub', user?.id] })
     queryClient.invalidateQueries({ queryKey: ['dashboard-daily-quiz', user?.id] })
+    queryClient.invalidateQueries({ queryKey: ['profile-stats', user?.id] })
+    queryClient.invalidateQueries({ queryKey: ['leaderboard', 'rating'] })
+    queryClient.invalidateQueries({ queryKey: ['leaderboard', 'streak'] })
+    queryClient.invalidateQueries({ queryKey: ['leaderboard', 'daily'] })
   }, [user, lessonId, quizzes.length, isDaily, dailyAttempt, queryClient])
 
   const finishQuiz = useCallback((sc, ans) => {
