@@ -3,10 +3,19 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Trophy, Flame, Coins, Crown, Star, Sparkles } from 'lucide-react'
+import { Trophy, Flame, Coins, Crown, Star, Sparkles, Clock } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+
+// ─── Utility functions ──────────────────────────────
+const formatTime = (ms) => {
+  if (!ms) return '00:00'
+  const totalSecs = Math.floor(ms / 1000)
+  const m = Math.floor(totalSecs / 60)
+  const s = totalSecs % 60
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
 
 // ─── Minimalist avatar fallback ──────────────────────
 function Avatar({ user, size = 44 }) {
@@ -98,6 +107,19 @@ function PodiumCard({ user, rank, isSelf, tab }) {
           : <><Sparkles size={12} color={isFirst ? '#D97706' : '#64748B'} /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.8125rem', color: isFirst ? '#92400E' : '#334155' }}>{user.rating_score?.toLocaleString() || 0}</span></>
         }
       </div>
+      {tab === 'daily' && user.time_ms != null && (
+        <div style={{ 
+          display: 'inline-flex', alignItems: 'center', gap: 4, 
+          marginTop: 6, background: isFirst ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.04)',
+          padding: '4px 10px', borderRadius: 100,
+          border: isFirst ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(0,0,0,0.02)'
+        }}>
+          <Clock size={10} color={isFirst ? '#92400E' : '#64748B'} strokeWidth={3} />
+          <span style={{ fontSize: '0.6875rem', color: isFirst ? '#92400E' : '#64748B', fontWeight: 800, fontFamily: 'monospace' }}>
+            {formatTime(user.time_ms)}
+          </span>
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -130,23 +152,34 @@ function LeaderRow({ user, rank, isSelf, tab }) {
 
       <Avatar user={user} size={40} />
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <p className="outfit-font" style={{
-          margin: '0 0 2px', fontWeight: 700, fontSize: '0.9375rem',
-          color: '#0F172A',
+          margin: 0, fontWeight: 700, fontSize: '0.9375rem',
+          color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {user.full_name || 'O\'quvchi'}
-          {isSelf && <span style={{ marginLeft: 6, fontSize: '0.625rem', fontWeight: 800, color: 'white', background: '#3461FF', padding: '2px 6px', borderRadius: 100 }} >Siz</span>}
+          {isSelf && <span style={{ fontSize: '0.625rem', fontWeight: 800, color: 'white', background: '#3461FF', padding: '2px 6px', borderRadius: 100 }} >Siz</span>}
         </p>
-        {user.streak_count > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Flame size={12} color="#F59E0B" />
-            <span style={{ fontSize: '0.8125rem', color: '#64748B', fontWeight: 500 }}>
-              {user.streak_count} kun streak
-            </span>
-          </div>
-        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {user.streak_count > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Flame size={12} color="#F59E0B" />
+              <span style={{ fontSize: '0.8125rem', color: '#64748B', fontWeight: 500 }}>
+                {user.streak_count} kun streak
+              </span>
+            </div>
+          )}
+          {tab === 'daily' && user.time_ms != null && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#94A3B8' }}>
+              <Clock size={12} strokeWidth={2.5} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, fontFamily: 'monospace', color: '#64748B' }}>
+                {formatTime(user.time_ms)}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0, background: '#F8FAFC', padding: '6px 12px', borderRadius: 16 }}>
@@ -156,11 +189,6 @@ function LeaderRow({ user, rank, isSelf, tab }) {
             : <><Sparkles size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.rating_score?.toLocaleString() || 0}</span></>
           }
         </div>
-        {tab === 'daily' && user.time_ms != null && (
-          <span style={{ fontSize: '0.6875rem', color: '#94A3B8', fontWeight: 600 }}>
-            {Math.floor(user.time_ms / 1000)}s
-          </span>
-        )}
       </div>
     </motion.div>
   )
@@ -232,31 +260,59 @@ export default function LeaderboardPage() {
     queryKey: ['leaderboard', tab],
     queryFn: async () => {
       if (tab === 'daily') {
-        // Fetch today's (or latest active) daily quiz
-        const { data: quiz } = await supabase
+        // 1. Get the currently active daily quiz (Today's Quiz)
+        // This ensures the leaderboard is fresh every day and only shows today's participants.
+        const { data: activeQuiz } = await supabase
           .from('daily_quizzes')
           .select('id')
           .eq('is_active', true)
           .order('quiz_date', { ascending: false })
           .limit(1)
-          .single()
-        if (!quiz) return []
+          .maybeSingle()
 
-        // Fetch attempts: sorted by score DESC, then fastest time ASC
-        const { data, error } = await supabase
+        if (!activeQuiz) return [] // No active quiz today = empty leaderboard
+
+        // 2. BULLETPROOF FAILSAFE:
+        // Fetch raw attempts for THIS specific quiz without complex DB ordering or joins.
+        const { data: rawAtts, error: aErr } = await supabase
           .from('daily_quiz_attempts')
-          .select('score, time_ms, profiles(id, full_name, avatar_url, streak_count)')
-          .eq('daily_quiz_id', quiz.id)
-          .not('score', 'is', null)
-          .order('score', { ascending: false })
-          .order('time_ms', { ascending: true })
-          .limit(50)
-        if (error) throw error
-        return (data || []).map(a => ({
-          ...a.profiles,
-          rating_score: a.score,
-          time_ms: a.time_ms,
-        }))
+          .select('*')
+          .eq('daily_quiz_id', activeQuiz.id)
+          .limit(500) // generous limit
+
+        if (aErr) throw aErr
+        if (!rawAtts || rawAtts.length === 0) return []
+
+        // Filter valid attempts in JS
+        const validAtts = rawAtts.filter(a => a.score !== null && a.score !== undefined)
+        if (validAtts.length === 0) return []
+
+        // Manually fetch profiles
+        const userIds = [...new Set(validAtts.map(a => a.user_id))]
+        const { data: profs, error: pErr } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, streak_count')
+          .in('id', userIds)
+        
+        if (pErr) throw pErr
+
+        const profMap = {}
+        profs?.forEach(p => { profMap[p.id] = p })
+
+        return validAtts
+          .map(a => {
+            const p = profMap[a.user_id]
+            if (!p) return null
+            return {
+              ...p,
+              rating_score: a.score,
+              time_ms: a.time_ms || (a.time_spent_sec ? a.time_spent_sec * 1000 : 0),
+              id: a.user_id
+            }
+          })
+          .filter(Boolean)
+          .sort((a, b) => b.rating_score - a.rating_score || a.time_ms - b.time_ms)
+          .slice(0, 50)
       }
 
       const col = tab === 'rating' ? 'rating_score' : 'streak_count'
@@ -440,10 +496,10 @@ export default function LeaderboardPage() {
         <div className="leader-container">
           <div className="leader-content">
 
-            {/* Podium — only if at least 3 users */}
+            {/* Podium — always shown if there is at least 1 user */}
             {loading ? (
               <PodiumSkeleton />
-            ) : !loading && top3.length === 3 && (
+            ) : !loading && top3.length > 0 && (
               <div
                 style={{
                   background: 'transparent',
@@ -451,15 +507,19 @@ export default function LeaderboardPage() {
                   display: 'flex', alignItems: 'flex-end', gap: 12, justifyContent: 'center'
                 }}
               >
-                {PODIUM_ORDER.map(rank => (
-                  <PodiumCard
-                    key={rank}
-                    user={top3[rank]}
-                    rank={rank}
-                    isSelf={top3[rank]?.id === user?.id}
-                    tab={tab}
-                  />
-                ))}
+                {PODIUM_ORDER.map(rank => {
+                  const pUser = top3[rank]
+                  if (!pUser) return <div key={`empty-${rank}`} style={{ flex: 1, maxWidth: '33.33%' }} />
+                  return (
+                    <PodiumCard
+                      key={rank}
+                      user={pUser}
+                      rank={rank}
+                      isSelf={pUser.id === user?.id}
+                      tab={tab}
+                    />
+                  )
+                })}
               </div>
             )}
 
@@ -494,11 +554,8 @@ export default function LeaderboardPage() {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {/* If podium shown, only render ranks 4+ in list */}
-                  {top3.length < 3
-                    ? leaders.map((u, i) => <LeaderRow key={u.id} user={u} rank={i} isSelf={u.id === user?.id} tab={tab} />)
-                    : rest.map((u, i) => <LeaderRow key={u.id} user={u} rank={i + 3} isSelf={u.id === user?.id} tab={tab} />)
-                  }
+                  {/* Always render rest of the users in list format */}
+                  {rest.map((u, i) => <LeaderRow key={u.id} user={u} rank={i + 3} isSelf={u.id === user?.id} tab={tab} />)}
                 </div>
               )}
             </div>

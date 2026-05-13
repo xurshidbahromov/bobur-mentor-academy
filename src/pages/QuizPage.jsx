@@ -8,7 +8,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { 
   ArrowLeft, CheckCircle2, XCircle, Trophy, RotateCcw, 
-  ChevronRight, HelpCircle, Star, Clock, Target, Loader2, Coins, Flame, Play
+  ChevronRight, HelpCircle, Star, Clock, Target, Loader2, Coins, Flame, Play, Sparkles
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -158,11 +158,28 @@ function ResultCard({ score, total, timeSpent, isDaily, onRetry, onBack, onAnaly
       <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} style={{ background: 'white', border: '1px solid rgba(15,23,42,0.08)', borderRadius: 40, padding: '56px 40px', textAlign: 'center', boxShadow: '0 32px 100px rgba(15,23,42,0.1)', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translate(-50%, -50%)', width: 300, height: 300, background: gradeColor, opacity: 0.1, filter: 'blur(70px)', pointerEvents: 'none' }} />
         
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 36 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 24 }}>
           {[1, 2, 3].map(i => (
             <motion.div key={i} initial={{ scale: 0, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', delay: i * 0.12 }}><Star size={i === 2 ? 64 : 48} color={i <= stars ? '#FCD34D' : '#E2E8F0'} fill={i <= stars ? '#FCD34D' : '#E2E8F0'} style={{ transform: i === 2 ? 'translateY(-12px)' : 'none', filter: i <= stars ? 'drop-shadow(0 8px 16px rgba(252,211,77,0.4))' : 'none' }} /></motion.div>
           ))}
         </div>
+
+        {isDaily && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.6 }}
+            style={{ 
+              display: 'inline-flex', alignItems: 'center', gap: 8, 
+              background: 'linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%)', 
+              padding: '8px 20px', borderRadius: 100, marginBottom: 24,
+              boxShadow: '0 8px 24px rgba(245,158,11,0.2)',
+              border: '1px solid rgba(255,255,255,0.4)'
+            }}
+          >
+            <Sparkles size={16} color="#92400E" fill="#92400E" />
+            <span style={{ fontWeight: 900, fontSize: '0.9375rem', color: '#92400E' }}>+{score} XP YUTDINGIZ!</span>
+          </motion.div>
+        )}
         
         <h2 className="outfit-font" style={{ margin: '0 0 8px', fontSize: '4.5rem', fontWeight: 900, color: gradeColor, letterSpacing: '-0.05em', lineHeight: 1 }}>{pct}%</h2>
         <p style={{ margin: '0 0 8px', fontWeight: 900, fontSize: '1.5rem', color: '#0F172A' }}>{gradeText}</p>
