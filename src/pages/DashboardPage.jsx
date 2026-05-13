@@ -487,7 +487,7 @@ export default function DashboardPage() {
                     <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Testlar Markazi</span>
                   </motion.button>
                   {dailyData?.quiz && (
-                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => dailyData.attempt ? navigate('/daily-leaderboard') : navigate(`/daily-quiz/${dailyData.quiz.id}`)} className="dash-quick-chip" style={{ background: 'rgba(52,97,255,0.2)', border: '1px solid rgba(52,97,255,0.4)' }}>
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => dailyData.attempt ? navigate('/leaderboard') : navigate(`/quiz/daily-${dailyData.quiz.id}`)} className="dash-quick-chip" style={{ background: 'rgba(52,97,255,0.2)', border: '1px solid rgba(52,97,255,0.4)' }}>
                       <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Flame size={14} color="white" /></div>
                       <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Kunlik Test</span>
                       <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)' }} />
