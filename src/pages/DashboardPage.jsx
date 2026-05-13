@@ -420,7 +420,8 @@ export default function DashboardPage() {
                     height: 44, borderRadius: 100,
                     overflow: 'hidden', cursor: isSearchOpen ? 'text' : 'pointer',
                     zIndex: 10,
-                    backdropFilter: isSearchOpen ? 'blur(24px)' : 'none'
+                    backdropFilter: isSearchOpen ? 'blur(20px)' : 'none',
+                    WebkitBackdropFilter: isSearchOpen ? 'blur(20px)' : 'none'
                   }}
                   onClick={() => {
                     if (!isSearchOpen) {

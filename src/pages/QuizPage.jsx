@@ -462,7 +462,7 @@ export default function QuizPage() {
 
       <AnimatePresence>
         {showPaymentModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ background: 'white', padding: 40, borderRadius: 40, maxWidth: 420, width: '100%', textAlign: 'center', boxShadow: '0 40px 100px rgba(0,0,0,0.3)' }}>
               <div style={{ width: 80, height: 80, borderRadius: 32, background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}><Coins size={40} color="#F59E0B" /></div>
               <h3 className="outfit-font" style={{ margin: '0 0 12px', fontWeight: 900, fontSize: '1.5rem' }}>Premium Test</h3>
@@ -478,7 +478,7 @@ export default function QuizPage() {
 
       <AnimatePresence>
         {zoomedImage && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setZoomedImage(null)} style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, cursor: 'zoom-out' }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setZoomedImage(null)} style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, cursor: 'zoom-out' }}>
             <motion.img initial={{ scale: 0.9 }} animate={{ scale: 1 }} src={zoomedImage} alt="Zoomed" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: 24, boxShadow: '0 40px 100px rgba(0,0,0,0.5)' }} />
           </motion.div>
         )}

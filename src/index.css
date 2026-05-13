@@ -72,8 +72,9 @@
   --spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* --- Blur (Glassmorphism) --- */
-  --blur-glass: blur(24px) saturate(2);
-  --blur-light: blur(12px) saturate(1.5);
+  /* Note: saturate() removed — poor Android WebView support */
+  --blur-glass: blur(20px);
+  --blur-light: blur(10px);
 }
 
 /* === Base Reset === */
@@ -363,6 +364,22 @@ textarea {
   transition: var(--transition-medium);
 }
 
+/* === Android WebView Fallback: solid backgrounds when blur unsupported === */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.97) !important;
+    -webkit-backdrop-filter: none;
+  }
+  .glass-card-premium {
+    background: #FFFFFF !important;
+    -webkit-backdrop-filter: none;
+  }
+  .card-glow-hover {
+    background: #FFFFFF !important;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 /* === Lesson Detail Responsiveness === */
 .lesson-grid {
   display: grid;
@@ -488,9 +505,9 @@ textarea {
 .card-glow-hover {
   --glow-rgb: 52, 97, 255;
   position: relative;
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(24px) saturate(2);
-  -webkit-backdrop-filter: blur(24px) saturate(2);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 32px rgba(15, 23, 42, 0.05);
   border: 1px solid var(--border-medium);
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);

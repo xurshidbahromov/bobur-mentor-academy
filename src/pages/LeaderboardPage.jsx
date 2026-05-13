@@ -471,8 +471,9 @@ export default function LeaderboardPage() {
                 <div style={{
                   padding: '80px 20px', textAlign: 'center',
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  background: 'rgba(255, 255, 255, 0.78)',
-                  backdropFilter: 'blur(32px)',
+                  background: 'rgba(255, 255, 255, 0.96)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
                   borderRadius: 32,
                   border: '1px solid var(--border-medium)',
                 }}>
