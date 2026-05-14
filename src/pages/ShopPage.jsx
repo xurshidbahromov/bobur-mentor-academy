@@ -303,7 +303,7 @@ export default function ShopPage() {
                 {/* Custom Input */}
                 <div
                   style={{
-                    background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px) saturate(2)', WebkitBackdropFilter: 'blur(32px) saturate(2)',
+                    background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)',
                     border: '1px solid rgba(15,23,42,0.06)', borderRadius: 32, padding: '32px',
                     boxShadow: '0 12px 32px rgba(15,23,42,0.04)',
                   }}
