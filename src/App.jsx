@@ -47,6 +47,13 @@ function TelegramAutoLogin() {
   const { user, loading, signInWithTelegram } = useAuth()
 
   useEffect(() => {
+    // Add Android detection globally to fix CSS glassmorphism bugs
+    if (/android/i.test(navigator.userAgent)) {
+      document.body.classList.add('is-android')
+    }
+  }, [])
+
+  useEffect(() => {
     if (!isTelegram || loading || user || !tgUser) return
     const shouldAutoLogin = localStorage.getItem('bma_tg_autologin') === 'true'
     if (!shouldAutoLogin) return

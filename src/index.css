@@ -12,8 +12,8 @@
   --bg-base:           #F8FAFC;
   --bg-surface:        rgba(255, 255, 255, 0.9);
   --bg-elevated:       #FFFFFF;
-  --bg-glass:          rgba(255, 255, 255, 0.65);
-  --bg-glass-strong:   rgba(255, 255, 255, 0.85);
+  --bg-glass:          rgba(255, 255, 255, 0.75);
+  --bg-glass-strong:   rgba(255, 255, 255, 0.95);
 
   /* --- Borders --- */
   --border-soft:       rgba(255, 255, 255, 0.4);
@@ -384,6 +384,20 @@ textarea {
     background: #FFFFFF !important;
     -webkit-backdrop-filter: none;
   }
+}
+
+/* === Force Solid Backgrounds on Android Boxes (Fixes Fake Backdrop-Filter Support) === */
+.is-android .glass-card,
+.is-android .glass-card-premium {
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.is-android .dash-stats-pill {
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* === Lesson Detail Responsiveness === */
