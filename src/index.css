@@ -10,16 +10,16 @@
 :root {
   /* --- Backgrounds (Clean Minimalist Slate) --- */
   --bg-base:           #F8FAFC;
-  --bg-surface:        rgba(255, 255, 255, 0.9);
+  --bg-surface:        rgba(255, 255, 255, 0.98);
   --bg-elevated:       #FFFFFF;
-  --bg-glass:          rgba(255, 255, 255, 0.75);
-  --bg-glass-strong:   rgba(255, 255, 255, 0.95);
+  --bg-glass:          rgba(255, 255, 255, 0.95);
+  --bg-glass-strong:   rgba(255, 255, 255, 1);
 
   /* --- Borders --- */
   --border-soft:       rgba(255, 255, 255, 0.4);
   --border-medium:     rgba(255, 255, 255, 0.6);
   --border-strong:     rgba(255, 255, 255, 0.9);
-  --border-glass:      rgba(255, 255, 255, 0.85);
+  --border-glass:      rgba(255, 255, 255, 1);
 
   /* --- Primary --- */
   --color-primary: #3461FF;

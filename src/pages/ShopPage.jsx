@@ -357,7 +357,7 @@ export default function ShopPage() {
                 {/* How to Buy Guide */}
                 <div
                   style={{
-                    background: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)',
+                    background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)',
                     border: '1px solid rgba(15,23,42,0.04)', borderRadius: 32, padding: '32px',
                   }}
                 >

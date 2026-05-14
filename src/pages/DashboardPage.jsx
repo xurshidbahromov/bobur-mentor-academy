@@ -264,7 +264,7 @@ export default function DashboardPage() {
         .dash-greeting h2 { margin:0; font-size:1.75rem; font-weight:900; color:white; letter-spacing:-0.03em; line-height:1; }
         .dash-stats-pill {
           display:inline-flex; align-items:center;
-          background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.22);
+          background:rgba(255,255,255,0.95); border:1px solid rgba(255,255,255,0.8);
           border-radius:100px; padding:3px; gap:3px;
           backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
         }
