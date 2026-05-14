@@ -363,9 +363,7 @@ export default function LeaderboardPage() {
 
         .leader-tab-bar {
           display: flex;
-          background: rgba(255, 255, 255, 0.08);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          background: rgba(0, 0, 0, 0.4);
           border-radius: 100px;
           padding: 4px;
           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -375,6 +373,13 @@ export default function LeaderboardPage() {
           -webkit-overflow-scrolling: touch;
           margin-bottom: 24px;
           max-width: 500px;
+        }
+        @supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
+          .leader-tab-bar {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+          }
         }
         .leader-tab-bar::-webkit-scrollbar { display: none; }
         

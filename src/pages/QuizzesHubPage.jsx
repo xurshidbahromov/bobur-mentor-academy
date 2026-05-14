@@ -94,7 +94,7 @@ export default function QuizzesHubPage() {
         }
         .qhub-tab-bar {
           display: flex;
-          background: rgba(255, 255, 255, 0.06);
+          background: rgba(0, 0, 0, 0.4);
           border-radius: 100px;
           padding: 4px;
           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -102,8 +102,13 @@ export default function QuizzesHubPage() {
           overflow-x: auto;
           scrollbar-width: none;
           -webkit-overflow-scrolling: touch;
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+        }
+        @supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
+          .qhub-tab-bar {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+          }
         }
         .qhub-tab-bar::-webkit-scrollbar { display: none; }
         .qhub-tab-btn {
