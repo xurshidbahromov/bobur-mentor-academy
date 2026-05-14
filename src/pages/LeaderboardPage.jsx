@@ -363,23 +363,18 @@ export default function LeaderboardPage() {
 
         .leader-tab-bar {
           display: flex;
-          background: rgba(0, 0, 0, 0.4);
+          background: rgba(0, 0, 0, 0.25);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
           border-radius: 100px;
           padding: 4px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           position: relative;
           overflow-x: auto;
           scrollbar-width: none;
           -webkit-overflow-scrolling: touch;
           margin-bottom: 24px;
           max-width: 500px;
-        }
-        @supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
-          .leader-tab-bar {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-          }
         }
         .leader-tab-bar::-webkit-scrollbar { display: none; }
         
