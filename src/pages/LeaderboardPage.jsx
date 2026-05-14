@@ -306,7 +306,7 @@ export default function LeaderboardPage() {
             return {
               ...p,
               rating_score: a.score,
-              time_ms: a.time_ms || (a.time_spent_sec ? a.time_spent_sec * 1000 : 0),
+              time_ms: a.time_taken_ms || a.time_ms || (a.time_spent_sec ? a.time_spent_sec * 1000 : 0),
               id: a.user_id
             }
           })

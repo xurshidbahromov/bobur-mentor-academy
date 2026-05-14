@@ -13,9 +13,29 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchProfile = async (userId) => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
-    if (data) setProfile(data)
+  const fetchProfile = async (userObj) => {
+    if (!userObj?.id) return
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userObj.id).single()
+    
+    if (data) {
+      setProfile(data)
+    } else if (error && error.code === 'PGRST116') {
+      // Profile doesn't exist (Email/Google login without DB trigger)
+      // We must create it manually so that streak calculation can start
+      const email = userObj.email || ''
+      const metaName = userObj.user_metadata?.full_name || userObj.user_metadata?.name || ''
+      const fullName = metaName || email.split('@')[0] || 'O\'quvchi'
+      const avatarUrl = userObj.user_metadata?.avatar_url || userObj.user_metadata?.picture || null
+      
+      const { data: newProfile } = await supabase.from('profiles').upsert({
+        id: userObj.id,
+        full_name: fullName,
+        avatar_url: avatarUrl,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' }).select().single()
+      
+      if (newProfile) setProfile(newProfile)
+    }
   }
 
   useEffect(() => {
@@ -24,7 +44,7 @@ export function AuthProvider({ children }) {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setLoading(false))
+        fetchProfile(session.user).finally(() => setLoading(false))
       } else {
         setProfile(null)
         setLoading(false)
@@ -37,7 +57,7 @@ export function AuthProvider({ children }) {
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
-          fetchProfile(session.user.id).finally(() => setLoading(false))
+          fetchProfile(session.user).finally(() => setLoading(false))
         } else {
           setProfile(null)
           setLoading(false)

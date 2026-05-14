@@ -254,7 +254,7 @@ export default function QuizPage() {
         setQuizzes(quizData.quizzes)
         setDailyAttempt(quizData.existingAttempt)
         if (quizData.existingAttempt?.completed_at) {
-          setPhase('result'); setScore(quizData.existingAttempt.score); setTimeSpent(Math.floor(quizData.existingAttempt.time_ms / 1000))
+          setPhase('result'); setScore(quizData.existingAttempt.score); setTimeSpent(Math.floor((quizData.existingAttempt.time_taken_ms || quizData.existingAttempt.time_ms || 0) / 1000))
         }
       } else if (isGeneral) {
         setAllQuizzes(quizData.allQuizzes)
