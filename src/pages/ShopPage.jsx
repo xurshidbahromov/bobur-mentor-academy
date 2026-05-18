@@ -227,7 +227,7 @@ export default function ShopPage() {
                       whileHover={{ y: -4, boxShadow: isPro ? '0 24px 48px rgba(245,158,11,0.3)' : '0 16px 32px rgba(15,23,42,0.12)' }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedPkg(pkg)}
-                      className="glass-card-premium"
+                      className={`glass-card-premium ${isPro ? 'pro-package-card' : ''}`}
                       style={{
                         background: isPro ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : undefined,
                         backdropFilter: isPro ? 'none' : undefined,
