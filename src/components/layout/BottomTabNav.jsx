@@ -1,15 +1,16 @@
 // src/components/layout/BottomTabNav.jsx
 import { NavLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, ShoppingBag, Target, Trophy, User } from 'lucide-react'
+import { Home, ShoppingBag, Target, Trophy, User, GraduationCap } from 'lucide-react'
 import { useTelegram } from '../../context/TelegramProvider'
 
 const TABS = [
-  { to: '/dashboard', label: "Darslar", Icon: Home },
-  { to: '/shop', label: "Do'kon", Icon: ShoppingBag },
-  { to: '/quizzes', label: "Testlar", Icon: Target },
-  { to: '/leaderboard', label: "Reyting", Icon: Trophy },
-  { to: '/profile', label: "Profil", Icon: User },
+  { to: '/dashboard',  label: "Darslar",  Icon: Home },
+  { to: '/shop',       label: "Do'kon",   Icon: ShoppingBag },
+  { to: '/quizzes',    label: "Testlar",  Icon: Target },
+  { to: '/dtm',        label: "DTM",      Icon: GraduationCap },
+  { to: '/leaderboard',label: "Reyting",  Icon: Trophy },
+  { to: '/profile',    label: "Profil",   Icon: User },
 ]
 
 export default function BottomTabNav() {
@@ -46,7 +47,7 @@ export default function BottomTabNav() {
                   height: 48,
                   display: 'flex',
                   alignItems: 'center',
-                  padding: isActive ? '0 18px' : '0 12px',
+                  padding: isActive ? '0 12px' : '0 6px',
                   borderRadius: '100px',
                   background: isActive ? '#FFFFFF' : 'transparent',
                   boxShadow: isActive ? '0 4px 15px rgba(52, 97, 255, 0.12)' : 'none',

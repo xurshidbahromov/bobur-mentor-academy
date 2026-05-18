@@ -23,6 +23,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const QuizPage = lazy(() => import('./pages/QuizPage'))
 const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
 const QuizzesHubPage = lazy(() => import('./pages/QuizzesHubPage'))
+const DtmCalculatorPage = lazy(() => import('./pages/DtmCalculatorPage'))
 // DailyQuizPage and DailyQuizLeaderboard are removed - unified into QuizPage and main Leaderboard
 
 // ── Admin pages ───────────────────────────────────────
@@ -73,6 +74,7 @@ export default function AppRoutes() {
           <Route path="/leaderboard" element={<PW><LeaderboardPage /></PW>} />
           <Route path="/quizzes" element={<PW><QuizzesHubPage /></PW>} />
           <Route path="/quiz/:lessonId" element={<PW><QuizPage /></PW>} />
+          <Route path="/dtm" element={<PW><DtmCalculatorPage /></PW>} />
 
           {/* ── Admin ── */}
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>

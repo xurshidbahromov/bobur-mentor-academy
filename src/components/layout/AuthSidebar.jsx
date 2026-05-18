@@ -3,7 +3,7 @@
 
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Target, Bell, Coins } from 'lucide-react'
+import { BookOpen, ShoppingBag, User, Trophy, LogOut, ShieldCheck, Target, Bell, Coins, GraduationCap } from 'lucide-react'
 
 export default function AuthSidebar() {
   const { user, profile, isAdmin, signOut } = useAuth()
@@ -20,6 +20,7 @@ export default function AuthSidebar() {
   const links = [
     { to: '/dashboard',   label: 'Darslar',  icon: <BookOpen size={20} /> },
     { to: '/quizzes',     label: 'Testlar',  icon: <Target size={20} /> },
+    { to: '/dtm',         label: 'DTM Kalkulyator', icon: <GraduationCap size={20} /> },
     { to: '/leaderboard', label: 'Reyting',  icon: <Trophy size={20} /> },
     { to: '/shop',        label: "Do'kon",   icon: <ShoppingBag size={20} /> },
     { to: '/profile',     label: 'Profil',   icon: <User size={20} /> },

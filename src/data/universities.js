@@ -1,0 +1,356 @@
+// src/data/universities.js
+// DTM 2024 - O'zbekiston davlat universitetlari ma'lumotlar bazasi
+// Score = umumiy ball (maks 189 = 63×3)
+
+export const SUBJECT_BLOCKS = {
+  math_phys: 'Matematika, Fizika, Informatika',
+  math_chem: 'Matematika, Kimyo, Biologiya',
+  bio_chem:  'Kimyo, Biologiya, Geografiya',
+  lang_hist: "O'zbek tili, Tarix, Geografiya",
+  lang_lit:  "O'zbek tili, Adabiyot, Tarix",
+  math_econ: "Matematika, Iqtisodiyot, Tarix",
+  math_chem_phys: "Matematika, Fizika, Kimyo",
+}
+
+export const REGIONS = [
+  'Toshkent',  'Samarqand', 'Buxoro',
+  "Farg'ona", 'Andijon',   'Namangan',
+  'Qashqadaryo','Surxondaryo','Xorazm',
+  'Jizzax',   'Sirdaryo',  "Qoraqalpog'iston", 'Navoiy',
+]
+
+// iconType: 'book' | 'cpu' | 'settings' | 'heart' | 'bar-chart' | 'home' | 'shield' | 'users'
+export const UNIVERSITIES = [
+  // ── TOSHKENT ─────────────────────────────────────────
+  {
+    id: 'nuuz',
+    name: "O'zbekiston Milliy Universiteti",
+    short: 'NUUz',
+    region: 'Toshkent',
+    icon: '🎓',
+    color: '#1D4ED8',
+    website: 'nuu.uz',
+    specialties: [
+      { id: 'math',     name: 'Matematika',             block: 'math_phys',     grant: 170, contract: 135, price: 16_500_000, gSeats: 20, cSeats: 25 },
+      { id: 'phys',     name: 'Fizika',                 block: 'math_phys',     grant: 162, contract: 128, price: 15_000_000, gSeats: 18, cSeats: 20 },
+      { id: 'cs',       name: 'Kompyuter ilmlari',       block: 'math_phys',     grant: 175, contract: 142, price: 19_000_000, gSeats: 25, cSeats: 30 },
+      { id: 'chem',     name: 'Kimyo',                  block: 'math_chem',     grant: 158, contract: 122, price: 14_500_000, gSeats: 18, cSeats: 20 },
+      { id: 'bio',      name: 'Biologiya',               block: 'bio_chem',      grant: 155, contract: 120, price: 14_000_000, gSeats: 18, cSeats: 22 },
+      { id: 'hist',     name: 'Tarix',                  block: 'lang_hist',     grant: 148, contract: 112, price: 13_000_000, gSeats: 15, cSeats: 20 },
+      { id: 'uz_lit',   name: "O'zbek filologiyasi",    block: 'lang_lit',      grant: 145, contract: 110, price: 12_500_000, gSeats: 20, cSeats: 25 },
+      { id: 'econ',     name: 'Iqtisodiyot',            block: 'math_econ',     grant: 155, contract: 125, price: 17_000_000, gSeats: 20, cSeats: 30 },
+    ],
+  },
+  {
+    id: 'tatu',
+    name: 'Toshkent Axborot Texnologiyalari Universiteti',
+    short: 'TATU',
+    region: 'Toshkent',
+    icon: '💻',
+    color: '#7C3AED',
+    website: 'tuit.uz',
+    specialties: [
+      { id: 'se',   name: 'Dasturiy injiniring',        block: 'math_phys', grant: 178, contract: 148, price: 21_000_000, gSeats: 30, cSeats: 40 },
+      { id: 'ai',   name: 'Sun\'iy intellekt',           block: 'math_phys', grant: 180, contract: 150, price: 22_000_000, gSeats: 20, cSeats: 30 },
+      { id: 'cs2',  name: 'Kompyuter muhandisligi',      block: 'math_phys', grant: 175, contract: 145, price: 20_000_000, gSeats: 25, cSeats: 35 },
+      { id: 'ib',   name: 'Axborot xavfsizligi',        block: 'math_phys', grant: 172, contract: 140, price: 19_500_000, gSeats: 20, cSeats: 25 },
+      { id: 'tele', name: 'Telekommunikatsiya',          block: 'math_phys', grant: 165, contract: 132, price: 18_000_000, gSeats: 22, cSeats: 28 },
+    ],
+  },
+  {
+    id: 'tdtu',
+    name: 'Toshkent Davlat Texnika Universiteti',
+    short: 'TDTU',
+    region: 'Toshkent',
+    icon: '⚙️',
+    color: '#B45309',
+    website: 'tdtu.uz',
+    specialties: [
+      { id: 'mech',   name: 'Mashinasozlik',            block: 'math_phys',      grant: 155, contract: 120, price: 14_500_000, gSeats: 25, cSeats: 35 },
+      { id: 'civil',  name: 'Qurilish muhandisligi',     block: 'math_chem_phys', grant: 152, contract: 118, price: 14_000_000, gSeats: 20, cSeats: 30 },
+      { id: 'elec',   name: 'Elektrotexnika',            block: 'math_phys',      grant: 158, contract: 122, price: 15_000_000, gSeats: 25, cSeats: 30 },
+      { id: 'oil',    name: 'Neft-gaz muhandisligi',     block: 'math_chem_phys', grant: 160, contract: 125, price: 16_000_000, gSeats: 22, cSeats: 28 },
+      { id: 'auto',   name: 'Avtomobilsozlik',           block: 'math_phys',      grant: 148, contract: 115, price: 13_500_000, gSeats: 20, cSeats: 25 },
+    ],
+  },
+  {
+    id: 'tta',
+    name: 'Toshkent Tibbiyot Akademiyasi',
+    short: 'TTA',
+    region: 'Toshkent',
+    icon: '🏥',
+    color: '#059669',
+    website: 'tma.uz',
+    specialties: [
+      { id: 'med',    name: 'Davolash ishi',             block: 'bio_chem', grant: 178, contract: 145, price: 28_000_000, gSeats: 40, cSeats: 60 },
+      { id: 'ped',    name: 'Pediatriya',                block: 'bio_chem', grant: 172, contract: 140, price: 26_000_000, gSeats: 30, cSeats: 40 },
+      { id: 'stom',   name: 'Stomatologiya',             block: 'bio_chem', grant: 175, contract: 148, price: 30_000_000, gSeats: 25, cSeats: 50 },
+      { id: 'pharm',  name: 'Farmatsiya',                block: 'bio_chem', grant: 168, contract: 135, price: 24_000_000, gSeats: 25, cSeats: 35 },
+    ],
+  },
+  {
+    id: 'tdiu',
+    name: 'Toshkent Davlat Iqtisodiyot Universiteti',
+    short: 'TDIU',
+    region: 'Toshkent',
+    icon: '📊',
+    color: '#0891B2',
+    website: 'tdiu.uz',
+    specialties: [
+      { id: 'fin',    name: 'Moliya',                   block: 'math_econ', grant: 158, contract: 125, price: 18_000_000, gSeats: 30, cSeats: 50 },
+      { id: 'acc',    name: 'Buxgalteriya hisobi',       block: 'math_econ', grant: 150, contract: 118, price: 16_000_000, gSeats: 25, cSeats: 40 },
+      { id: 'mgmt',   name: 'Menejment',                block: 'math_econ', grant: 148, contract: 115, price: 15_500_000, gSeats: 25, cSeats: 40 },
+      { id: 'bank',   name: 'Bank ishi',                block: 'math_econ', grant: 155, contract: 122, price: 17_000_000, gSeats: 25, cSeats: 35 },
+      { id: 'mktg',   name: 'Marketing',                block: 'math_econ', grant: 145, contract: 112, price: 15_000_000, gSeats: 20, cSeats: 35 },
+    ],
+  },
+  {
+    id: 'taqi',
+    name: 'Toshkent Arxitektura-Qurilish Instituti',
+    short: 'TAQI',
+    region: 'Toshkent',
+    icon: '🏛️',
+    color: '#DC2626',
+    website: 'taqi.uz',
+    specialties: [
+      { id: 'arch',   name: 'Arxitektura',              block: 'math_phys',      grant: 158, contract: 122, price: 16_000_000, gSeats: 20, cSeats: 30 },
+      { id: 'civil2', name: 'Binolar qurilishi',         block: 'math_chem_phys', grant: 148, contract: 115, price: 14_500_000, gSeats: 25, cSeats: 35 },
+      { id: 'env',    name: 'Atrof-muhit muhandisligi',  block: 'math_chem_phys', grant: 142, contract: 108, price: 13_500_000, gSeats: 20, cSeats: 28 },
+    ],
+  },
+  {
+    id: 'tsul',
+    name: 'Toshkent Davlat Yuridik Universiteti',
+    short: 'TSUL',
+    region: 'Toshkent',
+    icon: '⚖️',
+    color: '#1D4ED8',
+    website: 'tsul.uz',
+    specialties: [
+      { id: 'law',    name: 'Huquqshunoslik',           block: 'lang_hist', grant: 165, contract: 130, price: 17_500_000, gSeats: 35, cSeats: 50 },
+      { id: 'intlaw', name: 'Xalqaro huquq',            block: 'lang_hist', grant: 170, contract: 138, price: 19_000_000, gSeats: 20, cSeats: 30 },
+    ],
+  },
+  {
+    id: 'tdpu',
+    name: 'Toshkent Davlat Pedagogika Universiteti',
+    short: 'TDPU',
+    region: 'Toshkent',
+    icon: '📚',
+    color: '#7C3AED',
+    website: 'tdpu.uz',
+    specialties: [
+      { id: 'math_t', name: 'Matematika o\'qituvchisi',  block: 'math_phys', grant: 138, contract: 102, price: 11_000_000, gSeats: 30, cSeats: 40 },
+      { id: 'eng_t',  name: 'Ingliz tili o\'qituvchisi', block: 'lang_lit',  grant: 148, contract: 112, price: 12_000_000, gSeats: 30, cSeats: 45 },
+      { id: 'hist_t', name: 'Tarix o\'qituvchisi',       block: 'lang_hist', grant: 132, contract: 98,  price: 10_500_000, gSeats: 25, cSeats: 35 },
+      { id: 'bio_t',  name: 'Biologiya o\'qituvchisi',   block: 'bio_chem',  grant: 135, contract: 100, price: 10_500_000, gSeats: 25, cSeats: 30 },
+    ],
+  },
+  // ── SAMARQAND ─────────────────────────────────────────
+  {
+    id: 'samdu',
+    name: 'Samarqand Davlat Universiteti',
+    short: 'SamDU',
+    region: 'Samarqand',
+    icon: '🕌',
+    color: '#059669',
+    website: 'samdu.uz',
+    specialties: [
+      { id: 'math',   name: 'Matematika',               block: 'math_phys', grant: 155, contract: 118, price: 13_000_000, gSeats: 20, cSeats: 25 },
+      { id: 'cs',     name: 'Kompyuter ilmlari',         block: 'math_phys', grant: 162, contract: 125, price: 15_000_000, gSeats: 22, cSeats: 28 },
+      { id: 'econ',   name: 'Iqtisodiyot',              block: 'math_econ', grant: 142, contract: 108, price: 12_500_000, gSeats: 20, cSeats: 30 },
+      { id: 'law',    name: 'Huquqshunoslik',           block: 'lang_hist', grant: 150, contract: 115, price: 13_500_000, gSeats: 20, cSeats: 28 },
+      { id: 'hist',   name: 'Tarix',                    block: 'lang_hist', grant: 138, contract: 104, price: 11_500_000, gSeats: 18, cSeats: 22 },
+    ],
+  },
+  {
+    id: 'samdtu',
+    name: 'Samarqand Davlat Tibbiyot Universiteti',
+    short: 'SamDTU',
+    region: 'Samarqand',
+    icon: '⚕️',
+    color: '#DC2626',
+    website: 'samdmi.uz',
+    specialties: [
+      { id: 'med',  name: 'Davolash ishi',              block: 'bio_chem', grant: 165, contract: 132, price: 24_000_000, gSeats: 35, cSeats: 55 },
+      { id: 'ped',  name: 'Pediatriya',                 block: 'bio_chem', grant: 160, contract: 128, price: 22_000_000, gSeats: 25, cSeats: 40 },
+      { id: 'stom', name: 'Stomatologiya',              block: 'bio_chem', grant: 162, contract: 130, price: 26_000_000, gSeats: 20, cSeats: 35 },
+    ],
+  },
+  // ── BUXORO ─────────────────────────────────────────
+  {
+    id: 'buxdu',
+    name: 'Buxoro Davlat Universiteti',
+    short: 'BuxDU',
+    region: 'Buxoro',
+    icon: '🏰',
+    color: '#B45309',
+    website: 'buxdu.uz',
+    specialties: [
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 148, contract: 112, price: 12_000_000, gSeats: 18, cSeats: 22 },
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 138, contract: 104, price: 11_000_000, gSeats: 18, cSeats: 25 },
+      { id: 'law',  name: 'Huquqshunoslik',             block: 'lang_hist', grant: 140, contract: 106, price: 11_500_000, gSeats: 15, cSeats: 20 },
+      { id: 'hist', name: 'Tarix',                      block: 'lang_hist', grant: 125, contract: 94,  price: 10_000_000, gSeats: 15, cSeats: 18 },
+    ],
+  },
+  // ── FARG'ONA ─────────────────────────────────────────
+  {
+    id: 'fardu',
+    name: "Farg'ona Davlat Universiteti",
+    short: 'FarDU',
+    region: "Farg'ona",
+    icon: '🏫',
+    color: '#0891B2',
+    website: 'fdu.uz',
+    specialties: [
+      { id: 'cs',     name: 'Kompyuter ilmlari',        block: 'math_phys', grant: 150, contract: 115, price: 12_500_000, gSeats: 20, cSeats: 25 },
+      { id: 'math',   name: 'Matematika',               block: 'math_phys', grant: 142, contract: 108, price: 11_500_000, gSeats: 18, cSeats: 22 },
+      { id: 'econ',   name: 'Iqtisodiyot',              block: 'math_econ', grant: 135, contract: 102, price: 11_000_000, gSeats: 18, cSeats: 25 },
+      { id: 'pharm',  name: 'Farmatsiya',               block: 'bio_chem',  grant: 152, contract: 118, price: 18_000_000, gSeats: 15, cSeats: 20 },
+    ],
+  },
+  // ── ANDIJON ─────────────────────────────────────────
+  {
+    id: 'anddu',
+    name: 'Andijon Davlat Universiteti',
+    short: 'AndDU',
+    region: 'Andijon',
+    icon: '🌿',
+    color: '#059669',
+    website: 'adu.uz',
+    specialties: [
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 145, contract: 110, price: 12_000_000, gSeats: 18, cSeats: 22 },
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 132, contract: 98,  price: 10_500_000, gSeats: 18, cSeats: 25 },
+      { id: 'bio',  name: 'Biologiya',                  block: 'bio_chem',  grant: 130, contract: 96,  price: 10_000_000, gSeats: 15, cSeats: 20 },
+    ],
+  },
+  {
+    id: 'andti',
+    name: 'Andijon Davlat Tibbiyot Instituti',
+    short: 'AnDTI',
+    region: 'Andijon',
+    icon: '🏥',
+    color: '#DC2626',
+    website: 'andmi.uz',
+    specialties: [
+      { id: 'med',  name: 'Davolash ishi',              block: 'bio_chem', grant: 158, contract: 125, price: 22_000_000, gSeats: 30, cSeats: 50 },
+      { id: 'ped',  name: 'Pediatriya',                 block: 'bio_chem', grant: 152, contract: 120, price: 20_000_000, gSeats: 22, cSeats: 35 },
+    ],
+  },
+  // ── NAMANGAN ─────────────────────────────────────────
+  {
+    id: 'namdu',
+    name: 'Namangan Davlat Universiteti',
+    short: 'NamDU',
+    region: 'Namangan',
+    icon: '🌸',
+    color: '#7C3AED',
+    website: 'namdu.uz',
+    specialties: [
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 148, contract: 112, price: 12_000_000, gSeats: 18, cSeats: 22 },
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 132, contract: 98,  price: 10_500_000, gSeats: 18, cSeats: 25 },
+      { id: 'law',  name: 'Huquqshunoslik',             block: 'lang_hist', grant: 138, contract: 104, price: 11_000_000, gSeats: 15, cSeats: 22 },
+    ],
+  },
+  // ── QASHQADARYO ─────────────────────────────────────────
+  {
+    id: 'qardu',
+    name: 'Qarshi Davlat Universiteti',
+    short: 'QarDU',
+    region: 'Qashqadaryo',
+    icon: '🌄',
+    color: '#B45309',
+    website: 'qardu.uz',
+    specialties: [
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 142, contract: 108, price: 11_500_000, gSeats: 15, cSeats: 20 },
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 128, contract: 96,  price: 10_000_000, gSeats: 15, cSeats: 22 },
+      { id: 'oil',  name: 'Neft-gaz muhandisligi',      block: 'math_phys', grant: 145, contract: 112, price: 13_000_000, gSeats: 15, cSeats: 20 },
+    ],
+  },
+  // ── SURXONDARYO ─────────────────────────────────────────
+  {
+    id: 'terdu',
+    name: 'Termiz Davlat Universiteti',
+    short: 'TerDU',
+    region: 'Surxondaryo',
+    icon: '☀️',
+    color: '#DC2626',
+    website: 'termsu.uz',
+    specialties: [
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 138, contract: 104, price: 11_000_000, gSeats: 15, cSeats: 18 },
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 125, contract: 94,  price: 9_500_000,  gSeats: 15, cSeats: 20 },
+      { id: 'bio',  name: 'Biologiya',                  block: 'bio_chem',  grant: 122, contract: 92,  price: 9_000_000,  gSeats: 12, cSeats: 15 },
+    ],
+  },
+  // ── XORAZM ─────────────────────────────────────────
+  {
+    id: 'urdu',
+    name: 'Urganch Davlat Universiteti',
+    short: 'UrDU',
+    region: 'Xorazm',
+    icon: '🦅',
+    color: '#0891B2',
+    website: 'urdu.uz',
+    specialties: [
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 140, contract: 105, price: 11_000_000, gSeats: 15, cSeats: 20 },
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 125, contract: 94,  price: 9_500_000,  gSeats: 15, cSeats: 20 },
+    ],
+  },
+  // ── NAVOIY ─────────────────────────────────────────
+  {
+    id: 'navpi',
+    name: 'Navoiy Davlat Pedagogika Instituti',
+    short: 'NavPI',
+    region: 'Navoiy',
+    icon: '📖',
+    color: '#059669',
+    website: 'navpi.uz',
+    specialties: [
+      { id: 'math_t', name: "Matematika o'qituvchisi",  block: 'math_phys', grant: 125, contract: 92, price: 9_000_000, gSeats: 15, cSeats: 20 },
+      { id: 'eng_t',  name: "Ingliz tili o'qituvchisi", block: 'lang_lit',  grant: 135, contract: 100,price: 9_500_000, gSeats: 15, cSeats: 20 },
+    ],
+  },
+  // ── JIZZAX ─────────────────────────────────────────
+  {
+    id: 'jdpu',
+    name: 'Jizzax Davlat Pedagogika Universiteti',
+    short: 'JDPU',
+    region: 'Jizzax',
+    icon: '📝',
+    color: '#7C3AED',
+    website: 'jdpu.uz',
+    specialties: [
+      { id: 'math_t', name: "Matematika o'qituvchisi",  block: 'math_phys', grant: 128, contract: 95, price: 9_000_000, gSeats: 18, cSeats: 22 },
+      { id: 'bio_t',  name: "Biologiya o'qituvchisi",   block: 'bio_chem',  grant: 122, contract: 90, price: 8_500_000, gSeats: 15, cSeats: 18 },
+      { id: 'hist_t', name: "Tarix o'qituvchisi",       block: 'lang_hist', grant: 120, contract: 88, price: 8_500_000, gSeats: 15, cSeats: 18 },
+    ],
+  },
+  // ── SIRDARYO ─────────────────────────────────────────
+  {
+    id: 'guldu',
+    name: 'Guliston Davlat Universiteti',
+    short: 'GulDU',
+    region: 'Sirdaryo',
+    icon: '🌱',
+    color: '#059669',
+    website: 'guldu.uz',
+    specialties: [
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 122, contract: 92, price: 9_000_000, gSeats: 15, cSeats: 20 },
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 130, contract: 96, price: 10_000_000,gSeats: 15, cSeats: 18 },
+    ],
+  },
+  // ── QORAQALPOG'ISTON ─────────────────────────────────────────
+  {
+    id: 'qarqdu',
+    name: "Berdax nomidagi Qoraqalpog'iston Davlat Universiteti",
+    short: 'QarQDU',
+    region: "Qoraqalpog'iston",
+    icon: '🌊',
+    color: '#1D4ED8',
+    website: 'qardu.uz',
+    specialties: [
+      { id: 'cs',   name: 'Kompyuter ilmlari',          block: 'math_phys', grant: 128, contract: 94, price: 9_500_000, gSeats: 15, cSeats: 18 },
+      { id: 'econ', name: 'Iqtisodiyot',                block: 'math_econ', grant: 118, contract: 88, price: 8_500_000, gSeats: 12, cSeats: 15 },
+    ],
+  },
+]

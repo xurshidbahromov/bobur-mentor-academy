@@ -34,7 +34,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react'
 // ── Route zones ──────────────────────────────────────
 const PUBLIC_ROUTES = ['/']  // only '/' auto-redirects logged-in users
 const AUTH_ROUTES = ['/login', '/signup']
-const AUTH_APP_PREFIXES = ['/dashboard', '/courses', '/lessons', '/shop', '/profile', '/leaderboard', '/quiz', '/quizzes']
+const AUTH_APP_PREFIXES = ['/dashboard', '/courses', '/lessons', '/shop', '/profile', '/leaderboard', '/quiz', '/quizzes', '/dtm']
 
 function isAuthAppRoute(pathname) {
   return AUTH_APP_PREFIXES.some(p => pathname === p || pathname.startsWith(p + '/'))

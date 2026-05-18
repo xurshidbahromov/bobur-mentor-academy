@@ -482,10 +482,30 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
                 >
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/quizzes')} className="dash-quick-chip">
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(16,185,129,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Target size={14} color="white" /></div>
-                    <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Testlar Markazi</span>
+                  {/* DTM Calculator quick chip */}
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => navigate('/dtm')}
+                    className="dash-quick-chip"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(52,97,255,0.25) 0%, rgba(139,92,246,0.25) 100%)',
+                      border: '1px solid rgba(139,92,246,0.45)',
+                      position: 'relative',
+                    }}
+                  >
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#3461FF,#8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <GraduationCap size={14} color="white" />
+                    </div>
+                    <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>DTM Kalkulator</span>
+                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)' }} />
+                    <span style={{
+                      fontSize: '0.65rem', fontWeight: 900, color: 'white',
+                      background: 'linear-gradient(135deg,#F59E0B,#EF4444)',
+                      padding: '2px 7px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '0.06em'
+                    }}>Yangi</span>
                   </motion.button>
+
+                  {/* Daily Test */}
                   {dailyData?.quiz && (
                     <motion.button whileTap={{ scale: 0.97 }} onClick={() => dailyData.attempt ? navigate('/leaderboard') : navigate(`/quiz/daily-${dailyData.quiz.id}`)} className="dash-quick-chip" style={{ background: 'rgba(52,97,255,0.2)', border: '1px solid rgba(52,97,255,0.4)' }}>
                       <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Flame size={14} color="white" /></div>
@@ -496,6 +516,12 @@ export default function DashboardPage() {
                       </span>
                     </motion.button>
                   )}
+
+                  {/* Testlar Markazi */}
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/quizzes')} className="dash-quick-chip">
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(16,185,129,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Target size={14} color="white" /></div>
+                    <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>Testlar Markazi</span>
+                  </motion.button>
                 </motion.div>
               )}
             </AnimatePresence>
