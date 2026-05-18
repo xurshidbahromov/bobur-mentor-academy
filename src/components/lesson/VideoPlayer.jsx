@@ -116,15 +116,10 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
   }, [])
 
   useEffect(() => {
-    if (!window.YT) {
-      const tag = document.createElement('script')
-      tag.src = "https://www.youtube.com/iframe_api"
-      const firstTag = document.getElementsByTagName('script')[0]
-      firstTag.parentNode.insertBefore(tag, firstTag)
-    }
+    // IFrame API script is injected below if not present
 
     const onPlayerReady = async (event) => {
-      playerRef.current = event.target
+      // playerRef.current is already assigned the instance in initPlayer.
       setIsReady(true)
       
       const dur = event.target.getDuration()
@@ -163,12 +158,12 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
       }
     }
 
-    window.onYouTubeIframeAPIReady = () => {
+    const initPlayer = () => {
       if (playerRef.current && typeof playerRef.current.destroy === 'function') {
         try { playerRef.current.destroy() } catch(e) {}
       }
 
-      new window.YT.Player(`yt-player-${videoId}`, {
+      playerRef.current = new window.YT.Player(`yt-player-${videoId}`, {
         videoId: videoId,
         playerVars: {
           rel: 0,
@@ -184,8 +179,20 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
       })
     }
 
-    if (window.YT && window.YT.Player) {
-      window.onYouTubeIframeAPIReady()
+    if (!window.YT) {
+      const tag = document.createElement('script')
+      tag.src = "https://www.youtube.com/iframe_api"
+      window.onYouTubeIframeAPIReady = initPlayer
+      const firstTag = document.getElementsByTagName('script')[0]
+      firstTag.parentNode.insertBefore(tag, firstTag)
+    } else if (window.YT && window.YT.Player) {
+      initPlayer()
+    } else {
+      const oldReady = window.onYouTubeIframeAPIReady
+      window.onYouTubeIframeAPIReady = () => {
+        if (oldReady) oldReady()
+        initPlayer()
+      }
     }
 
     const handleFullscreenChange = () => {
@@ -199,6 +206,9 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
       stopTrackingProgress()
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange)
+      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+        try { playerRef.current.destroy() } catch(e) {}
+      }
     }
   }, [videoId, user, lessonId, startSavingProgress, stopSavingProgress, startTrackingProgress, stopTrackingProgress, onVideoEnd])
 
@@ -314,7 +324,7 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
       style={{
         ...(isFullscreen ? {
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          zIndex: 99999, width: '100vw', height: '100dvh',
+          zIndex: 99999, width: '100%', height: '100%',
           aspectRatio: 'auto'
         } : {
           position: 'relative', width: '100%',
@@ -380,7 +390,8 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
           position: 'absolute', inset: 0, pointerEvents: 'none',
           opacity: showControls || !isPlaying ? 1 : 0,
           transition: 'opacity 0.3s ease',
-          display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
+          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+          zIndex: 10
         }}
       >
         {/* PHYSICAL BLUR COVERS TO HIDE ANY YT ELEMENTS (Only visible when controls are visible) */}
