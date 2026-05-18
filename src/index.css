@@ -774,3 +774,24 @@ mathlive-keyboard-panel,
 .katex * {
   color: inherit !important;
 }
+
+/* ==========================================================================
+   FULLSCREEN VIDEO FIX
+   Hides navigation and resets stacking context when video is fullscreen
+   ========================================================================== */
+body.hide-ui-for-video header,
+body.hide-ui-for-video nav,
+body.hide-ui-for-video .bottom-nav,
+body.hide-ui-for-video .bottom-tab-nav,
+body.hide-ui-for-video .desktop-nav,
+body.hide-ui-for-video .mobile-nav,
+body.hide-ui-for-video .navbar {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+body.hide-ui-for-video {
+  overflow: hidden !important;
+}

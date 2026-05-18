@@ -255,26 +255,33 @@ export default function VideoPlayer({ videoId, lessonId, onVideoEnd }) {
       try {
         if (el.requestFullscreen) {
           await el.requestFullscreen()
+          try { await window.screen.orientation.lock('landscape') } catch(err) {}
         } else if (el.webkitRequestFullscreen) {
           el.webkitRequestFullscreen()
+          try { await window.screen.orientation.lock('landscape') } catch(err) {}
         } else {
           setIsFullscreen(true)
+          try { await window.screen.orientation.lock('landscape') } catch(err) {}
         }
       } catch (err) {
-        // Fallback for Telegram Mini Apps or restricted browsers
         setIsFullscreen(true)
+        try { await window.screen.orientation.lock('landscape') } catch(err) {}
       }
     } else {
       try {
         if (document.exitFullscreen && document.fullscreenElement) {
           await document.exitFullscreen()
+          try { window.screen.orientation.unlock() } catch(err) {}
         } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
           document.webkitExitFullscreen()
+          try { window.screen.orientation.unlock() } catch(err) {}
         } else {
           setIsFullscreen(false)
+          try { window.screen.orientation.unlock() } catch(err) {}
         }
       } catch (err) {
         setIsFullscreen(false)
+        try { window.screen.orientation.unlock() } catch(err) {}
       }
       setIsFullscreen(false) // Ensure state resets on fallback
     }
