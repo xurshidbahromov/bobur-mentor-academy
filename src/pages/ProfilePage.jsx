@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import {
   BookOpen, CheckCircle2, Flame, LogOut,
   ArrowRight, Trophy, ShieldCheck, Coins, ChevronRight,
-  MoreVertical, Calendar as CalendarIcon, Sparkles, Check, ArrowUpRight, Clock, Zap, Crown, Shield
+  MoreVertical, Calendar as CalendarIcon, Sparkles, Check, ArrowUpRight, Clock, Zap, Crown, Shield,
+  Edit3, X
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
@@ -24,6 +25,54 @@ const item = {
 export default function ProfilePage() {
   const { user, profile, loading: authLoading, signOut, isAdmin } = useAuth()
   const navigate = useNavigate()
+
+  // Profile Edit States
+  const [isEditing, setIsEditing] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [editAvatar, setEditAvatar] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+
+  const AVATAR_PRESETS = [
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Felix',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Oliver',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Sally',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Milo',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Bella',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Oscar',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Lily',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Ruby',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Zoe',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Max'
+  ]
+
+  const handleSaveProfile = async () => {
+    if (!editName.trim()) {
+      toast.error("Ism bo'sh bo'lishi mumkin emas!")
+      return
+    }
+    setIsSaving(true)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: editName.trim(),
+          avatar_url: editAvatar,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+
+      if (error) throw error
+
+      toast.success("Profil muvaffaqiyatli saqlandi! ✨")
+      setIsEditing(false)
+    } catch (err) {
+      toast.error("Xatolik yuz berdi. Qaytadan urunib ko'ring.")
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   // 1. Daily Reward Hook
   const { canClaim, claimDailyReward } = useStreak()
@@ -270,6 +319,24 @@ export default function ProfilePage() {
               marginTop: -60, // OVERLAP EFFECT
               zIndex: 10, background: 'rgba(255, 255, 255, 0.95)'
             }}>
+              {/* Edit Button */}
+              <button
+                onClick={() => {
+                  setEditName(name)
+                  setEditAvatar(avatarUrl || '')
+                  setIsEditing(true)
+                }}
+                style={{
+                  position: 'absolute', top: 16, right: 16, border: 'none', background: 'rgba(52,97,255,0.08)',
+                  borderRadius: 12, padding: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', transition: 'background 0.2s', color: '#3461FF'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(52,97,255,0.15)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(52,97,255,0.08)'}
+                title="Profilni tahrirlash"
+              >
+                <Edit3 size={16} />
+              </button>
               <div style={{
                 position: 'relative', marginBottom: 20, padding: 6, borderRadius: '50%',
                 background: 'linear-gradient(135deg, rgba(52,97,255,0.1), rgba(139,92,246,0.1))',
@@ -532,6 +599,119 @@ export default function ProfilePage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {isEditing && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(8px)',
+            padding: 16
+          }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', duration: 0.5 }}
+              style={{
+                background: 'white', borderRadius: 28, border: '1px solid rgba(255,255,255,0.8)',
+                boxShadow: '0 24px 60px rgba(15,23,42,0.15)', maxWidth: 460, width: '100%',
+                overflow: 'hidden', display: 'flex', flexDirection: 'column'
+              }}
+            >
+              {/* Header */}
+              <div style={{ padding: '24px 24px 16px', borderBottom: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 className="outfit-font" style={{ margin: 0, fontWeight: 900, fontSize: '1.25rem', color: '#0F172A' }}>
+                  Profilni tahrirlash
+                </h3>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  style={{
+                    background: '#F1F5F9', border: 'none', borderRadius: '50%', width: 32, height: 32,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#E2E8F0'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#F1F5F9'}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div style={{ padding: '24px', overflowY: 'auto', maxHeight: '60vh' }}>
+                {/* Name field */}
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ display: 'block', margin: '0 0 8px', fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    To'liq ism
+                  </label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    placeholder="Ismingizni kiriting"
+                    style={{
+                      width: '100%', padding: '12px 16px', borderRadius: 12, border: '1.5px solid #E2E8F0',
+                      fontSize: '0.9375rem', fontWeight: 600, color: '#0F172A', outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
+
+                {/* Avatar presets */}
+                <div>
+                  <label style={{ display: 'block', margin: '0 0 10px', fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Avatar tanlang
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                    {AVATAR_PRESETS.map((url, idx) => {
+                      const isSelected = editAvatar === url
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => setEditAvatar(url)}
+                          style={{
+                            padding: 4, borderRadius: '50%', border: isSelected ? '3px solid #3461FF' : '3px solid transparent',
+                            background: isSelected ? '#EFF6FF' : 'transparent', cursor: 'pointer', transition: 'all 0.2s',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box'
+                          }}
+                        >
+                          <img src={url} alt={`Preset ${idx}`} style={{ width: '100%', aspectRatio: '1', borderRadius: '50%', objectFit: 'cover' }} />
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div style={{ padding: '16px 24px 24px', borderTop: '1px solid #F1F5F9', display: 'flex', gap: 12 }}>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  style={{
+                    flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #E2E8F0',
+                    background: 'white', color: '#64748B', fontWeight: 800, fontSize: '0.9375rem', cursor: 'pointer'
+                  }}
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
+                  style={{
+                    flex: 1, padding: '12px', borderRadius: 12, border: 'none',
+                    background: 'linear-gradient(135deg,#3461FF 0%,#8B5CF6 100%)', color: 'white',
+                    fontWeight: 800, fontSize: '0.9375rem', cursor: isSaving ? 'default' : 'pointer',
+                    opacity: isSaving ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                  }}
+                >
+                  {isSaving ? 'Saqlanmoqda...' : 'Saqlash'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
