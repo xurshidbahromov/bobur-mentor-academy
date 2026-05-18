@@ -2,8 +2,8 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, MapPin, BookOpen, Trophy, TrendingUp, Minus, ChevronDown, ChevronUp, ExternalLink, Star, Filter, X, Info, Coins, Lightbulb, GraduationCap, Building2, Globe } from 'lucide-react'
-import { UNIVERSITIES, REGIONS } from '../data/universities'
+import { Search, MapPin, BookOpen, Trophy, TrendingUp, Minus, ChevronDown, ChevronUp, ExternalLink, Star, Filter, X, Info, Coins, Lightbulb, GraduationCap, Building2, Globe, Languages } from 'lucide-react'
+import { ALL_UNIVERSITIES, REGIONS, STUDY_TYPES, LANGUAGES as DTM_LANGUAGES, UNIVERSITY_TYPES } from '../data/universities'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
@@ -57,11 +57,11 @@ function StatusBadge({ status, score, spec }) {
 
 function UniversityCard({ uni, score, expanded, onToggle }) {
   const matchedSpecs = useMemo(() => {
-    return uni.specialties.map(s => ({ ...s, status: getStatus(score, s) }))
-      .sort((a,b) => {
-        const order = { grant:0, contract:1, none:2 }
-        return order[a.status] - order[b.status] || b.grant - a.grant
-      })
+    const baseSpecs = uni._filteredSpecs || uni.specialties.map(s => ({ ...s, status: getStatus(score, s) }))
+    return [...baseSpecs].sort((a,b) => {
+      const order = { grant:0, contract:1, none:2 }
+      return order[a.status] - order[b.status] || b.grant - a.grant
+    })
   }, [uni, score])
 
   const bestStatus = matchedSpecs[0]?.status || 'none'
@@ -70,6 +70,34 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
 
   const cardBorderColor = bestStatus === 'grant' ? '#10B981' : bestStatus === 'contract' ? '#F59E0B' : '#E2E8F0'
   const visibleSpecs = expanded ? matchedSpecs : matchedSpecs.slice(0, 2)
+
+  if (!uni.specialties || uni.specialties.length === 0) {
+    return (
+      <motion.div layout initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, scale:0.96 }}
+        style={{ background:'white', borderRadius:20, border:'1.5px solid #E2E8F0', overflow:'hidden', boxShadow:'0 2px 8px rgba(15,23,42,0.04)' }}>
+        <div style={{ padding:'16px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ width:44, height:44, borderRadius:14, background:`${uni.color}15`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <Building2 size={22} color={uni.color} strokeWidth={1.5}/>
+            </div>
+            <div style={{ minWidth:0, flex:1 }}>
+              <p style={{ margin:0, fontWeight:800, fontSize:'0.9375rem', color:'#0F172A', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{uni.short}</p>
+              <p style={{ margin:0, fontSize:'0.7rem', color:'#64748B', fontWeight:500, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{uni.name}</p>
+            </div>
+            <span style={{ background: uni.type==='Nodavlat'?'#EFF6FF': uni.type==='Xorijiy'?'#F0FDF4':'#FEF3C7', color: uni.type==='Nodavlat'?'#3461FF': uni.type==='Xorijiy'?'#16A34A':'#92400E', fontSize:'0.6rem', fontWeight:800, padding:'4px 10px', borderRadius:100, whiteSpace:'nowrap', textTransform:'uppercase' }}>
+              {uni.type || 'Davlat'}
+            </span>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:10 }}>
+            <MapPin size={11} color="#94A3B8"/><span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.region}</span>
+            <span style={{ color:'#E2E8F0' }}>·</span>
+            <Globe size={11} color="#94A3B8"/><span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.website}</span>
+          </div>
+          <p style={{ margin:'10px 0 0', fontSize:'0.75rem', color:'#94A3B8', fontStyle:'italic' }}>Ball ma'lumoti mavjud emas</p>
+        </div>
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div
@@ -130,6 +158,20 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
           <span style={{ color:'#E2E8F0' }}>·</span>
           <Globe size={11} color="#94A3B8" />
           <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.website}</span>
+          {uni.studyTypes && uni.studyTypes.length > 0 && (
+            <>
+              <span style={{ color:'#E2E8F0' }}>·</span>
+              <BookOpen size={11} color="#94A3B8" />
+              <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.studyTypes.join(', ')}</span>
+            </>
+          )}
+          {uni.languages && uni.languages.length > 0 && (
+            <>
+              <span style={{ color:'#E2E8F0' }}>·</span>
+              <Languages size={11} color="#94A3B8" />
+              <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.languages.join(', ')}</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -175,7 +217,7 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
 
 // All unique specialties across all universities
 const ALL_SPECIALTIES = ['Hammasi', ...Array.from(
-  new Set(UNIVERSITIES.flatMap(u => u.specialties.map(s => s.name)))
+  new Set(ALL_UNIVERSITIES.flatMap(u => u.specialties.map(s => s.name)))
 ).sort()]
 
 export default function DtmCalculatorPage() {
@@ -185,11 +227,9 @@ export default function DtmCalculatorPage() {
   const [score, setScore] = useState(0)
   const [inputVal, setInputVal] = useState('0')
   const [regionFilter, setRegionFilter] = useState('Hammasi')
-  const [statusFilter, setStatusFilter] = useState('Hammasi')
   const [specialtyFilter, setSpecialtyFilter] = useState('Hammasi')
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState({})
-  const [showFilters, setShowFilters] = useState(false)
   const [hasCalculated, setHasCalculated] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
 
@@ -203,33 +243,37 @@ export default function DtmCalculatorPage() {
   }
 
   const results = useMemo(() => {
-    return UNIVERSITIES
+    return ALL_UNIVERSITIES
       .filter(u => {
         if (regionFilter !== 'Hammasi' && u.region !== regionFilter) return false
         if (search && !u.name.toLowerCase().includes(search.toLowerCase()) &&
             !u.short.toLowerCase().includes(search.toLowerCase())) return false
-        // specialty filter: university must have at least one matching specialty
         if (specialtyFilter !== 'Hammasi') {
           return u.specialties.some(s => s.name === specialtyFilter)
         }
         return true
       })
       .map(u => {
-        // If specialty filter active, only consider that specialty for best status
         const filteredSpecs = specialtyFilter !== 'Hammasi'
           ? u.specialties.filter(s => s.name === specialtyFilter)
           : u.specialties
+        
+        // Faqat yetarli ball to'plangan (mos) yo'nalishlarni qoldiramiz
         const specs = filteredSpecs.map(s => ({ ...s, status: getStatus(score, s) }))
+                                   .filter(s => s.status !== 'none')
+        
         const best = specs.some(s=>s.status==='grant') ? 'grant'
           : specs.some(s=>s.status==='contract') ? 'contract' : 'none'
+        
         return { ...u, _best: best, _filteredSpecs: specs }
       })
-      .filter(u => statusFilter === 'Hammasi' || u._best === statusFilter.toLowerCase())
+      // Faqat kamida bitta mos yo'nalishi bor universitetlarni qoldiramiz
+      .filter(u => u._filteredSpecs.length > 0)
       .sort((a,b) => {
         const order = { grant:0, contract:1, none:2 }
         return order[a._best] - order[b._best]
       })
-  }, [score, regionFilter, statusFilter, specialtyFilter, search])
+  }, [score, regionFilter, specialtyFilter, search])
 
   const grantCount    = results.filter(u=>u._best==='grant').length
   const contractCount = results.filter(u=>u._best==='contract').length
@@ -293,6 +337,9 @@ export default function DtmCalculatorPage() {
           box-shadow:0 20px 60px rgba(15,23,42,0.12); position:relative; z-index:10;
           border:1px solid rgba(255,255,255,0.6); max-width:680px; margin:0 auto;
         }
+        @media(max-width:768px){
+          .dtm-score-card { padding:24px 16px; border-radius:20px; }
+        }
         .dtm-filter-chip {
           padding:6px 14px; border-radius:100px; border:1.5px solid #E2E8F0;
           background:white; font-size:0.75rem; font-weight:700; color:#64748B;
@@ -300,14 +347,14 @@ export default function DtmCalculatorPage() {
         }
         .dtm-filter-chip.active { border-color:#3461FF; background:#3461FF; color:white; }
         .results-grid {
-          display:grid; gap:16px;
-          grid-template-columns: 1fr;
+          display: grid; gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          width: 100%; box-sizing: border-box;
         }
-        @media(min-width:768px){
-          .results-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media(min-width:1024px){
-          .results-grid { grid-template-columns: repeat(2, 1fr); }
+        .dtm-filters-grid {
+          display: grid; gap: 16px; margin-bottom: 24px;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          width: 100%; box-sizing: border-box;
         }
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
@@ -394,83 +441,27 @@ export default function DtmCalculatorPage() {
             </div>
 
             {/* Filters on Main Card */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+            <div className="dtm-filters-grid">
               {/* Region Selector */}
               <div>
-                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>
-                  Hududni tanlang
-                </p>
+                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Hudud</p>
                 <div style={{ position: 'relative' }}>
-                  <select
-                    value={regionFilter}
-                    onChange={e => {
-                      setRegionFilter(e.target.value)
-                      setHasCalculated(false)
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '14px 16px',
-                      borderRadius: '16px',
-                      border: '2px solid #E2E8F0',
-                      background: '#F8FAFC',
-                      fontSize: '0.9375rem',
-                      fontWeight: 700,
-                      color: '#0F172A',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      appearance: 'none',
-                      backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'right 16px center',
-                      transition: 'border-color 0.2s',
-                      textAlign: 'center'
-                    }}
-                    onFocus={e => e.target.style.borderColor = '#3461FF'}
-                    onBlur={e => e.target.style.borderColor = '#E2E8F0'}
-                  >
-                    {['Hammasi', ...REGIONS].map(r => (
-                      <option key={r} value={r}>{r}</option>
-                    ))}
+                  <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setHasCalculated(false) }}
+                    style={{ width: '100%', padding: '14px 16px', borderRadius: '16px', border: '2px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.9rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', transition: 'border-color 0.2s', textAlign: 'center' }}
+                    onFocus={e => e.target.style.borderColor = '#3461FF'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} >
+                    {['Hammasi', ...REGIONS].map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
               </div>
 
               {/* Specialty Selector */}
               <div>
-                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>
-                  Yo'nalishni tanlang
-                </p>
+                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Yo'nalish</p>
                 <div style={{ position: 'relative' }}>
-                  <select
-                    value={specialtyFilter}
-                    onChange={e => {
-                      setSpecialtyFilter(e.target.value)
-                      setHasCalculated(false) // Recalculate on specialty change
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '14px 16px',
-                      borderRadius: '16px',
-                      border: '2px solid #E2E8F0',
-                      background: '#F8FAFC',
-                      fontSize: '0.9375rem',
-                      fontWeight: 700,
-                      color: '#0F172A',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      appearance: 'none',
-                      backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'right 16px center',
-                      transition: 'border-color 0.2s',
-                      textAlign: 'center'
-                    }}
-                    onFocus={e => e.target.style.borderColor = '#3461FF'}
-                    onBlur={e => e.target.style.borderColor = '#E2E8F0'}
-                  >
-                    {ALL_SPECIALTIES.map(sp => (
-                      <option key={sp} value={sp}>{sp}</option>
-                    ))}
+                  <select value={specialtyFilter} onChange={e => { setSpecialtyFilter(e.target.value); setHasCalculated(false) }}
+                    style={{ width: '100%', padding: '14px 16px', borderRadius: '16px', border: '2px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.9rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', transition: 'border-color 0.2s', textAlign: 'center' }}
+                    onFocus={e => e.target.style.borderColor = '#3461FF'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} >
+                    {ALL_SPECIALTIES.map(sp => <option key={sp} value={sp}>{sp}</option>)}
                   </select>
                 </div>
               </div>
@@ -582,32 +573,6 @@ export default function DtmCalculatorPage() {
                     />
                     {search && <button onClick={()=>setSearch('')} style={{ background:'none', border:'none', cursor:'pointer', color:'#94A3B8', display:'flex' }}><X size={14}/></button>}
                   </div>
-                  {/* Filter button with active badge */}
-                  <button
-                    onClick={()=>setShowFilters(f=>!f)}
-                    style={{ background:showFilters?'#3461FF':'white',
-                      border:'1.5px solid', borderColor:showFilters?'#3461FF':'#E2E8F0',
-                      borderRadius:14, padding:'10px 14px', cursor:'pointer', color:showFilters?'white':'#64748B',
-                      display:'flex', alignItems:'center', gap:6, fontSize:'0.8rem', fontWeight:700,
-                      position:'relative'
-                    }}
-                  >
-                    <Filter size={15}/>
-                    {showFilters ? 'Yopish' : 'Filter'}
-                    {/* Active filter count badge */}
-                    {(statusFilter !== 'Hammasi' || regionFilter !== 'Hammasi' || specialtyFilter !== 'Hammasi') && !showFilters && (
-                      <span style={{
-                        position:'absolute', top:-6, right:-6,
-                        width:18, height:18, borderRadius:'50%',
-                        background:'#EF4444', color:'white',
-                        fontSize:'0.6rem', fontWeight:900,
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        border:'2px solid #F8FAFC'
-                      }}>
-                        {[statusFilter !== 'Hammasi', regionFilter !== 'Hammasi', specialtyFilter !== 'Hammasi'].filter(Boolean).length}
-                      </span>
-                    )}
-                  </button>
                 </div>
 
                 {/* Active specialty indicator pill */}
@@ -627,26 +592,7 @@ export default function DtmCalculatorPage() {
                 {/* margin below the top bar */}
                 <div style={{ marginBottom: 16 }} />
 
-                {/* Filters panel */}
-                <AnimatePresence>
-                  {showFilters && (
-                    <motion.div initial={{opacity:0,height:0}} animate={{opacity:1,height:'auto'}} exit={{opacity:0,height:0}}
-                      style={{ overflow:'hidden', marginBottom:16 }}>
-                      <div style={{ background:'white', borderRadius:16, padding:'16px', border:'1.5px solid #E2E8F0' }}>
-
-                        {/* Status filter */}
-                        <p style={{ margin:'0 0 10px', fontSize:'0.7rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em' }}>Holat bo'yicha</p>
-                        <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:20 }}>
-                          {['Hammasi','Grant','Kontrakt'].map(f=>(
-                            <button key={f} className={`dtm-filter-chip${statusFilter===f?' active':''}`}
-                              onClick={()=>setStatusFilter(f)}>{f}</button>
-                          ))}
-                        </div>
-
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Filters panel removed since all filters are now on main card */}
 
                 {/* Results */}
                 <AnimatePresence mode="popLayout">
