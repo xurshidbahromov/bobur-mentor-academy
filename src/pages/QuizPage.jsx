@@ -281,6 +281,9 @@ export default function QuizPage() {
   const timerRef = useRef(null)
   const startTimeRef = useRef(null)
   const savedRef = useRef(false)
+  // Refs to always hold the latest score/answers for the stale-closure-safe timer
+  const scoreRef = useRef(0)
+  const answersRef = useRef({})
 
   const startDailyQuiz = async () => {
     const qData = quizData.originalQuiz
@@ -324,16 +327,22 @@ export default function QuizPage() {
     setTimeSpent(spent); saveAttempt(ans, sc, spent, true); setPhase('result')
   }, [saveAttempt])
 
-  const nextStep = () => {
+  const nextStepRef = useRef(null)
+  nextStepRef.current = () => {
     if (current + 1 < quizzes.length) {
       setCurrent(c => c + 1); setSelected(null); setSubmitted(false); setIsCorrect(false); setShowParticles(false); setTimeLeft(SECONDS_PER_QUESTION)
-    } else { finishQuiz(score, answers) }
+    } else {
+      // Use refs so we always get the LATEST score/answers, not stale closure values
+      finishQuiz(scoreRef.current, answersRef.current)
+    }
   }
+  const nextStep = () => nextStepRef.current()
 
   useEffect(() => {
     if (phase !== 'quiz') return
     timerRef.current = setInterval(() => {
-      setTimeLeft(t => { if (t <= 1) { nextStep(); return SECONDS_PER_QUESTION } return t - 1 })
+      // Always call via ref so we get the latest nextStep (avoids stale closure)
+      setTimeLeft(t => { if (t <= 1) { nextStepRef.current(); return SECONDS_PER_QUESTION } return t - 1 })
     }, 1000)
     return () => clearInterval(timerRef.current)
   }, [phase, current, quizzes.length])
@@ -344,6 +353,9 @@ export default function QuizPage() {
     const correct = selected === q.correct_option
     const newScore = correct ? score + 1 : score
     const newAnswers = { ...answers, [q.id || current]: selected }
+    // Update refs FIRST so timer always reads latest values (fixes stale closure bug)
+    scoreRef.current = newScore
+    answersRef.current = newAnswers
     setSubmitted(true); setIsCorrect(correct); setScore(newScore); setAnswers(newAnswers)
     if (correct) { setShowParticles(true); setTimeout(() => setShowParticles(false), 1000) }
   }
