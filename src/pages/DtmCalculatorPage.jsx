@@ -184,8 +184,8 @@ export default function DtmCalculatorPage() {
 
   const [score, setScore] = useState(0)
   const [inputVal, setInputVal] = useState('0')
-  const [regionFilter, setRegionFilter] = useState('Barchasi')
-  const [statusFilter, setStatusFilter] = useState('Barchasi')
+  const [regionFilter, setRegionFilter] = useState('Hammasi')
+  const [statusFilter, setStatusFilter] = useState('Hammasi')
   const [specialtyFilter, setSpecialtyFilter] = useState('Hammasi')
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState({})
@@ -205,7 +205,7 @@ export default function DtmCalculatorPage() {
   const results = useMemo(() => {
     return UNIVERSITIES
       .filter(u => {
-        if (regionFilter !== 'Barchasi' && u.region !== regionFilter) return false
+        if (regionFilter !== 'Hammasi' && u.region !== regionFilter) return false
         if (search && !u.name.toLowerCase().includes(search.toLowerCase()) &&
             !u.short.toLowerCase().includes(search.toLowerCase())) return false
         // specialty filter: university must have at least one matching specialty
@@ -224,7 +224,7 @@ export default function DtmCalculatorPage() {
           : specs.some(s=>s.status==='contract') ? 'contract' : 'none'
         return { ...u, _best: best, _filteredSpecs: specs }
       })
-      .filter(u => statusFilter === 'Barchasi' || u._best === statusFilter.toLowerCase())
+      .filter(u => statusFilter === 'Hammasi' || u._best === statusFilter.toLowerCase())
       .sort((a,b) => {
         const order = { grant:0, contract:1, none:2 }
         return order[a._best] - order[b._best]
@@ -283,8 +283,9 @@ export default function DtmCalculatorPage() {
           position:relative; overflow:hidden; box-shadow:0 20px 40px rgba(15,23,42,0.15);
         }
         @media(max-width:768px){ .dtm-hero{ padding:40px 0 140px; border-radius:0 0 32px 32px; margin-bottom:-80px; } }
-        .dtm-container { max-width:1040px; margin:0 auto; padding:0 24px; position:relative; z-index:20; }
-        @media(max-width:768px){ .dtm-container{ padding:0 16px; } }
+        .dtm-container { max-width:1040px; margin:0 auto; position:relative; z-index:20; }
+        .dtm-hero-content { max-width:1040px; margin:0 auto; padding:0 24px; position:relative; z-index:20; }
+        @media(max-width:768px){ .dtm-hero-content{ padding:0 16px; } }
         .dtm-content { padding:0 24px; position:relative; z-index:2; }
         @media(max-width:768px){ .dtm-content{ padding:0 16px; } }
         .dtm-score-card {
@@ -336,7 +337,7 @@ export default function DtmCalculatorPage() {
             </motion.div>
           ))}
 
-          <div className="dtm-container">
+          <div className="dtm-hero-content">
             <div style={{ maxWidth:800 }}>
               <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
                 <div style={{ padding:'6px 12px', background:'rgba(255,255,255,0.1)', borderRadius:100,
@@ -392,43 +393,86 @@ export default function DtmCalculatorPage() {
               </div>
             </div>
 
-            {/* Specialty Selector on Main Card */}
-            <div style={{ marginBottom: 24 }}>
-              <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>
-                Yo'nalishni tanlang
-              </p>
-              <div style={{ position: 'relative' }}>
-                <select
-                  value={specialtyFilter}
-                  onChange={e => {
-                    setSpecialtyFilter(e.target.value)
-                    setHasCalculated(false) // Recalculate on specialty change
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    borderRadius: '16px',
-                    border: '2px solid #E2E8F0',
-                    background: '#F8FAFC',
-                    fontSize: '0.9375rem',
-                    fontWeight: 700,
-                    color: '#0F172A',
-                    outline: 'none',
-                    cursor: 'pointer',
-                    appearance: 'none',
-                    backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 16px center',
-                    transition: 'border-color 0.2s',
-                    textAlign: 'center'
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#3461FF'}
-                  onBlur={e => e.target.style.borderColor = '#E2E8F0'}
-                >
-                  {ALL_SPECIALTIES.map(sp => (
-                    <option key={sp} value={sp}>{sp}</option>
-                  ))}
-                </select>
+            {/* Filters on Main Card */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+              {/* Region Selector */}
+              <div>
+                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>
+                  Hududni tanlang
+                </p>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={regionFilter}
+                    onChange={e => {
+                      setRegionFilter(e.target.value)
+                      setHasCalculated(false)
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      borderRadius: '16px',
+                      border: '2px solid #E2E8F0',
+                      background: '#F8FAFC',
+                      fontSize: '0.9375rem',
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      appearance: 'none',
+                      backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 16px center',
+                      transition: 'border-color 0.2s',
+                      textAlign: 'center'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#3461FF'}
+                    onBlur={e => e.target.style.borderColor = '#E2E8F0'}
+                  >
+                    {['Hammasi', ...REGIONS].map(r => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Specialty Selector */}
+              <div>
+                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>
+                  Yo'nalishni tanlang
+                </p>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={specialtyFilter}
+                    onChange={e => {
+                      setSpecialtyFilter(e.target.value)
+                      setHasCalculated(false) // Recalculate on specialty change
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      borderRadius: '16px',
+                      border: '2px solid #E2E8F0',
+                      background: '#F8FAFC',
+                      fontSize: '0.9375rem',
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      appearance: 'none',
+                      backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 16px center',
+                      transition: 'border-color 0.2s',
+                      textAlign: 'center'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#3461FF'}
+                    onBlur={e => e.target.style.borderColor = '#E2E8F0'}
+                  >
+                    {ALL_SPECIALTIES.map(sp => (
+                      <option key={sp} value={sp}>{sp}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -551,7 +595,7 @@ export default function DtmCalculatorPage() {
                     <Filter size={15}/>
                     {showFilters ? 'Yopish' : 'Filter'}
                     {/* Active filter count badge */}
-                    {(statusFilter !== 'Barchasi' || regionFilter !== 'Barchasi' || specialtyFilter !== 'Hammasi') && !showFilters && (
+                    {(statusFilter !== 'Hammasi' || regionFilter !== 'Hammasi' || specialtyFilter !== 'Hammasi') && !showFilters && (
                       <span style={{
                         position:'absolute', top:-6, right:-6,
                         width:18, height:18, borderRadius:'50%',
@@ -560,7 +604,7 @@ export default function DtmCalculatorPage() {
                         display:'flex', alignItems:'center', justifyContent:'center',
                         border:'2px solid #F8FAFC'
                       }}>
-                        {[statusFilter !== 'Barchasi', regionFilter !== 'Barchasi', specialtyFilter !== 'Hammasi'].filter(Boolean).length}
+                        {[statusFilter !== 'Hammasi', regionFilter !== 'Hammasi', specialtyFilter !== 'Hammasi'].filter(Boolean).length}
                       </span>
                     )}
                   </button>
@@ -593,20 +637,12 @@ export default function DtmCalculatorPage() {
                         {/* Status filter */}
                         <p style={{ margin:'0 0 10px', fontSize:'0.7rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em' }}>Holat bo'yicha</p>
                         <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:20 }}>
-                          {['Barchasi','Grant','Kontrakt'].map(f=>(
+                          {['Hammasi','Grant','Kontrakt'].map(f=>(
                             <button key={f} className={`dtm-filter-chip${statusFilter===f?' active':''}`}
                               onClick={()=>setStatusFilter(f)}>{f}</button>
                           ))}
                         </div>
 
-                        {/* Region filter */}
-                        <p style={{ margin:'0 0 10px', fontSize:'0.7rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em' }}>Hudud bo'yicha</p>
-                        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                          {['Barchasi',...REGIONS].map(r=>(
-                            <button key={r} className={`dtm-filter-chip${regionFilter===r?' active':''}`}
-                              onClick={()=>setRegionFilter(r)}>{r}</button>
-                          ))}
-                        </div>
                       </div>
                     </motion.div>
                   )}
