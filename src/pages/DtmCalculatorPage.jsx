@@ -83,49 +83,52 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
           : '0 2px 8px rgba(15,23,42,0.04)' }}
     >
       {/* Header */}
-      <div style={{ padding:'16px 16px 12px', borderBottom:'1px solid #F1F5F9' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-          <div style={{ width:44, height:44, borderRadius:14, background:`${uni.color}15`,
-            display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-            <Building2 size={22} color={uni.color} strokeWidth={1.5}/>
+      <div style={{ padding:'16px', borderBottom:'1px solid #F1F5F9' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12, flex:'1 1 auto', minWidth:0 }}>
+            <div style={{ width:44, height:44, borderRadius:14, background:`${uni.color}15`,
+              display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <Building2 size={22} color={uni.color} strokeWidth={1.5}/>
+            </div>
+            <div style={{ minWidth:0 }}>
+              <p style={{ margin:0, fontWeight:800, fontSize:'0.9375rem', color:'#0F172A',
+                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                {uni.short}
+              </p>
+              <p style={{ margin:0, fontSize:'0.7rem', color:'#64748B', fontWeight:500,
+                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                {uni.name}
+              </p>
+            </div>
           </div>
-          <div style={{ flex:1, minWidth:0 }}>
-            <p style={{ margin:0, fontWeight:800, fontSize:'0.9375rem', color:'#0F172A',
-              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              {uni.short}
-            </p>
-            <p style={{ margin:0, fontSize:'0.7rem', color:'#64748B', fontWeight:500,
-              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              {uni.name}
-            </p>
-          </div>
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4, flexShrink:0 }}>
+          {/* Responsive Badge Container */}
+          <div style={{ display:'flex', gap:4, flexWrap:'wrap', justifyContent:'flex-end', flexShrink:0 }}>
             {grantCount > 0 && (
               <span style={{ background:'#DCFCE7', color:'#15803D', fontSize:'0.65rem', fontWeight:800,
-                padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4 }}>
+                padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap' }}>
                 <Trophy size={10}/> {grantCount} grant
               </span>
             )}
             {contractCount > 0 && (
               <span style={{ background:'#FEF3C7', color:'#92400E', fontSize:'0.65rem', fontWeight:800,
-                padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4 }}>
+                padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap' }}>
                 <Star size={10}/> {contractCount} kontrakt
               </span>
             )}
             {grantCount === 0 && contractCount === 0 && (
               <span style={{ background:'#F1F5F9', color:'#94A3B8', fontSize:'0.65rem', fontWeight:800,
-                padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4 }}>
+                padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap' }}>
                 <Minus size={10}/> Mos emas
               </span>
             )}
           </div>
         </div>
 
-        <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:8 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:10, flexWrap:'wrap' }}>
           <MapPin size={11} color="#94A3B8" />
           <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.region}</span>
           <span style={{ color:'#E2E8F0' }}>·</span>
-          <ExternalLink size={11} color="#94A3B8" />
+          <Globe size={11} color="#94A3B8" />
           <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.website}</span>
         </div>
       </div>
@@ -136,8 +139,8 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
           <div key={spec.id} style={{ display:'flex', alignItems:'center', gap:10, paddingBottom:10,
             marginBottom:10, borderBottom:'1px solid #F8FAFC' }}>
             <div style={{ flex:1, minWidth:0 }}>
-              <p style={{ margin:'0 0 3px', fontWeight:700, fontSize:'0.8125rem', color:'#1E293B',
-                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+              <p style={{ margin:'0 0 4px', fontWeight:700, fontSize:'0.8125rem', color:'#1E293B',
+                lineHeight: 1.3 }}>
                 {spec.name}
               </p>
               <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
@@ -179,8 +182,8 @@ export default function DtmCalculatorPage() {
   const { user, profile, setProfile } = useAuth()
   const userCoins = profile?.coins ?? 0
 
-  const [score, setScore] = useState(140)
-  const [inputVal, setInputVal] = useState('140')
+  const [score, setScore] = useState(0)
+  const [inputVal, setInputVal] = useState('0')
   const [regionFilter, setRegionFilter] = useState('Barchasi')
   const [statusFilter, setStatusFilter] = useState('Barchasi')
   const [specialtyFilter, setSpecialtyFilter] = useState('Hammasi')
