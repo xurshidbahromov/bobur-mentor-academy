@@ -81,8 +81,8 @@ function CourseCard({ course, index, onNavigate }) {
       style={{
         position: 'relative', width: '100%', height: '100%',
         cursor: 'pointer',
-        padding: '24px 20px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
-        display: 'flex', flexDirection: 'column', gap: 14,
+        padding: '16px', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
+        display: 'flex', flexDirection: 'column', gap: 12,
         overflow: 'hidden'
       }}
     >
@@ -94,26 +94,31 @@ function CourseCard({ course, index, onNavigate }) {
         <BookOpen size={180} />
       </div>
 
-      {/* Top icon and title */}
-      <div style={{ position: 'relative', zIndex: 1, flex: 1 }}>
-        <div style={{
-          width: 48, height: 48, borderRadius: 14,
-          background: 'rgba(52, 97, 255, 0.08)', border: '1px solid rgba(52, 97, 255, 0.1)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0, marginBottom: 12
-        }}>
-          {course.icon_url ? (
-            <img src={course.icon_url} alt="" loading="lazy" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-          ) : (
-            <BookOpen size={24} color="#3461FF" />
-          )}
+      {/* Top icon and title side-by-side */}
+      <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: 12,
+            background: 'rgba(52, 97, 255, 0.08)', border: '1px solid rgba(52, 97, 255, 0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            {course.icon_url ? (
+              <img src={course.icon_url} alt="" loading="lazy" style={{ width: 22, height: 22, objectFit: 'contain' }} />
+            ) : (
+              <BookOpen size={20} color="#3461FF" />
+            )}
+          </div>
+          
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h3 className="outfit-font" style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {course.title}
+            </h3>
+          </div>
         </div>
-
-        <h3 className="outfit-font" style={{ margin: '0 0 4px', fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-          {course.title}
-        </h3>
+        
         {course.description && (
-          <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', lineHeight: 1.5, fontWeight: 500 }}>
+          <p style={{ margin: 0, color: '#64748B', fontSize: '0.8rem', lineHeight: 1.5, fontWeight: 500, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {course.description}
           </p>
         )}
@@ -241,27 +246,27 @@ export default function DashboardPage() {
         .dash-hero {
           background: linear-gradient(135deg, #0F172A 0%, #262364ff 25%, #3c2f52ff 55%, #153283ff 80%, #025886ff 100%);
           position: relative; z-index: 10;
-          padding: 40px 0 100px;
-          border-radius: 0 0 40px 40px;
-          margin-bottom: -60px;
-          box-shadow: 0 20px 40px rgba(13,13,43,0.25);
+          padding: 28px 0 80px;
+          border-radius: 0 0 24px 24px;
+          margin-bottom: -48px;
+          box-shadow: 0 15px 30px rgba(13,13,43,0.2);
         }
-        .dash-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; padding-bottom:32px; border-bottom:1px solid rgba(255,255,255,0.08); }
-        .dash-topbar-left { display:flex; align-items:center; gap:14px; }
+        .dash-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); }
+        .dash-topbar-left { display:flex; align-items:center; gap:10px; }
         .dash-topbar-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
         .dash-avatar-ring {
-          width:52px; height:52px; border-radius:50%; background:white;
-          flex-shrink:0; padding:3px; position:relative;
-          box-shadow: 0 4px 16px rgba(15,23,42,0.2);
+          width:44px; height:44px; border-radius:50%; background:white;
+          flex-shrink:0; padding:2.5px; position:relative;
+          box-shadow: 0 3px 12px rgba(15,23,42,0.2);
           display:flex; align-items:center; justify-content:center;
         }
         .dash-avatar-inner {
           width:100%; height:100%; border-radius:50%; overflow:hidden;
           background:#F1F5F9; display:flex; align-items:center;
-          justify-content:center; color:#3461FF; font-weight:800; font-size:1.375rem;
+          justify-content:center; color:#3461FF; font-weight:800; font-size:1.125rem;
         }
-        .dash-greeting p { margin:0; font-size:0.875rem; font-weight:700; color:rgba(255,255,255,0.6); }
-        .dash-greeting h2 { margin:0; font-size:1.75rem; font-weight:900; color:white; letter-spacing:-0.03em; line-height:1; }
+        .dash-greeting p { margin:0; font-size:0.8125rem; font-weight:700; color:rgba(255,255,255,0.6); }
+        .dash-greeting h2 { margin:0; font-size:1.375rem; font-weight:900; color:white; letter-spacing:-0.03em; line-height:1; }
         .dash-stats-pill {
           display:inline-flex; align-items:center;
           background:rgba(255,255,255,0.95); border:1px solid rgba(255,255,255,0.8);
@@ -270,48 +275,48 @@ export default function DashboardPage() {
         }
         .dash-stat-chip {
           display:flex; align-items:center; gap:5px;
-          padding:5px 12px; border-radius:100px;
-          font-size:0.875rem; font-weight:800; color:white;
+          padding:4px 10px; border-radius:100px;
+          font-size:0.8125rem; font-weight:800; color:white;
           text-decoration:none; white-space:nowrap;
         }
         .dash-stat-xp  { background:linear-gradient(135deg,#3461FF,#254EDC); box-shadow:0 3px 10px rgba(52,97,255,0.4); }
         .dash-stat-coin{ background:linear-gradient(135deg,#F59E0B,#D97706); box-shadow:0 3px 10px rgba(245,158,11,0.4); }
         .dash-bell {
-          width:42px; height:42px; border-radius:50%; position:relative;
+          width:38px; height:38px; border-radius:50%; position:relative;
           background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
           display:flex; align-items:center; justify-content:center;
           cursor:pointer; -webkit-tap-highlight-color:transparent;
         }
-        .dash-section-bar { display:flex; align-items:center; justify-content:space-between; position:relative; height:48px; margin-bottom:24px; }
-        .dash-section-title { margin:0; font-weight:900; color:white; letter-spacing:-0.04em; line-height:1.05; font-size:clamp(2.25rem,7vw,3.75rem); }
-        .dash-quick-row { display:flex; gap:10px; margin-top:18px; overflow-x:auto; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
+        .dash-section-bar { display:flex; align-items:center; justify-content:space-between; position:relative; height:44px; margin-bottom:20px; }
+        .dash-section-title { margin:0; font-weight:900; color:white; letter-spacing:-0.04em; line-height:1.05; font-size:clamp(1.75rem,5vw,2.5rem); }
+        .dash-quick-row { display:flex; gap:8px; margin-top:14px; overflow-x:auto; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
         .dash-quick-row::-webkit-scrollbar { display:none; }
         .dash-quick-chip {
-          display:inline-flex; align-items:center; gap:8px; flex-shrink:0;
+          display:inline-flex; align-items:center; gap:6px; flex-shrink:0;
           background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
-          border-radius:100px; padding:9px 18px 9px 12px;
+          border-radius:100px; padding:6px 12px 6px 8px;
           cursor:pointer; color:white; white-space:nowrap;
         }
         @media (max-width: 640px) {
-          .dash-hero { padding:18px 0 74px; border-radius:0 0 26px 26px; margin-bottom:-38px; }
-          .dash-topbar { margin-bottom:24px; padding-bottom:24px; }
-          .dash-avatar-ring { width:40px; height:40px; padding:2px; }
-          .dash-avatar-inner { font-size:1.1rem; }
-          .dash-greeting h2 { font-size:1.125rem; }
-          .dash-stat-chip { padding:4px 8px; font-size:0.6875rem; gap:3px; }
+          .dash-hero { padding:14px 0 60px; border-radius:0 0 18px 18px; margin-bottom:-32px; }
+          .dash-topbar { margin-bottom:16px; padding-bottom:16px; }
+          .dash-avatar-ring { width:36px; height:36px; padding:2px; }
+          .dash-avatar-inner { font-size:1rem; }
+          .dash-greeting h2 { font-size:1rem; }
+          .dash-stat-chip { padding:3px 7px; font-size:0.625rem; gap:3px; }
           .dash-stats-pill { padding:2px; gap:2px; }
-          .dash-bell { width:36px; height:36px; }
-          .dash-quick-chip { padding:7px 12px 7px 9px; font-size:0.8125rem; }
+          .dash-bell { width:32px; height:32px; }
+          .dash-quick-chip { padding:5px 10px 5px 8px; font-size:0.75rem; }
         }
-        .dash-content { padding:0 24px; }
-        @media (max-width: 768px) { .dash-content { padding:0 16px; } }
+        .dash-content { padding:0 20px; }
+        @media (max-width: 768px) { .dash-content { padding:0 14px; } }
       `}</style>
 
       <div className="dash-page-wrapper">
         {/* ── FULL WIDTH MESH HERO ── */}
         <div className="dash-hero">
           {/* Clipped background glow layer — separate from content so notification panel can overflow */}
-          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', borderRadius: '0 0 40px 40px', zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', borderRadius: '0 0 24px 24px', zIndex: 0, pointerEvents: 'none' }}>
             <div style={{ position: 'absolute', top: -80, right: -60, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 65%)' }} />
             <div style={{ position: 'absolute', bottom: -60, left: -80, width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(29,78,216,0.2) 0%, transparent 65%)' }} />
             <div style={{ position: 'absolute', top: '30%', right: '20%', width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(217,119,6,0.08) 0%, transparent 65%)' }} />
@@ -538,26 +543,23 @@ export default function DashboardPage() {
               {!isSearchOpen && canClaim && (
                 <motion.div
                   initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  animate={{ opacity: 1, height: 'auto', marginBottom: 32 }}
+                  animate={{ opacity: 1, height: 'auto', marginBottom: 20 }}
                   exit={{ opacity: 0, height: 0, marginBottom: 0, overflow: 'hidden' }}
                 >
                   <div className="card-glow-hover" style={{
-                    display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
+                    display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12,
                     background: '#F8FAFC',
                     border: '1px solid var(--border-medium)',
-                    borderRadius: 24, padding: '20px 24px',
-                    boxShadow: '0 12px 32px rgba(15,23,42,0.05)',
-                    flexWrap: 'wrap',
+                    borderRadius: 16, padding: '14px 18px',
+                    boxShadow: '0 8px 24px rgba(15,23,42,0.05)',
                     position: 'relative', overflow: 'hidden'
                   }}>
-                    {/* Decorative glass glow */}
                     <div style={{ position: 'absolute', top: -30, left: -30, width: 120, height: 120, background: 'rgba(52,97,255,0.08)', borderRadius: '50%', filter: 'blur(40px)' }} />
-
                     <div style={{ flex: '1 1 200px' }}>
-                      <h3 style={{ margin: '0 0 6px', fontSize: '1.1875rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <h3 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 800, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8 }}>
                         {!canClaim ? 'Mukofot olindi!' : 'Bugungi mukofotingiz tayyor!'}
                       </h3>
-                      <p style={{ margin: 0, fontSize: '0.9375rem', color: '#64748B', fontWeight: 500 }}>
+                      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', fontWeight: 500 }}>
                         {!canClaim ? 'Ertaga yana kiring va tanga yig\'ing.' : 'Quyidagi tugmani bosib, 1 ta coin (tanga) oling va bilimlarga investitsiya qiling.'}
                       </p>
                     </div>
@@ -566,15 +568,15 @@ export default function DashboardPage() {
                       onClick={handleClaimReward}
                       disabled={!canClaim}
                       style={{
-                        padding: '12px 24px', borderRadius: 100, border: 'none',
+                        padding: '9px 18px', borderRadius: 100, border: 'none',
                         background: !canClaim ? 'rgba(15,23,42,0.05)' : '#3461FF',
                         color: !canClaim ? '#94A3B8' : 'white',
-                        fontWeight: 800, fontSize: '0.9375rem', cursor: !canClaim ? 'default' : 'pointer',
-                        display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, width: 'max-content',
+                        fontWeight: 800, fontSize: '0.875rem', cursor: !canClaim ? 'default' : 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, width: 'max-content',
                         boxShadow: !canClaim ? 'none' : '0 4px 16px rgba(52,97,255,0.2)'
                       }}
                     >
-                      {!canClaim ? <CheckCircle2 size={18} /> : <Gift size={18} />}
+                      {!canClaim ? <CheckCircle2 size={16} /> : <Gift size={16} />}
                       {!canClaim ? 'Olindi' : 'Olish (+1)'}
                     </motion.button>
                   </div>
@@ -584,8 +586,8 @@ export default function DashboardPage() {
             {/* ── Courses Grid ── */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
-              gap: 20,
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+              gap: 16,
               alignItems: 'stretch'
             }}>
               {loading ? (

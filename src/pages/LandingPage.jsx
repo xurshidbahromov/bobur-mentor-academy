@@ -29,14 +29,14 @@ export default function LandingPage() {
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
         <section style={{
-          minHeight: '88vh',
+          minHeight: '75vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          gap: '20px',
-          padding: '120px 0 80px',
+          gap: '16px',
+          padding: '80px 0 60px',
           position: 'relative'
         }}>
 
@@ -57,7 +57,7 @@ export default function LandingPage() {
 
           <h1 className="outfit-font text-gradient-premium" style={{
             maxWidth: '780px', margin: '0 auto',
-            fontSize: 'clamp(2.5rem, 8vw, 5rem)',
+            fontSize: 'clamp(2rem, 6vw, 4rem)',
             letterSpacing: '-0.04em', fontWeight: 900, lineHeight: 1.08,
             position: 'relative', zIndex: 1,
             wordBreak: 'break-word', overflowWrap: 'break-word'
@@ -110,9 +110,9 @@ export default function LandingPage() {
         </section>
 
         {/* ── BENTO FEATURES ───────────────────────── */}
-        <section style={{ padding: '80px 0' }}>
-          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-            <Badge variant="primary" style={{ marginBottom: '16px' }}>Platforma imkoniyatlari</Badge>
+        <section style={{ padding: '40px 0' }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <Badge variant="primary" style={{ marginBottom: '12px' }}>Platforma imkoniyatlari</Badge>
             <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', marginBottom: '16px', color: 'var(--text-primary)' }}>
               Nimalarni taqdim etamiz?
             </h2>
@@ -140,7 +140,7 @@ export default function LandingPage() {
               gridColumn: 'span 2',
               background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E3A8A 100%)',
               borderRadius: 'var(--radius-card)',
-              padding: '48px',
+              padding: '32px',
               color: 'white',
               border: '1.2px solid rgba(255,255,255,0.25)',
               position: 'relative',
@@ -160,7 +160,7 @@ export default function LandingPage() {
             {/* Tall card — Quiz (span 2 rows) */}
             <Card className="card-glow-hover" style={{
               gridColumn: 'span 1', gridRow: 'span 2',
-              display: 'flex', flexDirection: 'column', padding: '40px 32px'
+              display: 'flex', flexDirection: 'column', padding: '24px'
             }}>
               <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                 <Sparkles size={24} color="var(--color-accent)" />
@@ -183,7 +183,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Small card — Zero to Hero */}
-            <Card className="card-glow-hover" style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
+            <Card className="card-glow-hover" style={{ gridColumn: 'span 1', padding: '24px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(6,182,212,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <BookOpen size={22} color="var(--color-teal)" />
               </div>
@@ -194,7 +194,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Small card — Offline */}
-            <Card className="card-glow-hover" style={{ gridColumn: 'span 1', padding: '32px', display: 'flex', flexDirection: 'column' }}>
+            <Card className="card-glow-hover" style={{ gridColumn: 'span 1', padding: '24px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(139,92,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <MapPin size={22} color="#8B5CF6" />
               </div>
@@ -207,7 +207,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── FEATURED COURSES ─────────────────────── */}
-        <section style={{ padding: '40px 0 80px' }}>
+        <section style={{ padding: '20px 0 60px' }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
             marginBottom: '40px', flexWrap: 'wrap', gap: '16px'
@@ -269,9 +269,9 @@ export default function LandingPage() {
         </section>
 
         {/* ── SOCIAL PROOF ─────────────────────────── */}
-        <section style={{ padding: '40px 0 80px' }}>
+        <section style={{ padding: '20px 0 60px' }}>
           <Card style={{
-            padding: 'clamp(40px, 6vw, 72px)',
+            padding: 'clamp(24px, 4vw, 40px)',
             display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '40px',
             position: 'relative', overflow: 'hidden'
           }}>

@@ -23,10 +23,10 @@ export default function LessonRow({ lesson, index, isUnlocked = false, isWatched
     : 'var(--text-muted)'
 
   const Icon = isWatched
-    ? <CheckCircle2 size={17} strokeWidth={2.5} />
+    ? <CheckCircle2 size={15} strokeWidth={2.5} />
     : state === 'locked'
-    ? <Lock size={15} strokeWidth={2} />
-    : <Play size={15} fill="currentColor" />
+    ? <Lock size={13} strokeWidth={2} />
+    : <Play size={13} fill="currentColor" />
 
   return (
     <Link
@@ -35,12 +35,12 @@ export default function LessonRow({ lesson, index, isUnlocked = false, isWatched
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
-        padding: '18px 20px',
+        gap: '14px',
+        padding: '12px 16px',
         background: 'var(--bg-glass)',
         backdropFilter: 'var(--blur-glass)',
         WebkitBackdropFilter: 'var(--blur-glass)',
-        borderRadius: '20px',
+        borderRadius: '16px',
         border: '1px solid var(--border-glass)',
         textDecoration: 'none',
         boxShadow: 'var(--shadow-soft)',
@@ -54,13 +54,13 @@ export default function LessonRow({ lesson, index, isUnlocked = false, isWatched
       `}</style>
 
       {/* Order number */}
-      <span style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', minWidth: '22px', fontWeight: 700, textAlign: 'center' }}>
+      <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', minWidth: '18px', fontWeight: 700, textAlign: 'center' }}>
         {index + 1}
       </span>
 
       {/* Status icon */}
       <div style={{
-        width: 36, height: 36, borderRadius: '11px',
+        width: 32, height: 32, borderRadius: '10px',
         background: iconBg,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         color: iconColor, flexShrink: 0
@@ -72,9 +72,10 @@ export default function LessonRow({ lesson, index, isUnlocked = false, isWatched
       <span style={{
         flex: 1, color: isWatched ? 'var(--text-muted)' : 'var(--text-primary)',
         fontWeight: isWatched ? 400 : 600,
-        fontSize: '0.9375rem', lineHeight: 1.4,
+        fontSize: '0.85rem', lineHeight: 1.3,
         textDecoration: isWatched ? 'line-through' : 'none',
-        textDecorationColor: 'var(--border-strong)'
+        textDecorationColor: 'var(--border-strong)',
+        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
       }}>
         {lesson.title}
       </span>
@@ -82,20 +83,22 @@ export default function LessonRow({ lesson, index, isUnlocked = false, isWatched
       {/* Right badge */}
       {state === 'locked' && (lesson.coin_price > 0) ? (
         <div style={{
-          display: 'flex', alignItems: 'center', gap: '5px',
-          padding: '5px 12px', borderRadius: 'var(--radius-full)',
+          display: 'flex', alignItems: 'center', gap: '4px',
+          padding: '4px 10px', borderRadius: 'var(--radius-full)',
           background: 'rgba(245, 158, 11, 0.1)',
           border: '1px solid rgba(245, 158, 11, 0.2)',
-          color: '#d97706', fontSize: '0.8125rem', fontWeight: 700
+          color: '#d97706', fontSize: '0.7rem', fontWeight: 700,
+          whiteSpace: 'nowrap'
         }}>
-          <Coins size={13} /> {lesson.coin_price}
+          <Coins size={12} /> {lesson.coin_price}
         </div>
       ) : state === 'free' ? (
         <div style={{
-          padding: '5px 12px', borderRadius: 'var(--radius-full)',
+          padding: '4px 10px', borderRadius: 'var(--radius-full)',
           background: 'rgba(16, 185, 129, 0.1)',
           border: '1px solid rgba(16, 185, 129, 0.2)',
-          color: 'var(--color-accent)', fontSize: '0.8125rem', fontWeight: 600
+          color: 'var(--color-accent)', fontSize: '0.7rem', fontWeight: 600,
+          whiteSpace: 'nowrap'
         }}>
           Bepul
         </div>

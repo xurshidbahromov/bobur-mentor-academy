@@ -115,10 +115,9 @@ export default function AboutPage() {
         </button>
       </div>
 
-      {/* ── HERO BANNER ──────────────────────────── */}
       <div style={{
         background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E3A8A 100%)',
-        padding: '120px 24px 100px',
+        padding: '80px 24px 60px',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -140,11 +139,11 @@ export default function AboutPage() {
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '9999px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', fontSize: '0.875rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: '24px' }}>
                 Asoschi & Bosh Mentor
               </div>
-              <h1 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.08, marginBottom: '24px', color: 'white' }}>
+              <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.08, marginBottom: '20px', color: 'white' }}>
                 Bobur<br />
                 <span className="text-gradient-fire">Mentor</span>
               </h1>
-              <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.65, maxWidth: '520px', marginBottom: '40px' }}>
+              <p style={{ fontSize: '1.0625rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.65, maxWidth: '520px', marginBottom: '32px' }}>
                 Matematika — bu shunchaki raqamlar yig'indisi emas, bu hayotiy qarorlar va mantiqiy fikrlash poydevoridir.
               </p>
               <Link to="/dashboard" style={{ textDecoration: 'none' }}>
@@ -193,11 +192,11 @@ export default function AboutPage() {
       </div>
 
       {/* ── STATS BENTO ──────────────────────────── */}
-      <div style={{ maxWidth: '1200px', margin: '-32px auto 80px', padding: '0 24px', position: 'relative', zIndex: 20 }}>
+      <div style={{ maxWidth: '1200px', margin: '-24px auto 60px', padding: '0 24px', position: 'relative', zIndex: 20 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="stats-grid">
           <style>{`@media (max-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }`}</style>
           {stats.map(({ icon, value, label, color, bg }) => (
-            <Card key={label} style={{ padding: '24px', textAlign: 'center' }}>
+            <Card key={label} style={{ padding: '16px', textAlign: 'center' }}>
               <div style={{ width: 52, height: 52, borderRadius: '18px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color }}>
                 {icon}
               </div>
@@ -209,7 +208,7 @@ export default function AboutPage() {
       </div>
 
       {/* ── STORY SECTION ────────────────────────── */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto 80px', padding: '0 24px' }}>
+      <section style={{ maxWidth: '1200px', margin: '0 auto 60px', padding: '0 24px' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
@@ -261,7 +260,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── SOCIAL MEDIA ─────────────────────────── */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto 80px', padding: '0 24px' }}>
+      <section style={{ maxWidth: '1200px', margin: '0 auto 60px', padding: '0 24px' }}>
         <div style={{ marginBottom: '40px' }}>
           <Badge variant="primary" style={{ marginBottom: '16px' }}>Ijtimoiy Tarmoqlar</Badge>
           <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: '#0F172A', letterSpacing: '-0.03em', fontWeight: 800, marginBottom: '12px' }}>
@@ -294,8 +293,8 @@ export default function AboutPage() {
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '20px',
-                padding: '24px 28px',
+                gap: '16px',
+                padding: '16px 20px',
                 background: 'var(--bg-glass)',
                 backdropFilter: 'var(--blur-glass)',
                 WebkitBackdropFilter: 'var(--blur-glass)',
@@ -319,7 +318,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── METHODOLOGY ──────────────────────────── */}
-      <section style={{ maxWidth: '1200px', margin: '0 auto 100px', padding: '0 24px' }}>
+      <section style={{ maxWidth: '1200px', margin: '0 auto 80px', padding: '0 24px' }}>
         <div style={{ marginBottom: '56px' }}>
           <Badge variant="primary" style={{ marginBottom: '16px' }}>Metodika</Badge>
           <h2 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', color: '#0F172A', letterSpacing: '-0.03em', fontWeight: 800, marginBottom: '12px' }}>
@@ -332,7 +331,7 @@ export default function AboutPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
           {methodCards.map(({ icon, title, desc, color, bg }) => (
-            <Card hover key={title} style={{ padding: '36px', borderTop: `3px solid ${color}` }}>
+            <Card hover key={title} style={{ padding: '24px', borderTop: `3px solid ${color}` }}>
               <div style={{ width: 48, height: 48, borderRadius: '16px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', color }}>
                 {icon}
               </div>
@@ -347,9 +346,9 @@ export default function AboutPage() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
         <div style={{
           background: 'linear-gradient(140deg, #3461FF 0%, #1e3a8a 100%)',
-          borderRadius: '32px',
-          padding: 'clamp(48px, 6vw, 80px) clamp(32px, 5vw, 72px)',
-          display: 'flex', flexDirection: 'column', gap: '32px',
+          borderRadius: '24px',
+          padding: 'clamp(32px, 5vw, 60px) clamp(24px, 4vw, 48px)',
+          display: 'flex', flexDirection: 'column', gap: '24px',
           position: 'relative', overflow: 'hidden',
           boxShadow: 'var(--shadow-xl)'
         }}>

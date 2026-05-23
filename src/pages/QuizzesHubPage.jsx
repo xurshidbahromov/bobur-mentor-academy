@@ -70,27 +70,22 @@ export default function QuizzesHubPage() {
   return (
     <>
       <style>{`
-        .qhub-wrapper { width: 100%; padding-bottom: 80px; }
+        .qhub-wrapper { width: 100%; padding-bottom: 60px; }
 
         .qhub-hero {
           background: linear-gradient(145deg, #0F172A 0%, #134E4A 50%, #064E3B 100%);
           position: relative; overflow: hidden;
-          padding: 48px 0 90px;
-          border-radius: 0 0 40px 40px;
-          margin-bottom: -50px;
-          box-shadow: 0 20px 40px rgba(6,78,59,0.2);
+          padding: 32px 0 70px;
+          border-radius: 0 0 24px 24px;
+          margin-bottom: -40px;
+          box-shadow: 0 15px 30px rgba(6,78,59,0.18);
         }
-        .qhub-hero-inner { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+        .qhub-hero-inner { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
 
         .qhub-tab-wrap {
-          max-width: 1040px; margin: 0 auto;
-          padding: 0 24px; position: relative; z-index: 10;
-        }
-        .qhub-tab-inner { /* unused but kept for compat */ }
-        .qhub-tab-wrap {
           max-width: 540px;
-          margin: 16px auto 0;
-          padding: 0 16px;
+          margin: 12px auto 0;
+          padding: 0 14px;
         }
         .qhub-tab-bar {
           display: flex;
@@ -107,10 +102,10 @@ export default function QuizzesHubPage() {
         }
         .qhub-tab-bar::-webkit-scrollbar { display: none; }
         .qhub-tab-btn {
-          flex: 1 0 auto; padding: 12px 20px;
+          flex: 1 0 auto; padding: 9px 16px;
           border: none; background: transparent;
           color: rgba(255, 255, 255, 0.55);
-          font-weight: 600; font-size: 0.875rem;
+          font-weight: 600; font-size: 0.8125rem;
           cursor: pointer; position: relative;
           display: flex; align-items: center;
           justify-content: center; gap: 6px;
@@ -133,8 +128,8 @@ export default function QuizzesHubPage() {
 
         /* Lesson card */
         .qhub-lesson-card {
-          display: flex; align-items: center; gap: 16px;
-          padding: 18px 24px; border-radius: 20px;
+          display: flex; align-items: center; gap: 14px;
+          padding: 12px 16px; border-radius: 16px;
           background: #FFFFFF;
           border: 1px solid rgba(15,23,42,0.05);
           cursor: pointer; transition: all 0.24s cubic-bezier(0.22, 1, 0.36, 1);
@@ -160,9 +155,9 @@ export default function QuizzesHubPage() {
         .qhub-lesson-card.locked::before { display: none; }
 
         @media (max-width: 640px) {
-          .qhub-hero { padding: 36px 0 72px; border-radius: 0 0 28px 28px; }
-          .qhub-hero-inner, .qhub-content, .qhub-tab-wrap { padding: 0 16px; }
-          .qhub-tab-btn { padding: 12px 16px; font-size: 0.875rem; }
+          .qhub-hero { padding: 24px 0 56px; border-radius: 0 0 18px 18px; }
+          .qhub-hero-inner, .qhub-content, .qhub-tab-wrap { padding: 0 14px; }
+          .qhub-tab-btn { padding: 8px 12px; font-size: 0.8125rem; }
         }
       `}</style>
 
@@ -179,14 +174,14 @@ export default function QuizzesHubPage() {
           ))}
           <div className="qhub-hero-inner">
             <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.6,ease:[0.16,1,0.3,1]}}>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:7, background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:100, padding:'5px 14px', marginBottom:14 }}>
-                <Zap size={13} color="#A78BFA" fill="#A78BFA" />
-                <span style={{ color:'#DDD6FE', fontSize:'0.7rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.1em' }}>Testlar Markazi</span>
+              <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:100, padding:'4px 12px', marginBottom:10 }}>
+                <Zap size={12} color="#A78BFA" fill="#A78BFA" />
+                <span style={{ color:'#DDD6FE', fontSize:'0.65rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.1em' }}>Testlar Markazi</span>
               </div>
-              <h1 className="outfit-font" style={{ margin:'0 0 10px', fontSize:'clamp(2.25rem, 7vw, 3.75rem)', fontWeight:900, color:'white', letterSpacing:'-0.04em', lineHeight:1.05 }}>
+              <h1 className="outfit-font" style={{ margin:'0 0 8px', fontSize:'clamp(1.75rem, 5vw, 2.5rem)', fontWeight:900, color:'white', letterSpacing:'-0.04em', lineHeight:1.05 }}>
                 Testlar
               </h1>
-              <p style={{ margin:'0 0 32px', color:'rgba(255,255,255,0.6)', fontSize:'0.9375rem', fontWeight:500 }}>
+              <p style={{ margin:'0 0 20px', color:'rgba(255,255,255,0.6)', fontSize:'0.875rem', fontWeight:500 }}>
                 Kunlik test, mavzulashtirilgan va umumiy testlar — bir joyda.
               </p>
 
@@ -201,14 +196,14 @@ export default function QuizzesHubPage() {
                   <div style={{
                     background: 'rgba(255,255,255,0.07)',
                     border: '1px solid rgba(255,255,255,0.13)',
-                    borderRadius: 40, padding: '18px 22px',
+                    borderRadius: 20, padding: '14px 18px',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
                   }}>
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                        <div style={{ width:40, height:40, borderRadius:12, background:'rgba(52,97,255,0.3)', border:'1px solid rgba(52,97,255,0.4)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                          <Sparkles size={18} color="#93C5FD" fill="#93C5FD" />
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                        <div style={{ width:34, height:34, borderRadius:10, background:'rgba(52,97,255,0.3)', border:'1px solid rgba(52,97,255,0.4)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                          <Sparkles size={15} color="#93C5FD" fill="#93C5FD" />
                         </div>
                         <div>
                           <p style={{ margin:0, fontSize:'0.75rem', color:'rgba(255,255,255,0.5)', fontWeight:700 }}>Sizning darajangiz</p>
@@ -298,7 +293,7 @@ export default function QuizzesHubPage() {
                       return (
                         <div key={dQuiz.id} className="glass-card-premium card-glow-hover" style={{
                           display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
-                          padding: '24px 24px',
+                          padding: '16px 20px', borderRadius: 20,
                           position: 'relative', overflow: 'hidden'
                         }}>
                           {/* Decorative glow */}
@@ -324,12 +319,12 @@ export default function QuizzesHubPage() {
                           </div>
 
                           {attempt ? (
-                            <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate('/leaderboard')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F0FDF4', color: '#059669', border: '1px solid rgba(16,185,129,0.2)', padding: '12px 24px', borderRadius: 100, fontWeight: 800, cursor: 'pointer', fontSize: '0.9375rem', flexShrink: 0, boxShadow: '0 4px 12px rgba(16,185,129,0.1)' }}>
-                              <CheckCircle2 size={18} /> Natija: {attempt.score}/{attempt.total_questions}
+                            <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate('/leaderboard')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F0FDF4', color: '#059669', border: '1px solid rgba(16,185,129,0.2)', padding: '10px 20px', borderRadius: 100, fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', flexShrink: 0, boxShadow: '0 4px 12px rgba(16,185,129,0.1)' }}>
+                              <CheckCircle2 size={16} /> Natija: {attempt.score}/{attempt.total_questions}
                             </motion.button>
                           ) : (
-                            <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate(`/quiz/daily-${dQuiz.id}`)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: isToday ? '#EF4444' : '#3461FF', color: 'white', border: 'none', padding: '12px 24px', borderRadius: 100, fontWeight: 800, cursor: 'pointer', fontSize: '0.9375rem', flexShrink: 0, boxShadow: isToday ? '0 8px 24px rgba(239,68,68,0.3)' : '0 8px 24px rgba(52,97,255,0.3)' }}>
-                              <Play size={18} fill="white" /> Boshlash
+                            <motion.button whileTap={{ scale: 0.95 }} onClick={() => navigate(`/quiz/daily-${dQuiz.id}`)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: isToday ? '#EF4444' : '#3461FF', color: 'white', border: 'none', padding: '10px 20px', borderRadius: 100, fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', flexShrink: 0, boxShadow: isToday ? '0 8px 24px rgba(239,68,68,0.3)' : '0 8px 24px rgba(52,97,255,0.3)' }}>
+                              <Play size={16} fill="white" /> Boshlash
                             </motion.button>
                           )}
                         </div>
@@ -364,17 +359,17 @@ export default function QuizzesHubPage() {
                                 onClick={() => setOpenCourse(isOpen ? null : course.id)}
                                 style={{ 
                                   width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                                  padding: '24px', background: 'transparent', border: 'none', cursor: 'pointer', 
+                                  padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer', 
                                   textAlign: 'left', WebkitTapHighlightColor: 'transparent'
                                 }}
                               >
-                                 <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                                    <div style={{ 
-                                     width: 56, height: 56, borderRadius: 18, 
+                                     width: 40, height: 40, borderRadius: 12, 
                                      background: isOpen ? `linear-gradient(135deg, ${accent}, #1E1B4B)` : '#F8FAFC', 
                                      color: isOpen ? 'white' : accent, 
                                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                                     fontWeight: 900, fontSize: '1.4rem', flexShrink: 0,
+                                     fontWeight: 900, fontSize: '1.2rem', flexShrink: 0,
                                      transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                                      boxShadow: isOpen ? `0 10px 25px ${accent}44` : 'inset 0 2px 4px rgba(0,0,0,0.02)',
                                      border: isOpen ? 'none' : '1.5px solid rgba(15,23,42,0.04)'
@@ -382,8 +377,8 @@ export default function QuizzesHubPage() {
                                      {ci + 1}
                                    </div>
                                    <div>
-                                     <h3 className="outfit-font" style={{ margin: '0 0 4px', fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{course.title}</h3>
-                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                     <h3 className="outfit-font" style={{ margin: '0 0 2px', fontSize: '1.125rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{course.title}</h3>
+                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                        <span style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
                                          <BookOpen size={14} /> {lessons.length} ta dars
                                        </span>
@@ -397,14 +392,14 @@ export default function QuizzesHubPage() {
                                  <motion.div 
                                    animate={{ rotate: isOpen ? 180 : 0 }} 
                                    style={{ 
-                                     width: 40, height: 40, borderRadius: 12, 
+                                     width: 32, height: 32, borderRadius: 10, 
                                      background: isOpen ? '#F1F5F9' : 'transparent',
                                      color: isOpen ? '#0F172A' : '#94A3B8',
                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                                      border: isOpen ? '1px solid rgba(15,23,42,0.06)' : 'none'
                                    }}
                                  >
-                                   <ChevronDown size={22} strokeWidth={3} />
+                                   <ChevronDown size={18} strokeWidth={3} />
                                  </motion.div>
                                </button>
 
@@ -434,24 +429,24 @@ export default function QuizzesHubPage() {
                                              style={{
                                                background: canAccess ? 'white' : '#F8FAFC',
                                                border: `2px solid ${canAccess ? '#FFFFFF' : 'rgba(255,255,255,0.4)'}`,
-                                               padding: '16px 20px',
-                                               borderRadius: 20,
+                                               padding: '10px 14px',
+                                               borderRadius: 12,
                                                boxShadow: canAccess ? '0 4px 12px rgba(52,97,255,0.03)' : 'none',
-                                               display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer',
+                                               display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
                                                transition: 'all 0.2s'
                                              }}
                                            >
                                              <div style={{ 
-                                               width: 44, height: 44, borderRadius: 14, flexShrink: 0, 
+                                               width: 36, height: 36, borderRadius: 10, flexShrink: 0, 
                                                background: canAccess ? accentBg : '#E2E8F0', 
                                                color: canAccess ? accent : '#94A3B8', 
                                                display: 'flex', alignItems: 'center', justifyContent: 'center', 
                                                boxShadow: canAccess ? `0 4px 12px ${accent}22` : 'none'
                                              }}>
-                                               {canAccess ? <Play size={18} fill={accent} strokeWidth={0} /> : <Lock size={16} />}
+                                               {canAccess ? <Play size={16} fill={accent} strokeWidth={0} /> : <Lock size={14} />}
                                              </div>
                                              <div style={{ flex: 1, minWidth: 0 }}>
-                                               <p className="outfit-font" style={{ margin: '0 0 2px', fontSize: '1rem', fontWeight: 800, color: canAccess ? '#0F172A' : '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{lesson.title}</p>
+                                               <p className="outfit-font" style={{ margin: '0 0 2px', fontSize: '0.9rem', fontWeight: 800, color: canAccess ? '#0F172A' : '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{lesson.title}</p>
                                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                                  <span style={{ fontSize: '0.8125rem', color: canAccess ? '#64748B' : '#CBD5E1', fontWeight: 600 }}>{lesson.quizCount} ta savol</span>
                                                </div>
@@ -485,7 +480,7 @@ export default function QuizzesHubPage() {
                 {activeTab === 'general' && (
                   <div className="glass-card-premium card-glow-hover" style={{
                     display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16,
-                    padding: '24px 24px',
+                    padding: '16px 20px', borderRadius: 20,
                     position: 'relative', overflow: 'hidden'
                   }}>
                     {/* Decorative glass glow */}
@@ -517,15 +512,15 @@ export default function QuizzesHubPage() {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => navigate('/quiz/general')}
                       style={{ 
-                        display: 'flex', alignItems: 'center', gap: 10, 
+                        display: 'flex', alignItems: 'center', gap: 8, 
                         background: '#10B981', color: 'white', border: 'none', 
-                        padding: '16px 32px', borderRadius: 100, fontWeight: 800, 
-                        cursor: 'pointer', fontSize: '1rem', flexShrink: 0, 
+                        padding: '12px 24px', borderRadius: 100, fontWeight: 800, 
+                        cursor: 'pointer', fontSize: '0.9rem', flexShrink: 0, 
                         boxShadow: '0 10px 25px rgba(16,185,129,0.3)',
                         transition: 'all 0.3s'
                       }}
                     >
-                      <Play size={20} fill="white" /> Boshlash
+                      <Play size={18} fill="white" /> Boshlash
                     </motion.button>
                   </div>
                 )}

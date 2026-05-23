@@ -89,9 +89,9 @@ function OptionBtn({ opt, value, selected, submitted, correct, onClick }) {
       whileTap={submitted ? {} : { scale: 0.98 }}
       onClick={onClick}
       style={{
-        display: 'flex', alignItems: 'center', gap: 16,
+        display: 'flex', alignItems: 'center', gap: 12,
         background: bg, border: `2px solid ${border}`,
-        borderRadius: 20, padding: '20px 24px',
+        borderRadius: 14, padding: '12px 16px',
         cursor: submitted ? 'default' : 'pointer',
         textAlign: 'left', width: '100%',
         boxShadow: shadow, transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -99,20 +99,20 @@ function OptionBtn({ opt, value, selected, submitted, correct, onClick }) {
       }}
     >
       <span style={{
-        width: 36, height: 36, borderRadius: 12, flexShrink: 0,
+        width: 28, height: 28, borderRadius: 8, flexShrink: 0,
         background: isCorrect ? '#22C55E' : isWrong ? '#EF4444' : (opt === selected ? '#3461FF' : 'rgba(15,23,42,0.05)'),
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontWeight: 900, fontSize: '0.9375rem',
+        fontWeight: 900, fontSize: '0.8125rem',
         color: isCorrect || isWrong || opt === selected ? 'white' : '#64748B',
         position: 'relative', zIndex: 1, transition: 'all 0.2s'
       }}>{opt.toUpperCase()}</span>
-      <div style={{ flex: 1, fontWeight: 700, fontSize: '1.125rem', color, lineHeight: 1.5, position: 'relative', zIndex: 1 }}>
+      <div style={{ flex: 1, fontWeight: 700, fontSize: '0.9375rem', color, lineHeight: 1.5, position: 'relative', zIndex: 1 }}>
         <MathRenderer math={value} />
       </div>
       <AnimatePresence>
         {(isCorrect || isWrong) && (
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} style={{ position: 'relative', zIndex: 2 }}>
-            {isCorrect ? <CheckCircle2 size={24} color="#22C55E" strokeWidth={3} /> : <XCircle size={24} color="#EF4444" strokeWidth={3} />}
+            {isCorrect ? <CheckCircle2 size={20} color="#22C55E" strokeWidth={3} /> : <XCircle size={20} color="#EF4444" strokeWidth={3} />}
           </motion.div>
         )}
       </AnimatePresence>
@@ -126,18 +126,18 @@ function FeedbackBanner({ isCorrect }) {
       <motion.div
         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
         style={{
-          display: 'flex', alignItems: 'center', gap: 14, padding: '16px 24px', borderRadius: 20, marginBottom: 20,
+          display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 16, marginBottom: 16,
           background: isCorrect ? '#F0FDF4' : '#FEF2F2', border: `1px solid ${isCorrect ? '#22C55E' : '#EF4444'}`,
         }}
       >
-        <div style={{ width: 32, height: 32, borderRadius: '50%', background: isCorrect ? '#22C55E' : '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {isCorrect ? <CheckCircle2 size={20} color="white" /> : <XCircle size={20} color="white" />}
+        <div style={{ width: 28, height: 28, borderRadius: '50%', background: isCorrect ? '#22C55E' : '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {isCorrect ? <CheckCircle2 size={16} color="white" /> : <XCircle size={16} color="white" />}
         </div>
         <div>
-          <p style={{ margin: 0, fontWeight: 900, fontSize: '1rem', color: isCorrect ? '#166534' : '#991B1B' }}>
+          <p style={{ margin: 0, fontWeight: 900, fontSize: '0.9375rem', color: isCorrect ? '#166534' : '#991B1B' }}>
             {isCorrect ? 'Ajoyib! To\'g\'ri javob!' : 'Xato javob!'}
           </p>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: isCorrect ? '#10B981' : '#F87171', fontWeight: 600 }}>
+          <p style={{ margin: 0, fontSize: '0.75rem', color: isCorrect ? '#10B981' : '#F87171', fontWeight: 600 }}>
             {isCorrect ? 'Bilimingizni oshirishda davom eting' : 'Keyingi savolga diqqat qiling'}
           </p>
         </div>
@@ -155,7 +155,7 @@ function ResultCard({ score, total, timeSpent, isDaily, onRetry, onBack, onAnaly
 
   return (
     <div style={{ maxWidth: 540, margin: '0 auto', width: '100%' }}>
-      <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} style={{ background: 'white', border: '1px solid rgba(15,23,42,0.08)', borderRadius: 40, padding: '56px 40px', textAlign: 'center', boxShadow: '0 32px 100px rgba(15,23,42,0.1)', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+      <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} style={{ background: 'white', border: '1px solid rgba(15,23,42,0.08)', borderRadius: 32, padding: '40px 32px', textAlign: 'center', boxShadow: '0 32px 100px rgba(15,23,42,0.1)', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translate(-50%, -50%)', width: 300, height: 300, background: gradeColor, opacity: 0.1, filter: 'blur(70px)', pointerEvents: 'none' }} />
         
         <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 24 }}>
@@ -181,13 +181,13 @@ function ResultCard({ score, total, timeSpent, isDaily, onRetry, onBack, onAnaly
           </motion.div>
         )}
         
-        <h2 className="outfit-font" style={{ margin: '0 0 8px', fontSize: '4.5rem', fontWeight: 900, color: gradeColor, letterSpacing: '-0.05em', lineHeight: 1 }}>{pct}%</h2>
-        <p style={{ margin: '0 0 8px', fontWeight: 900, fontSize: '1.5rem', color: '#0F172A' }}>{gradeText}</p>
-        <p style={{ margin: '0 0 40px', color: '#64748B', fontSize: '1.125rem', fontWeight: 600 }}>{total} tadan <strong style={{ color: '#0F172A' }}>{score} ta</strong> to'g'ri javob</p>
+        <h2 className="outfit-font" style={{ margin: '0 0 8px', fontSize: '3.5rem', fontWeight: 900, color: gradeColor, letterSpacing: '-0.05em', lineHeight: 1 }}>{pct}%</h2>
+        <p style={{ margin: '0 0 8px', fontWeight: 900, fontSize: '1.25rem', color: '#0F172A' }}>{gradeText}</p>
+        <p style={{ margin: '0 0 32px', color: '#64748B', fontSize: '1.125rem', fontWeight: 600 }}>{total} tadan <strong style={{ color: '#0F172A' }}>{score} ta</strong> to'g'ri javob</p>
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 40 }}>
-          <div style={{ padding: '24px', borderRadius: 28, background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.03)' }}><p style={{ margin: '0 0 4px', fontSize: '2.25rem', fontWeight: 900, color: '#0F172A' }}>{score}</p><p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' }}>To'g'ri</p></div>
-          <div style={{ padding: '24px', borderRadius: 28, background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.03)' }}><p style={{ margin: '0 0 4px', fontSize: '2.25rem', fontWeight: 900, color: '#0F172A' }}>{mins}:{String(secs).padStart(2, '0')}</p><p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' }}>Vaqt</p></div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 32 }}>
+          <div style={{ padding: '20px', borderRadius: 20, background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.03)' }}><p style={{ margin: '0 0 4px', fontSize: '2rem', fontWeight: 900, color: '#0F172A' }}>{score}</p><p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' }}>To'g'ri</p></div>
+          <div style={{ padding: '20px', borderRadius: 20, background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.03)' }}><p style={{ margin: '0 0 4px', fontSize: '2rem', fontWeight: 900, color: '#0F172A' }}>{mins}:{String(secs).padStart(2, '0')}</p><p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase' }}>Vaqt</p></div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
@@ -366,7 +366,7 @@ export default function QuizPage() {
     <div style={{ minHeight: '100vh', background: '#F8FAFC', color: '#1E293B', display: 'flex', flexDirection: 'column' }}>
       <header style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, background: 'rgba(248,250,252,0.98)', zIndex: 10, borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
         <button onClick={() => navigate('/quizzes')} style={{ background: 'rgba(15,23,42,0.05)', border: 'none', color: '#1E293B', width: 40, height: 40, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><ArrowLeft size={20} /></button>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Quiz Session</p>
           <h1 className="outfit-font" style={{ margin: 0, fontSize: '1.125rem', fontWeight: 900, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lesson?.title}</h1>
         </div>
@@ -433,11 +433,11 @@ export default function QuizPage() {
           {phase === 'quiz' && (
             <motion.div key={current} initial={{ opacity: 0, x: 25 }} animate={{ opacity: 1, x: 0 }} transition={{ type: 'spring', damping: 25 }} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               {quizzes[current].image_url && (
-                <motion.button whileTap={{ scale: 0.99 }} onClick={() => setZoomedImage(quizzes[current].image_url)} style={{ width: '100%', marginBottom: 28, borderRadius: 24, overflow: 'hidden', border: '1px solid rgba(15,23,42,0.06)', background: 'white', cursor: 'pointer', outline: 'none' }}>
+                <motion.button whileTap={{ scale: 0.99 }} onClick={() => setZoomedImage(quizzes[current].image_url)} style={{ width: '100%', marginBottom: 24, borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(15,23,42,0.06)', background: 'white', cursor: 'pointer', outline: 'none' }}>
                   <img src={quizzes[current].image_url} alt="Diagram" style={{ width: '100%', height: 'auto', display: 'block' }} />
                 </motion.button>
               )}
-              <div className="outfit-font" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.4, marginBottom: 32, letterSpacing: '-0.01em' }}>
+              <div className="outfit-font" style={{ fontSize: '1.125rem', fontWeight: 700, color: '#0F172A', lineHeight: 1.4, marginBottom: 20, letterSpacing: '-0.01em' }}>
                 <MathRenderer math={quizzes[current].question || quizzes[current].text} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
@@ -447,12 +447,23 @@ export default function QuizPage() {
               </div>
               {submitted && <FeedbackBanner isCorrect={isCorrect} />}
               {submitted && quizzes[current].explanation && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: '20px', borderRadius: 20, background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.06)', marginBottom: 20, fontSize: '0.9375rem', color: '#475569', lineHeight: 1.6 }}><strong style={{ color: '#0F172A', fontWeight: 800 }}>Tushuntirish:</strong><br/>{quizzes[current].explanation}</motion.div>}
-              <div style={{ marginTop: 'auto', paddingTop: 20 }}>
-                {!submitted ? (
-                  <motion.button whileTap={selected ? { scale: 0.98 } : {}} disabled={!selected} onClick={handleConfirm} style={{ width: '100%', padding: '20px', borderRadius: 24, background: selected ? '#1E293B' : '#E2E8F0', color: selected ? 'white' : '#94A3B8', border: 'none', fontWeight: 900, fontSize: '1.125rem', cursor: selected ? 'pointer' : 'not-allowed', transition: 'all 0.3s' }}>Tekshirish</motion.button>
-                ) : (
-                  <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} whileTap={{ scale: 0.98 }} onClick={nextStep} style={{ width: '100%', padding: '20px', borderRadius: 24, background: '#3461FF', color: 'white', border: 'none', fontWeight: 900, fontSize: '1.125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 12px 30px rgba(52,97,255,0.3)' }}>{current + 1 < quizzes.length ? 'Keyingi savol' : 'Natijani ko\'rish'} <ChevronRight size={22} strokeWidth={2.5} /></motion.button>
-                )}
+              {/* Fixed Bottom Action Bar */}
+              <div style={{ height: 80 }} /> {/* Spacer to prevent content from hiding behind the bar */}
+              <div style={{ 
+                position: 'fixed', bottom: 0, left: 0, right: 0, 
+                padding: '12px 20px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+                background: 'rgba(248,250,252,0.85)', 
+                backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                borderTop: '1px solid rgba(15,23,42,0.06)',
+                zIndex: 100 
+              }}>
+                <div style={{ maxWidth: 640, margin: '0 auto' }}>
+                  {!submitted ? (
+                    <motion.button whileTap={selected ? { scale: 0.98 } : {}} disabled={!selected} onClick={handleConfirm} style={{ width: '100%', padding: '16px', borderRadius: 16, background: selected ? '#1E293B' : '#E2E8F0', color: selected ? 'white' : '#94A3B8', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: selected ? 'pointer' : 'not-allowed', transition: 'all 0.3s', boxShadow: selected ? '0 8px 24px rgba(15,23,42,0.12)' : 'none' }}>Tekshirish</motion.button>
+                  ) : (
+                    <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} whileTap={{ scale: 0.98 }} onClick={nextStep} style={{ width: '100%', padding: '16px', borderRadius: 16, background: '#3461FF', color: 'white', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 8px 24px rgba(52,97,255,0.25)' }}>{current + 1 < quizzes.length ? 'Keyingi savol' : 'Natijani ko\'rish'} <ChevronRight size={20} strokeWidth={2.5} /></motion.button>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}

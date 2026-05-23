@@ -29,62 +29,63 @@ function CourseCard({ course }) {
       >
         <style>{`
           .course-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-elevated);
+            border-color: ${accent}40;
           }
           .course-card:active {
             transform: scale(0.985);
-            transition: transform 0.1s ease;
           }
-          .course-card:hover .course-thumb-icon {
-            transform: scale(1.1) rotate(-5deg);
+          .course-card-icon {
+            transition: transform 0.3s ease;
+          }
+          .course-card:hover .course-card-icon {
+            transform: scale(1.08) rotate(-5deg);
           }
         `}</style>
 
-        {/* Thumbnail */}
-        <div style={{
-          width: '100%', aspectRatio: '16/9',
-          background: `linear-gradient(140deg, ${accent}18 0%, ${accent}08 100%)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          position: 'relative', overflow: 'hidden'
-        }}>
-          <div style={{ position: 'absolute', top: '-30%', right: '-10%', width: 180, height: 180, borderRadius: '50%', background: `radial-gradient(circle, ${accent}22 0%, transparent 70%)`, filter: 'blur(20px)' }} />
-          <div className="course-thumb-icon" style={{ color: accent, transition: 'transform 0.4s cubic-bezier(0.22,1,0.36,1)' }}>
-            <Layers size={52} strokeWidth={1.5} />
+        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+              background: `linear-gradient(135deg, ${accent}15 0%, ${accent}05 100%)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: `1px solid ${accent}20`
+            }}>
+              <Layers size={20} color={accent} className="course-card-icon" />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Badge variant="primary" style={{ marginBottom: '6px', background: `${accent}12`, color: accent, border: 'none', padding: '3px 8px', fontSize: '0.65rem', fontWeight: 700 }}>
+                {subject}
+              </Badge>
+              <h3 style={{
+                margin: 0, color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 700,
+                lineHeight: 1.3, letterSpacing: '-0.01em',
+                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+              }}>
+                {course.title}
+              </h3>
+            </div>
           </div>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Badge variant="primary" style={{ marginBottom: '14px', alignSelf: 'flex-start', background: `${accent}15`, color: accent, border: `1px solid ${accent}30` }}>
-            {subject}
-          </Badge>
-          <h3 style={{
-            color: 'var(--text-primary)', fontSize: '1.125rem', fontWeight: 700,
-            lineHeight: 1.35, marginBottom: '10px', letterSpacing: '-0.01em',
-            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
-          }}>
-            {course.title}
-          </h3>
+          
           <p style={{
-            fontSize: '0.9375rem', color: 'var(--text-secondary)',
+            margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-            overflow: 'hidden', lineHeight: 1.6, flex: 1
+            overflow: 'hidden', lineHeight: 1.5, flex: 1
           }}>
             {course.description}
           </p>
 
-          {/* Footer */}
           <div style={{
-            marginTop: '20px', paddingTop: '16px',
+            paddingTop: '12px',
             borderTop: '1px solid var(--border-soft)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between'
           }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600 }}>
               {course.lesson_count || 0} ta dars
             </span>
-            <span style={{ color: 'var(--color-primary)', fontSize: '0.875rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Boshlash <ArrowRight size={14} />
+            <span style={{ color: accent, fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              Boshlash <ArrowRight size={12} />
             </span>
           </div>
         </div>

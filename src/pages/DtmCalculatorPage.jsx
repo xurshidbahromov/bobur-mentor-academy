@@ -1,5 +1,5 @@
 // src/pages/DtmCalculatorPage.jsx
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, MapPin, BookOpen, Trophy, TrendingUp, Minus, ChevronDown, ChevronUp, ExternalLink, Star, Filter, X, Info, Coins, Lightbulb, GraduationCap, Building2, Globe, Languages } from 'lucide-react'
@@ -30,24 +30,24 @@ function StatusBadge({ status, score, spec }) {
     : score - spec.contract
 
   const cfg = {
-    grant:    { bg: 'linear-gradient(135deg,#10B981,#059669)', label: 'GRANT',    icon: <Trophy size={11}/> },
-    contract: { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', label: 'KONTRAKT', icon: <Star size={11}/> },
-    none:     { bg: 'linear-gradient(135deg,#94A3B8,#64748B)', label: "YETMAYDI", icon: <Minus size={11}/> },
+    grant:    { bg: 'linear-gradient(135deg,#10B981,#059669)', label: 'GRANT',    icon: <Trophy size={10}/> },
+    contract: { bg: 'linear-gradient(135deg,#F59E0B,#D97706)', label: 'KONTRAKT', icon: <Star size={10}/> },
+    none:     { bg: 'linear-gradient(135deg,#94A3B8,#64748B)', label: "YETMAYDI", icon: <Minus size={10}/> },
   }[status]
 
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4, flexShrink:0 }}>
-      <div style={{ background: cfg.bg, color:'white', fontSize:'0.6rem', fontWeight:900,
-        padding:'4px 10px', borderRadius:100, display:'flex', alignItems:'center', gap:4,
+      <div style={{ background: cfg.bg, color:'white', fontSize:'0.55rem', fontWeight:900,
+        padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4,
         textTransform:'uppercase', letterSpacing:'0.08em', whiteSpace:'nowrap' }}>
         {cfg.icon}{cfg.label}
       </div>
       {status !== 'none' ? (
-        <span style={{ fontSize:'0.65rem', fontWeight:700, color: status==='grant'?'#10B981':'#F59E0B' }}>
+        <span style={{ fontSize:'0.6rem', fontWeight:700, color: status==='grant'?'#10B981':'#F59E0B' }}>
           +{diff.toFixed(1)} ball
         </span>
       ) : (
-        <span style={{ fontSize:'0.65rem', fontWeight:700, color:'#EF4444' }}>
+        <span style={{ fontSize:'0.6rem', fontWeight:700, color:'#EF4444' }}>
           {Math.abs(diff).toFixed(1)} ball kam
         </span>
       )}
@@ -74,24 +74,24 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
   if (!uni.specialties || uni.specialties.length === 0) {
     return (
       <motion.div layout initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, scale:0.96 }}
-        style={{ background:'white', borderRadius:20, border:'1.5px solid #E2E8F0', overflow:'hidden', boxShadow:'0 2px 8px rgba(15,23,42,0.04)' }}>
-        <div style={{ padding:'16px' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <div style={{ width:44, height:44, borderRadius:14, background:`${uni.color}15`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-              <Building2 size={22} color={uni.color} strokeWidth={1.5}/>
+        style={{ background:'white', borderRadius:16, border:'1.5px solid #E2E8F0', overflow:'hidden', boxShadow:'0 2px 8px rgba(15,23,42,0.04)' }}>
+        <div style={{ padding:'12px 14px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            <div style={{ width:36, height:36, borderRadius:12, background:`${uni.color}15`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <Building2 size={18} color={uni.color} strokeWidth={1.5}/>
             </div>
             <div style={{ minWidth:0, flex:1 }}>
-              <p style={{ margin:0, fontWeight:800, fontSize:'0.9375rem', color:'#0F172A', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{uni.short}</p>
-              <p style={{ margin:0, fontSize:'0.7rem', color:'#64748B', fontWeight:500, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{uni.name}</p>
+              <p style={{ margin:0, fontWeight:800, fontSize:'0.85rem', color:'#0F172A', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{uni.short}</p>
+              <p style={{ margin:0, fontSize:'0.65rem', color:'#64748B', fontWeight:500, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{uni.name}</p>
             </div>
-            <span style={{ background: uni.type==='Nodavlat'?'#EFF6FF': uni.type==='Xorijiy'?'#F0FDF4':'#FEF3C7', color: uni.type==='Nodavlat'?'#3461FF': uni.type==='Xorijiy'?'#16A34A':'#92400E', fontSize:'0.6rem', fontWeight:800, padding:'4px 10px', borderRadius:100, whiteSpace:'nowrap', textTransform:'uppercase' }}>
+            <span style={{ background: uni.type==='Nodavlat'?'#EFF6FF': uni.type==='Xorijiy'?'#F0FDF4':'#FEF3C7', color: uni.type==='Nodavlat'?'#3461FF': uni.type==='Xorijiy'?'#16A34A':'#92400E', fontSize:'0.55rem', fontWeight:800, padding:'3px 8px', borderRadius:100, whiteSpace:'nowrap', textTransform:'uppercase' }}>
               {uni.type || 'Davlat'}
             </span>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:10 }}>
-            <MapPin size={11} color="#94A3B8"/><span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.region}</span>
+          <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:8 }}>
+            <MapPin size={10} color="#94A3B8"/><span style={{ fontSize:'0.65rem', color:'#94A3B8', fontWeight:600 }}>{uni.region}</span>
             <span style={{ color:'#E2E8F0' }}>·</span>
-            <Globe size={11} color="#94A3B8"/><span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.website}</span>
+            <Globe size={10} color="#94A3B8"/><span style={{ fontSize:'0.65rem', color:'#94A3B8', fontWeight:600 }}>{uni.website}</span>
           </div>
           <p style={{ margin:'10px 0 0', fontSize:'0.75rem', color:'#94A3B8', fontStyle:'italic' }}>Ball ma'lumoti mavjud emas</p>
         </div>
@@ -105,25 +105,25 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
       initial={{ opacity:0, y:12 }}
       animate={{ opacity:1, y:0 }}
       exit={{ opacity:0, scale:0.96 }}
-      style={{ background:'white', borderRadius:20, border:`1.5px solid ${cardBorderColor}`,
+      style={{ background:'white', borderRadius:16, border:`1.5px solid ${cardBorderColor}`,
         overflow:'hidden', boxShadow: bestStatus!=='none'
           ? `0 4px 20px ${bestStatus==='grant'?'rgba(16,185,129,0.12)':'rgba(245,158,11,0.12)'}`
           : '0 2px 8px rgba(15,23,42,0.04)' }}
     >
       {/* Header */}
-      <div style={{ padding:'16px', borderBottom:'1px solid #F1F5F9' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:12, flex:'1 1 auto', minWidth:0 }}>
-            <div style={{ width:44, height:44, borderRadius:14, background:`${uni.color}15`,
+      <div style={{ padding:'12px 14px', borderBottom:'1px solid #F1F5F9' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:10, flex:'1 1 auto', minWidth:0 }}>
+            <div style={{ width:36, height:36, borderRadius:12, background:`${uni.color}15`,
               display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-              <Building2 size={22} color={uni.color} strokeWidth={1.5}/>
+              <Building2 size={18} color={uni.color} strokeWidth={1.5}/>
             </div>
             <div style={{ minWidth:0 }}>
-              <p style={{ margin:0, fontWeight:800, fontSize:'0.9375rem', color:'#0F172A',
+              <p style={{ margin:0, fontWeight:800, fontSize:'0.85rem', color:'#0F172A',
                 overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                 {uni.short}
               </p>
-              <p style={{ margin:0, fontSize:'0.7rem', color:'#64748B', fontWeight:500,
+              <p style={{ margin:0, fontSize:'0.65rem', color:'#64748B', fontWeight:500,
                 overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                 {uni.name}
               </p>
@@ -132,69 +132,69 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
           {/* Responsive Badge Container */}
           <div style={{ display:'flex', gap:4, flexWrap:'wrap', justifyContent:'flex-end', flexShrink:0 }}>
             {grantCount > 0 && (
-              <span style={{ background:'#DCFCE7', color:'#15803D', fontSize:'0.65rem', fontWeight:800,
+              <span style={{ background:'#DCFCE7', color:'#15803D', fontSize:'0.55rem', fontWeight:800,
                 padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap' }}>
-                <Trophy size={10}/> {grantCount} grant
+                <Trophy size={9}/> {grantCount} grant
               </span>
             )}
             {contractCount > 0 && (
-              <span style={{ background:'#FEF3C7', color:'#92400E', fontSize:'0.65rem', fontWeight:800,
+              <span style={{ background:'#FEF3C7', color:'#92400E', fontSize:'0.55rem', fontWeight:800,
                 padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap' }}>
-                <Star size={10}/> {contractCount} kontrakt
+                <Star size={9}/> {contractCount} kontrakt
               </span>
             )}
             {grantCount === 0 && contractCount === 0 && (
-              <span style={{ background:'#F1F5F9', color:'#94A3B8', fontSize:'0.65rem', fontWeight:800,
+              <span style={{ background:'#F1F5F9', color:'#94A3B8', fontSize:'0.55rem', fontWeight:800,
                 padding:'3px 8px', borderRadius:100, display:'flex', alignItems:'center', gap:4, whiteSpace:'nowrap' }}>
-                <Minus size={10}/> Mos emas
+                <Minus size={9}/> Mos emas
               </span>
             )}
           </div>
         </div>
 
-        <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:10, flexWrap:'wrap' }}>
-          <MapPin size={11} color="#94A3B8" />
-          <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.region}</span>
+        <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:8, flexWrap:'wrap' }}>
+          <MapPin size={10} color="#94A3B8" />
+          <span style={{ fontSize:'0.65rem', color:'#94A3B8', fontWeight:600 }}>{uni.region}</span>
           <span style={{ color:'#E2E8F0' }}>·</span>
-          <Globe size={11} color="#94A3B8" />
-          <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.website}</span>
+          <Globe size={10} color="#94A3B8" />
+          <span style={{ fontSize:'0.65rem', color:'#94A3B8', fontWeight:600 }}>{uni.website}</span>
           {uni.studyTypes && uni.studyTypes.length > 0 && (
             <>
               <span style={{ color:'#E2E8F0' }}>·</span>
-              <BookOpen size={11} color="#94A3B8" />
-              <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.studyTypes.join(', ')}</span>
+              <BookOpen size={10} color="#94A3B8" />
+              <span style={{ fontSize:'0.65rem', color:'#94A3B8', fontWeight:600 }}>{uni.studyTypes.join(', ')}</span>
             </>
           )}
           {uni.languages && uni.languages.length > 0 && (
             <>
               <span style={{ color:'#E2E8F0' }}>·</span>
-              <Languages size={11} color="#94A3B8" />
-              <span style={{ fontSize:'0.7rem', color:'#94A3B8', fontWeight:600 }}>{uni.languages.join(', ')}</span>
+              <Languages size={10} color="#94A3B8" />
+              <span style={{ fontSize:'0.65rem', color:'#94A3B8', fontWeight:600 }}>{uni.languages.join(', ')}</span>
             </>
           )}
         </div>
       </div>
 
       {/* Specialties */}
-      <div style={{ padding:'12px 16px' }}>
+      <div style={{ padding:'10px 14px' }}>
         {visibleSpecs.map(spec => (
-          <div key={spec.id} style={{ display:'flex', alignItems:'center', gap:10, paddingBottom:10,
-            marginBottom:10, borderBottom:'1px solid #F8FAFC' }}>
+          <div key={spec.id} style={{ display:'flex', alignItems:'center', gap:10, paddingBottom:8,
+            marginBottom:8, borderBottom:'1px solid #F8FAFC' }}>
             <div style={{ flex:1, minWidth:0 }}>
-              <p style={{ margin:'0 0 4px', fontWeight:700, fontSize:'0.8125rem', color:'#1E293B',
+              <p style={{ margin:'0 0 4px', fontWeight:700, fontSize:'0.75rem', color:'#1E293B',
                 lineHeight: 1.3 }}>
                 {spec.name}
               </p>
               <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-                <span style={{ fontSize:'0.65rem', color:'#64748B', fontWeight:600, display:'flex', alignItems:'center', gap:3 }}>
-                  <Trophy size={10} color="#10B981"/> Grant: {spec.grant} ball
+                <span style={{ fontSize:'0.6rem', color:'#64748B', fontWeight:600, display:'flex', alignItems:'center', gap:3 }}>
+                  <Trophy size={9} color="#10B981"/> Grant: {spec.grant} ball
                 </span>
-                <span style={{ fontSize:'0.65rem', color:'#64748B', fontWeight:600, display:'flex', alignItems:'center', gap:3 }}>
-                  <Star size={10} color="#F59E0B"/> Kontrakt: {spec.contract} ball
+                <span style={{ fontSize:'0.6rem', color:'#64748B', fontWeight:600, display:'flex', alignItems:'center', gap:3 }}>
+                  <Star size={9} color="#F59E0B"/> Kontrakt: {spec.contract} ball
                 </span>
               </div>
               {spec.status !== 'none' && (
-                <p style={{ margin:'4px 0 0', fontSize:'0.65rem', color:'#94A3B8', fontWeight:500 }}>
+                <p style={{ margin:'4px 0 0', fontSize:'0.6rem', color:'#94A3B8', fontWeight:500 }}>
                   Kontrakt narxi: {formatPrice(spec.price)}/yil
                 </p>
               )}
@@ -205,9 +205,9 @@ function UniversityCard({ uni, score, expanded, onToggle }) {
 
         {matchedSpecs.length > 2 && (
           <button onClick={onToggle} style={{ width:'100%', border:'none', background:'#F8FAFC',
-            borderRadius:10, padding:'8px', display:'flex', alignItems:'center', justifyContent:'center',
-            gap:6, cursor:'pointer', color:'#64748B', fontSize:'0.75rem', fontWeight:700 }}>
-            {expanded ? <><ChevronUp size={14}/>Kamroq ko'rsat</> : <><ChevronDown size={14}/>+{matchedSpecs.length-2} ta yo'nalish</>}
+            borderRadius:8, padding:'6px', display:'flex', alignItems:'center', justifyContent:'center',
+            gap:6, cursor:'pointer', color:'#64748B', fontSize:'0.7rem', fontWeight:700 }}>
+            {expanded ? <><ChevronUp size={12}/>Kamroq ko'rsat</> : <><ChevronDown size={12}/>+{matchedSpecs.length-2} ta yo'nalish</>}
           </button>
         )}
       </div>
@@ -232,6 +232,14 @@ export default function DtmCalculatorPage() {
   const [expanded, setExpanded] = useState({})
   const [hasCalculated, setHasCalculated] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
+  const [hasUsedFree, setHasUsedFree] = useState(false)
+
+  useEffect(() => {
+    const storageKey = `dtm_free_used_${user?.id || 'guest'}`
+    if (localStorage.getItem(storageKey) === 'true') {
+      setHasUsedFree(true)
+    }
+  }, [user])
 
   const handleScoreInput = (v) => {
     setInputVal(v)
@@ -279,9 +287,27 @@ export default function DtmCalculatorPage() {
   const contractCount = results.filter(u=>u._best==='contract').length
 
   const handleCalculate = async () => {
+    const storageKey = `dtm_free_used_${user?.id || 'guest'}`
+    const alreadyUsed = localStorage.getItem(storageKey) === 'true'
+
+    if (!alreadyUsed) {
+      setIsCalculating(true)
+      try {
+        localStorage.setItem(storageKey, 'true')
+        setHasUsedFree(true)
+        setHasCalculated(true)
+        toast.success('Natijalar hisoblandi! ✨', {
+          description: `Sizning birinchi tekin hisob-kitobingiz amalga oshirildi. Kelgusi safar ${UNLOCK_COST} coin bo'ladi.`
+        })
+      } finally {
+        setIsCalculating(false)
+      }
+      return
+    }
+
     if (userCoins < UNLOCK_COST) {
       toast.error('Coinlar yetarli emas!', {
-        description: "DTM hisob-kitobini o'tkazish uchun sizda kamida 10 coin bo'lishi kerak."
+        description: `DTM hisob-kitobini o'tkazish uchun sizda kamida ${UNLOCK_COST} coin bo'lishi kerak.`
       })
       return
     }
@@ -323,22 +349,23 @@ export default function DtmCalculatorPage() {
         .dtm-page { width:100%; padding-bottom:100px; }
         .dtm-hero {
           background: linear-gradient(145deg, #0F172A 0%, #1E293B 40%, #1a1040 70%, #0d1f4f 100%);
-          padding: 60px 0 160px; border-radius:0 0 40px 40px; margin-bottom:-100px;
-          position:relative; overflow:hidden; box-shadow:0 20px 40px rgba(15,23,42,0.15);
+          padding: 32px 0 90px; border-radius:0 0 24px 24px; margin-bottom:-50px;
+          position:relative; overflow:hidden; box-shadow:0 15px 30px rgba(15,23,42,0.12);
         }
-        @media(max-width:768px){ .dtm-hero{ padding:40px 0 140px; border-radius:0 0 32px 32px; margin-bottom:-80px; } }
+        @media(max-width:768px){ .dtm-hero{ padding:24px 0 80px; border-radius:0 0 16px 16px; margin-bottom:-40px; } }
         .dtm-container { max-width:1040px; margin:0 auto; position:relative; z-index:20; }
         .dtm-hero-content { max-width:1040px; margin:0 auto; padding:0 24px; position:relative; z-index:20; }
         @media(max-width:768px){ .dtm-hero-content{ padding:0 16px; } }
         .dtm-content { padding:0 24px; position:relative; z-index:2; }
         @media(max-width:768px){ .dtm-content{ padding:0 16px; } }
         .dtm-score-card {
-          background:white; border-radius:28px; padding:32px 24px;
-          box-shadow:0 20px 60px rgba(15,23,42,0.12); position:relative; z-index:10;
+          background:white; border-radius:32px; padding:20px 16px;
+          box-shadow:0 12px 40px rgba(15,23,42,0.08); position:relative; z-index:10;
           border:1px solid rgba(255,255,255,0.6); max-width:680px; margin:0 auto;
+          box-sizing: border-box; width: 100%;
         }
         @media(max-width:768px){
-          .dtm-score-card { padding:24px 16px; border-radius:20px; }
+          .dtm-score-card { padding:16px 14px; border-radius:24px; }
         }
         .dtm-filter-chip {
           padding:6px 14px; border-radius:100px; border:1.5px solid #E2E8F0;
@@ -389,17 +416,17 @@ export default function DtmCalculatorPage() {
               <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
                 <div style={{ padding:'6px 12px', background:'rgba(255,255,255,0.1)', borderRadius:100,
                   border:'1px solid rgba(255,255,255,0.15)', display:'inline-flex', alignItems:'center', gap:6 }}>
-                  <TrendingUp size={14} color="#34D399"/>
-                  <span style={{ color:'#6EE7B7', fontSize:'0.7rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.1em' }}>
+                  <TrendingUp size={12} color="#34D399"/>
+                  <span style={{ color:'#6EE7B7', fontSize:'0.65rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.1em' }}>
                     DTM Kalkulator 2024
                   </span>
                 </div>
               </div>
-              <h1 className="outfit-font" style={{ margin:'0 0 16px', fontSize:'clamp(2.25rem,7vw,3.75rem)',
-                fontWeight:900, color:'white', letterSpacing:'-0.04em', lineHeight:1.1 }}>
+              <h1 className="outfit-font" style={{ margin:'0 0 8px', fontSize:'clamp(1.5rem,4vw,2.25rem)',
+                fontWeight:900, color:'white', letterSpacing:'-0.03em', lineHeight:1.1 }}>
                 OTM Yo'nalishlari<br/>Kalkulyatori
               </h1>
-              <p style={{ margin:'0 0 0', color:'rgba(255,255,255,0.65)', fontSize:'1rem', fontWeight:500 }}>
+              <p style={{ margin:'0 0 0', color:'rgba(255,255,255,0.65)', fontSize:'0.9rem', fontWeight:500 }}>
                 Imtihon ballingizni kiriting va barcha imkoniyatlaringizni bir zumda tahlil qiling
               </p>
             </div>
@@ -410,11 +437,11 @@ export default function DtmCalculatorPage() {
           <div className="dtm-content">
           {/* Score Card */}
           <div className="dtm-score-card">
-            <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <p style={{ margin:'0 0 12px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em' }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <p style={{ margin:'0 0 10px', fontSize:'0.65rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em' }}>
                 Umumiy ballingizni kiriting
               </p>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:10, background: '#F8FAFC', padding: '12px 24px', borderRadius: 20, border: '2px solid #E2E8F0', transition: 'border-color 0.2s' }} className="input-glow-wrapper">
+              <div style={{ display:'inline-flex', alignItems:'center', gap:8, background: '#F8FAFC', padding: '8px 20px', borderRadius: 16, border: '2px solid #E2E8F0', transition: 'border-color 0.2s' }} className="input-glow-wrapper">
                 <input
                   type="number"
                   min={0}
@@ -424,10 +451,10 @@ export default function DtmCalculatorPage() {
                   onChange={e => handleScoreInput(e.target.value)}
                   className="input-glow"
                   style={{
-                    width: 130,
+                    width: 90,
                     border: 'none',
                     background: 'transparent',
-                    fontSize: '3rem',
+                    fontSize: '2rem',
                     fontWeight: 900,
                     color: '#0F172A',
                     outline: 'none',
@@ -436,7 +463,7 @@ export default function DtmCalculatorPage() {
                     padding: 0
                   }}
                 />
-                <span style={{ fontSize:'1.5rem', color:'#94A3B8', fontWeight:800 }}>/ {MAX_SCORE}</span>
+                <span style={{ fontSize:'1rem', color:'#94A3B8', fontWeight:800 }}>/ {MAX_SCORE}</span>
               </div>
             </div>
 
@@ -444,10 +471,10 @@ export default function DtmCalculatorPage() {
             <div className="dtm-filters-grid">
               {/* Region Selector */}
               <div>
-                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Hudud</p>
+                <p style={{ margin:'0 0 6px', fontSize:'0.65rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Hudud</p>
                 <div style={{ position: 'relative' }}>
                   <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setHasCalculated(false) }}
-                    style={{ width: '100%', padding: '14px 16px', borderRadius: '16px', border: '2px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.9rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', transition: 'border-color 0.2s', textAlign: 'center' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1.5px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.85rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', transition: 'border-color 0.2s', textAlign: 'center' }}
                     onFocus={e => e.target.style.borderColor = '#3461FF'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} >
                     {['Hammasi', ...REGIONS].map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
@@ -456,10 +483,10 @@ export default function DtmCalculatorPage() {
 
               {/* Specialty Selector */}
               <div>
-                <p style={{ margin:'0 0 8px', fontSize:'0.75rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Yo'nalish</p>
+                <p style={{ margin:'0 0 6px', fontSize:'0.65rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Yo'nalish</p>
                 <div style={{ position: 'relative' }}>
                   <select value={specialtyFilter} onChange={e => { setSpecialtyFilter(e.target.value); setHasCalculated(false) }}
-                    style={{ width: '100%', padding: '14px 16px', borderRadius: '16px', border: '2px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.9rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center', transition: 'border-color 0.2s', textAlign: 'center' }}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1.5px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.85rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', transition: 'border-color 0.2s', textAlign: 'center' }}
                     onFocus={e => e.target.style.borderColor = '#3461FF'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} >
                     {ALL_SPECIALTIES.map(sp => <option key={sp} value={sp}>{sp}</option>)}
                   </select>
@@ -475,28 +502,28 @@ export default function DtmCalculatorPage() {
                 background: hasCalculated ? '#E2E8F0' : 'linear-gradient(135deg, #3461FF 0%, #8B5CF6 100%)',
                 color: hasCalculated ? '#94A3B8' : 'white',
                 border: 'none',
-                borderRadius: 16,
-                padding: '16px 20px',
-                fontSize: '1.05rem',
+                borderRadius: 14,
+                padding: '12px 16px',
+                fontSize: '0.95rem',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 8,
                 cursor: hasCalculated ? 'default' : 'pointer',
-                boxShadow: hasCalculated ? 'none' : '0 8px 25px rgba(52, 97, 255, 0.25)',
+                boxShadow: hasCalculated ? 'none' : '0 6px 20px rgba(52, 97, 255, 0.25)',
                 transition: 'all 0.2s'
               }}
             >
               {isCalculating ? 'Hisoblanmoqda...' : hasCalculated ? 'Natijalar ko\'rsatilmoqda' : (
                 <>
-                  <Search size={20} />
-                  Hisoblash ({UNLOCK_COST} Coin)
+                  <Search size={18} />
+                  {hasUsedFree ? `Hisoblash (${UNLOCK_COST} Coin)` : 'Hisoblash (Tekin)'}
                 </>
               )}
             </button>
 
-            {!hasCalculated && userCoins < UNLOCK_COST && (
+            {!hasCalculated && hasUsedFree && userCoins < UNLOCK_COST && (
               <div style={{ textAlign: 'center', marginTop: 16 }}>
                 <Link to="/shop" style={{ color:'#EF4444', textDecoration:'none', fontWeight:700, fontSize: '0.9rem' }}>
                   Sizda coin yetarli emas. Sotib olish →
@@ -553,7 +580,7 @@ export default function DtmCalculatorPage() {
                 DTM Kalkulyatori orqali siz o'z ballingizga mos bo'lgan barcha davlat universitetlarini, grant va kontrakt o'tish ballarini, hamda to'lov-kontrakt miqdorini aniq bilib olishingiz mumkin.
               </p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: '0.85rem', color: '#3461FF', fontWeight: 700 }}>
-                <Info size={16} /> Har bir hisoblash 10 coin talab qiladi
+                <Info size={16} /> {hasUsedFree ? `Har bir hisoblash ${UNLOCK_COST} coin talab qiladi` : 'Birinchi hisoblash mutlaqo bepul!'}
               </div>
             </motion.div>
           ) : (

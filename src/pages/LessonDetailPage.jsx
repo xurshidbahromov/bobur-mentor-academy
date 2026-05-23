@@ -102,8 +102,8 @@ export default function LessonDetailPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: 100 }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 20px' }}>
+    <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: 80 }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 16px' }}>
 
         {/* ── Navigator (Pill) ── */}
         <div style={{ display: 'flex', marginBottom: 24 }}>
@@ -132,14 +132,14 @@ export default function LessonDetailPage() {
           </motion.div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Main Grid: Video + Playlist */}
           <div className="lesson-grid" style={{ alignItems: 'start' }}>
 
             {/* Left Column: Video & Info */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div style={{ borderRadius: 32, overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', background: '#F1F5F9', border: '1px solid rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 30px rgba(0,0,0,0.08)', background: '#F1F5F9', border: '1px solid rgba(0,0,0,0.05)' }}>
                 {canWatch ? (
                   <VideoPlayer key={lesson.id} videoId={lesson.youtube_video_id} lessonId={lesson.id} lessonTitle={lesson.title} />
                 ) : (
@@ -152,7 +152,7 @@ export default function LessonDetailPage() {
                 display: 'flex',
                 overflowX: 'auto',
                 background: '#F1F5F9',
-                borderRadius: 24, padding: 4,
+                borderRadius: 16, padding: 3,
                 border: '1px solid rgba(0,0,0,0.05)',
                 scrollbarWidth: 'none',
                 WebkitOverflowScrolling: 'touch',
@@ -174,10 +174,10 @@ export default function LessonDetailPage() {
                       onClick={() => setActiveTab(tab.id)}
                       style={{
                         flex: '1 0 auto',
-                        padding: '10px 16px', borderRadius: 20, border: 'none',
+                        padding: '8px 14px', borderRadius: 14, border: 'none',
                         background: isActive ? 'white' : 'transparent',
                         color: isActive ? '#3461FF' : '#64748B',
-                        fontWeight: 800, fontSize: '0.8125rem',
+                        fontWeight: 800, fontSize: '0.8rem',
                         boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
                         cursor: 'pointer', transition: 'all 0.2s',
                         WebkitTapHighlightColor: 'transparent',
@@ -204,28 +204,28 @@ export default function LessonDetailPage() {
                   {activeTab === 'info' && (
                     <div style={{
                       background: 'white',
-                      borderRadius: 24, padding: '24px',
+                      borderRadius: 16, padding: '18px',
                       border: '1px solid rgba(0,0,0,0.05)'
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                         <span style={{
                           fontSize: '0.6875rem', fontWeight: 800, letterSpacing: '0.06em',
                           color: lesson.is_free ? '#10B981' : '#3461FF',
                           background: lesson.is_free ? 'rgba(16,185,129,0.08)' : 'rgba(52,97,255,0.08)',
-                          padding: '4px 12px', borderRadius: 100
+                          padding: '3px 10px', borderRadius: 100
                         }}>
                           {lesson.is_free ? 'BEPUL' : `${lesson.coin_price ?? 5} COIN`}
                         </span>
                         <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 700 }}>DARS #{lesson.order_index}</span>
                       </div>
                       <h1 className="outfit-font" style={{
-                        margin: '0 0 16px', fontSize: 'clamp(1.5rem, 5vw, 2.125rem)', fontWeight: 900, color: '#0F172A',
+                        margin: '0 0 10px', fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 900, color: '#0F172A',
                         letterSpacing: '-0.03em', lineHeight: 1.15, wordBreak: 'break-word', overflowWrap: 'anywhere'
                       }}>
                         {lesson.title}
                       </h1>
                       {lesson.description && (
-                        <p style={{ margin: 0, color: '#475569', lineHeight: 1.6, fontSize: '1rem', fontWeight: 500 }}>{lesson.description}</p>
+                        <p style={{ margin: 0, color: '#475569', lineHeight: 1.6, fontSize: '0.9rem', fontWeight: 500 }}>{lesson.description}</p>
                       )}
                     </div>
                   )}
@@ -294,10 +294,10 @@ export default function LessonDetailPage() {
             {/* Right Column: Playlist Sidebar */}
             <aside className="lesson-sidebar" style={{
               background: 'white',
-              borderRadius: 24, padding: 20,
+              borderRadius: 16, padding: 16,
               border: '1px solid rgba(0,0,0,0.05)'
             }}>
-              <h3 className="outfit-font" style={{ margin: '0 0 20px', fontSize: '1.25rem', fontWeight: 900, color: '#0F172A' }}>
+              <h3 className="outfit-font" style={{ margin: '0 0 14px', fontSize: '1.0625rem', fontWeight: 900, color: '#0F172A' }}>
                 Darslar ro'yxati
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -310,26 +310,26 @@ export default function LessonDetailPage() {
                       key={item.id}
                       onClick={() => navigate(`/lessons/${item.id}`)}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: 12,
-                        width: '100%', maxWidth: '100%', padding: '12px', borderRadius: 16, border: 'none',
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        width: '100%', maxWidth: '100%', padding: '10px', borderRadius: 12, border: 'none',
                         background: isActive ? 'rgba(52,97,255,0.08)' : 'transparent',
                         color: isActive ? '#3461FF' : '#475569',
                         cursor: 'pointer', transition: 'all 0.2s ease', textAlign: 'left',
                       }}
                     >
                       <div style={{
-                        width: 28, height: 28, borderRadius: 8,
+                        width: 24, height: 24, borderRadius: 7,
                         background: isActive ? '#3461FF' : 'rgba(0,0,0,0.05)',
                         color: isActive ? 'white' : '#94A3B8',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '0.75rem', fontWeight: 800, flexShrink: 0
+                        fontSize: '0.6875rem', fontWeight: 800, flexShrink: 0
                       }}>
                         {item.order_index}
                       </div>
-                      <span style={{ fontSize: '0.875rem', fontWeight: isActive ? 800 : 700, flex: 1, wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4 }}>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: isActive ? 800 : 700, flex: 1, wordBreak: 'break-word', overflowWrap: 'anywhere', lineHeight: 1.4 }}>
                         {item.title}
                       </span>
-                      {!item.is_free && !isActive && <Lock size={14} style={{ opacity: 0.4 }} />}
+                      {!item.is_free && !isActive && <Lock size={12} style={{ opacity: 0.4 }} />}
                     </button>
                   )
                 })}
@@ -481,21 +481,21 @@ function QuizStartCard({ quizzes, bestScore, onStart }) {
       {/* Decorative glow */}
       <div style={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, background: 'rgba(52,97,255,0.05)', borderRadius: '50%', filter: 'blur(40px)' }} />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, position: 'relative', zIndex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, position: 'relative', zIndex: 1 }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 18,
+          width: 44, height: 44, borderRadius: 14,
           background: 'rgba(52,97,255,0.08)', color: '#3461FF',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          boxShadow: '0 8px 20px rgba(52,97,255,0.1)',
+          boxShadow: '0 6px 16px rgba(52,97,255,0.08)',
           border: '1px solid rgba(52,97,255,0.1)'
         }}>
-          <ClipboardList size={26} strokeWidth={2.5} />
+          <ClipboardList size={22} strokeWidth={2.5} />
         </div>
         <div>
-          <h2 className="outfit-font" style={{ margin: '0 0 2px', fontSize: '1.375rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+          <h2 className="outfit-font" style={{ margin: '0 0 2px', fontSize: '1.125rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
             Bilimni tekshirish
           </h2>
-          <p style={{ margin: 0, color: '#64748B', fontSize: '0.875rem', fontWeight: 600 }}>
+          <p style={{ margin: 0, color: '#64748B', fontSize: '0.8125rem', fontWeight: 600 }}>
             {quizzes.length} ta savol · Har biriga 60s
           </p>
         </div>
@@ -537,12 +537,12 @@ function QuizStartCard({ quizzes, bestScore, onStart }) {
         whileTap={{ scale: 0.97 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          width: '100%', padding: '18px', borderRadius: 18, border: 'none',
+          width: '100%', padding: '14px', borderRadius: 14, border: 'none',
           background: 'linear-gradient(135deg, #1D4ED8, #1E40AF)',
-          color: 'white', fontWeight: 800, fontSize: '1rem',
+          color: 'white', fontWeight: 800, fontSize: '0.9375rem',
           cursor: 'pointer', fontFamily: 'inherit',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-          boxShadow: '0 8px 24px rgba(29,78,216,0.25)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          boxShadow: '0 6px 18px rgba(29,78,216,0.22)',
           WebkitTapHighlightColor: 'transparent',
           position: 'relative', zIndex: 1
         }}

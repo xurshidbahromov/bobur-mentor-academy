@@ -134,35 +134,35 @@ function LeaderRow({ user, rank, isSelf, tab }) {
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={`card-glow-hover ${glowClass}`}
       style={{
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: '12px 16px', borderRadius: 20,
+        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 14px', borderRadius: 14,
         background: '#FFFFFF',
         border: '1px solid var(--border-medium)',
-        boxShadow: '0 4px 12px rgba(15,23,42,0.04)',
+        boxShadow: '0 3px 8px rgba(15,23,42,0.03)',
         position: 'relative', cursor: 'pointer'
       }}
     >
       <span style={{
-        width: 24, textAlign: 'center', fontWeight: 800,
-        fontSize: '0.9375rem', flexShrink: 0,
+        width: 20, textAlign: 'center', fontWeight: 800,
+        fontSize: '0.875rem', flexShrink: 0,
         color: '#94A3B8',
       }}>
         {rank + 1}
       </span>
 
-      <Avatar user={user} size={40} />
+      <Avatar user={user} size={36} />
 
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
         <p className="outfit-font" style={{
-          margin: 0, fontWeight: 700, fontSize: '0.9375rem',
-          color: '#0F172A', display: 'flex', alignItems: 'center', gap: 8,
+          margin: 0, fontWeight: 700, fontSize: '0.875rem',
+          color: '#0F172A', display: 'flex', alignItems: 'center', gap: 6,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {user.full_name || 'O\'quvchi'}
-          {isSelf && <span style={{ fontSize: '0.625rem', fontWeight: 800, color: 'white', background: '#3461FF', padding: '2px 6px', borderRadius: 100 }} >Siz</span>}
+          {isSelf && <span style={{ fontSize: '0.5625rem', fontWeight: 800, color: 'white', background: '#3461FF', padding: '1px 5px', borderRadius: 100 }} >Siz</span>}
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {user.streak_count > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Flame size={12} color="#F59E0B" />
@@ -182,11 +182,11 @@ function LeaderRow({ user, rank, isSelf, tab }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0, background: '#F8FAFC', padding: '6px 12px', borderRadius: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1, flexShrink: 0, background: '#F8FAFC', padding: '4px 10px', borderRadius: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {tab === 'streak'
-            ? <><Flame size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.streak_count}</span></>
-            : <><Sparkles size={14} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0F172A' }}>{user.rating_score?.toLocaleString() || 0}</span></>
+            ? <><Flame size={12} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.875rem', color: '#0F172A' }}>{user.streak_count}</span></>
+            : <><Sparkles size={12} color="#F59E0B" /><span className="outfit-font" style={{ fontWeight: 800, fontSize: '0.875rem', color: '#0F172A' }}>{user.rating_score?.toLocaleString() || 0}</span></>
           }
         </div>
       </div>
@@ -336,7 +336,7 @@ export default function LeaderboardPage() {
   return (
     <>
       <style>{`
-        .leader-page-wrapper { width: 100%; padding-bottom: 80px; }
+        .leader-page-wrapper { width: 100%; padding-bottom: 60px; }
         .leader-container { max-width: 1040px; margin: 0 auto; }
         
         .leader-hero {
@@ -344,17 +344,17 @@ export default function LeaderboardPage() {
           position: relative;
           z-index: 1;
           overflow: hidden;
-          padding: 60px 0 160px;
-          border-radius: 0 0 40px 40px;
-          margin-bottom: -120px;
-          box-shadow: 0 20px 40px rgba(15,23,42,0.15);
+          padding: 40px 0 120px;
+          border-radius: 0 0 24px 24px;
+          margin-bottom: -90px;
+          box-shadow: 0 15px 30px rgba(15,23,42,0.12);
         }
         
         @media (max-width: 768px) {
           .leader-hero {
-            padding: 40px 0 140px;
-            border-radius: 0 0 32px 32px;
-            margin-bottom: -80px;
+            padding: 30px 0 100px;
+            border-radius: 0 0 16px 16px;
+            margin-bottom: -70px;
           }
         }
         
@@ -367,31 +367,31 @@ export default function LeaderboardPage() {
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border-radius: 100px;
-          padding: 4px;
+          padding: 3px;
           border: 1px solid rgba(255, 255, 255, 0.1);
           position: relative;
           overflow-x: auto;
           scrollbar-width: none;
           -webkit-overflow-scrolling: touch;
-          margin-bottom: 24px;
-          max-width: 500px;
+          margin-bottom: 20px;
+          max-width: 440px;
         }
         .leader-tab-bar::-webkit-scrollbar { display: none; }
         
         .leader-tab-btn {
           flex: 1 0 auto;
-          padding: 10px 20px;
+          padding: 8px 16px;
           border: none;
           background: transparent;
           color: rgba(255, 255, 255, 0.6);
           font-weight: 600;
-          font-size: 0.9375rem;
+          font-size: 0.875rem;
           cursor: pointer;
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 6px;
           transition: color 0.3s ease;
           font-family: inherit;
           -webkit-tap-highlight-color: transparent;
@@ -427,33 +427,33 @@ export default function LeaderboardPage() {
           <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
 
             {/* ── Header ── */}
-            <div style={{ marginBottom: 32 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <div style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      <Trophy size={14} color="#FDE68A" />
-                      <span style={{ color: '#FEF3C7', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Peshqadamlar</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <div style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.15)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <Trophy size={12} color="#FDE68A" />
+                      <span style={{ color: '#FEF3C7', fontSize: '0.625rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Global Peshqadamlar</span>
                     </div>
                   </div>
-                  <h1 className="outfit-font" style={{ margin: '0 0 8px', fontSize: 'clamp(2.25rem, 7vw, 3.75rem)', fontWeight: 900, color: 'white', letterSpacing: '-0.04em', lineHeight: 1.05 }}>
+                  <h1 className="outfit-font" style={{ margin: '0 0 6px', fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', fontWeight: 900, color: 'white', letterSpacing: '-0.04em', lineHeight: 1.05 }}>
                     Reyting
                   </h1>
-                  <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '1rem', fontWeight: 500 }}>
+                  <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem', fontWeight: 500 }}>
                     Top 50 o'quvchilar ro'yxati
                   </p>
                 </div>
 
                 {myRank >= 0 && (
                   <div style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
+                    display: 'flex', alignItems: 'center', gap: 8,
                     background: 'rgba(255, 255, 255, 0.15)',
                     border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: 100, padding: '10px 24px',
-                    boxShadow: '0 8px 32px rgba(15,23,42,0.1)',
+                    borderRadius: 100, padding: '8px 18px',
+                    boxShadow: '0 6px 24px rgba(15,23,42,0.08)',
                   }}>
-                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9375rem', fontWeight: 600 }}>Sizning o'rningiz:</span>
-                    <span style={{ color: 'white', fontWeight: 900, fontSize: '1.25rem' }}>#{myRank + 1}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem', fontWeight: 600 }}>Sizning o'rningiz:</span>
+                    <span style={{ color: 'white', fontWeight: 900, fontSize: '1.125rem' }}>#{myRank + 1}</span>
                   </div>
                 )}
               </div>
@@ -524,36 +524,36 @@ export default function LeaderboardPage() {
             )}
 
             {/* List */}
-            <div style={{ marginTop: 24 }}>
+            <div style={{ marginTop: 16 }}>
               {loading ? (
                 <SkeletonRows />
               ) : leaders.length === 0 ? (
                 <div style={{
-                  padding: '80px 20px', textAlign: 'center',
+                  padding: '60px 20px', textAlign: 'center',
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
                   background: 'rgba(255, 255, 255, 0.96)',
                   backdropFilter: 'blur(20px)',
                   WebkitBackdropFilter: 'blur(20px)',
-                  borderRadius: 32,
+                  borderRadius: 24,
                   border: '1px solid var(--border-medium)',
                 }}>
                   <div style={{
-                    width: 64, height: 64, borderRadius: '50%',
+                    width: 52, height: 52, borderRadius: '50%',
                     background: 'rgba(245,158,11,0.1)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: 16
+                    marginBottom: 12
                   }}>
-                    <Trophy size={28} color="#F59E0B" />
+                    <Trophy size={24} color="#F59E0B" />
                   </div>
-                  <p className="outfit-font" style={{ margin: '0 0 8px', fontSize: '1.25rem', fontWeight: 800, color: '#0F172A' }}>
+                  <p className="outfit-font" style={{ margin: '0 0 6px', fontSize: '1.125rem', fontWeight: 800, color: '#0F172A' }}>
                     Hali hech kim yo'q
                   </p>
-                  <p style={{ margin: 0, fontSize: '0.9375rem', color: '#64748B' }}>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748B' }}>
                     Birinchi bo'lib reyting listiga kiring!
                   </p>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {/* Always render rest of the users in list format */}
                   {rest.map((u, i) => <LeaderRow key={u.id} user={u} rank={i + 3} isSelf={u.id === user?.id} tab={tab} />)}
                 </div>

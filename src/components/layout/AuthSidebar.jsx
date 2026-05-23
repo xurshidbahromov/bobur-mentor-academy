@@ -33,7 +33,7 @@ export default function AuthSidebar() {
   return (
     <>
       <aside className="auth-desktop-sidebar" style={{
-        width: 280,
+        width: 240,
         height: '100vh',
         position: 'fixed',
         top: 0,
@@ -42,22 +42,22 @@ export default function AuthSidebar() {
         borderRight: '1.5px solid rgba(100,120,255,0.08)',
         display: 'flex',
         flexDirection: 'column',
-        padding: '28px 24px',
+        padding: '22px 18px',
         zIndex: 100,
         boxShadow: '4px 0 24px rgba(0,0,0,0.02)',
         overflowY: 'auto',
       }}>
         {/* Logo */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', marginBottom: 40 }}>
-          <img src="/logo.svg" alt="BMA" width="38" height="38" style={{ objectFit: 'contain' }} />
-          <span className="outfit-font" style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1 }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginBottom: 28 }}>
+          <img src="/logo.svg" alt="BMA" width="32" height="32" style={{ objectFit: 'contain' }} />
+          <span className="outfit-font" style={{ fontWeight: 800, fontSize: '1.125rem', color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1 }}>
             Bobur<span style={{ fontWeight: 400, color: '#64748B' }}> Mentor</span>
           </span>
         </Link>
 
         {/* Navigation */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-          <p style={{ margin: '0 0 8px', fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: 12 }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+          <p style={{ margin: '0 0 6px', fontSize: '0.6875rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: 10 }}>
             Menyu
           </p>
           {links.map((link) => (
@@ -65,13 +65,13 @@ export default function AuthSidebar() {
               key={link.to}
               to={link.to}
               style={({ isActive }) => ({
-                display: 'flex', alignItems: 'center', gap: 14,
-                padding: '12px 14px', borderRadius: 12,
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 12px', borderRadius: 10,
                 textDecoration: 'none',
                 color: isActive ? '#3461FF' : '#475569',
                 background: isActive ? 'rgba(52,97,255,0.08)' : 'transparent',
                 fontWeight: isActive ? 700 : 600,
-                fontSize: '0.9375rem',
+                fontSize: '0.875rem',
                 transition: 'all 0.2s',
               })}
             >
@@ -87,8 +87,8 @@ export default function AuthSidebar() {
           ))}
 
           {isAdmin && (
-            <div style={{ marginTop: 24 }}>
-              <p style={{ margin: '0 0 8px', fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: 12 }}>
+            <div style={{ marginTop: 16 }}>
+              <p style={{ margin: '0 0 6px', fontSize: '0.6875rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: 10 }}>
                 Admin
               </p>
               {adminLinks.map((link) => (
@@ -96,13 +96,13 @@ export default function AuthSidebar() {
                   key={link.to}
                   to={link.to}
                   style={({ isActive }) => ({
-                    display: 'flex', alignItems: 'center', gap: 14,
-                    padding: '12px 14px', borderRadius: 12,
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 12px', borderRadius: 10,
                     textDecoration: 'none',
                     color: isActive ? '#3461FF' : '#475569',
                     background: isActive ? 'rgba(52,97,255,0.08)' : 'transparent',
                     fontWeight: isActive ? 700 : 600,
-                    fontSize: '0.9375rem',
+                    fontSize: '0.875rem',
                     transition: 'all 0.2s',
                   })}
                 >
@@ -121,18 +121,18 @@ export default function AuthSidebar() {
         </nav>
 
         {/* Footer actions */}
-        <div style={{ marginTop: 'auto', paddingTop: 20, borderTop: '1px solid rgba(100,120,255,0.1)' }}>
+        <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid rgba(100,120,255,0.1)' }}>
           <button
             onClick={handleSignOut}
             style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-              padding: '12px 14px', borderRadius: 12,
+              width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+              padding: '10px 12px', borderRadius: 10,
               background: 'rgba(239,68,68,0.05)', color: '#EF4444',
-              border: 'none', fontWeight: 600, fontSize: '0.9375rem', cursor: 'pointer',
+              border: 'none', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer',
               transition: 'background 0.2s', textAlign: 'left'
             }}
           >
-            <LogOut size={20} />
+            <LogOut size={18} />
             Chiqish
           </button>
         </div>
