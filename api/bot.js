@@ -53,15 +53,29 @@ if (bot) {
       
       if (error) throw error;
       if (!profile || profile.length === 0) {
-        return ctx.reply("Siz hali platformaga kirmagansiz yoki profilingiz Telegramingizga ulanmagan. Iltimos, '🚀 Platformaga kirish' tugmasi orqali platformaga kiring.");
+        return ctx.reply(
+          "Siz hali platformaga kirmagansiz yoki profilingiz Telegramingizga ulanmagan.\n\nIltimos, quyidagi tugma orqali platformaga kiring:",
+          {
+            ...Markup.inlineKeyboard([
+              [Markup.button.webApp("🚀 Platformaga kirish", WEB_APP_URL)]
+            ])
+          }
+        );
       }
 
       const p = profile[0];
+      const coins = p.coins ?? 0;
+      const xp = p.xp ?? 0;
+      const streak = p.streak_count ?? 0;
+      const longestStreak = p.longest_streak ?? 0;
+      const fullName = p.full_name || ctx.from.first_name || 'Kiritilmagan';
+
       const msg = `👤 <b>Sizning Profilingiz</b>\n\n` +
-                  `Ism: <b>${p.full_name || 'Kiritilmagan'}</b>\n` +
-                  `Tangalar: <b>${p.coins} 🪙</b>\n` +
-                  `Streak: <b>${p.streak_count} 🔥</b>\n` +
-                  `Eng uzun streak: <b>${p.longest_streak} 🏆</b>`;
+                  `Ism: <b>${fullName}</b>\n` +
+                  `Tangalar: <b>${coins} 🪙</b>\n` +
+                  `XP: <b>${xp} ⚡</b>\n` +
+                  `Streak: <b>${streak} 🔥</b>\n` +
+                  `Eng uzun streak: <b>${longestStreak} 🏆</b>`;
                   
       ctx.reply(msg, { parse_mode: 'HTML' });
     } catch (err) {
@@ -118,10 +132,12 @@ if (bot) {
       const { data: stats, error } = await supabase.rpc('get_bot_stats');
       if (error) throw error;
 
+      const s = stats || {};
       const msg = `📊 <b>Platforma Statistikasi</b>\n\n` +
-                  `👤 Jami o'quvchilar: <b>${stats.total_users}</b>\n` +
-                  `🔥 Bugun qo'shilganlar: <b>${stats.today_new_users}</b>\n` +
-                  `🪙 Tarqatilgan tangalar: <b>${stats.total_coins}</b>`;
+                  `👤 Jami o'quvchilar: <b>${s.total_users ?? 0}</b>\n` +
+                  `🔥 Bugun qo'shilganlar: <b>${s.today_new_users ?? 0}</b>\n` +
+                  `🪙 Tarqatilgan tangalar: <b>${s.total_coins ?? 0}</b>\n` +
+                  `⚡ Jami XP: <b>${s.total_xp ?? 0}</b>`;
                   
       ctx.reply(msg, { parse_mode: 'HTML' });
     } catch (err) {

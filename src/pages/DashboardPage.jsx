@@ -652,12 +652,13 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
+                className="dash-notif-panel"
                 style={{
-                  position: 'fixed', top: 100, right: 16, width: 300,
+                  position: 'fixed', top: 60, right: 16, width: 'min(300px, calc(100vw - 32px))',
                   background: '#FFFFFF',
                   border: '1px solid rgba(52,97,255,0.15)', borderRadius: 24, padding: '20px 16px',
                   boxShadow: '0 12px 40px rgba(15,23,42,0.15)', zIndex: 9999,
-                  maxHeight: 400, overflowY: 'auto'
+                  maxHeight: '60vh', overflowY: 'auto'
                 }}
               >
                 <h4 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 800, color: '#0F172A', paddingLeft: 4 }}>Bildirishnomalar</h4>
