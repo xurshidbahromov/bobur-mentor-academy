@@ -3,40 +3,46 @@
 -- ══════════════════════════════════════════════════════════════
 
 -- 1. Telegram ID orqali profil ma'lumotlarini olish (RLS ni chetlab o'tish uchun)
+DROP FUNCTION IF EXISTS public.get_profile_by_telegram_id(TEXT);
+
 CREATE OR REPLACE FUNCTION public.get_profile_by_telegram_id(p_tg_id TEXT)
 RETURNS TABLE (
   id UUID,
   full_name TEXT,
   coins INT,
+  xp INT,
   streak_count INT,
   longest_streak INT
 ) AS $$
 BEGIN
   RETURN QUERY
-  SELECT p.id, p.full_name, p.coins, p.streak_count, p.longest_streak
+  SELECT p.id, p.full_name, p.coins, p.rating_score AS xp, p.streak_count, p.longest_streak
   FROM public.profiles p
   WHERE p.telegram_id = p_tg_id
   LIMIT 1;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 2. Admin uchun statistika (Jami o'quvchilar, bugungi ro'yxatdan o'tganlar, tangalar)
+-- 2. Admin uchun statistika (Jami o'quvchilar, bugungi ro'yxatdan o'tganlar, tangalar, XP)
 CREATE OR REPLACE FUNCTION public.get_bot_stats()
 RETURNS JSON AS $$
 DECLARE
   total_users INT;
   today_new_users INT;
   total_coins INT;
+  total_xp INT;
   result JSON;
 BEGIN
   SELECT COUNT(*) INTO total_users FROM public.profiles;
   SELECT COUNT(*) INTO today_new_users FROM public.profiles WHERE created_at >= CURRENT_DATE;
   SELECT COALESCE(SUM(coins), 0) INTO total_coins FROM public.profiles;
+  SELECT COALESCE(SUM(rating_score), 0) INTO total_xp FROM public.profiles;
 
   result := json_build_object(
     'total_users', total_users,
     'today_new_users', today_new_users,
-    'total_coins', total_coins
+    'total_coins', total_coins,
+    'total_xp', total_xp
   );
 
   RETURN result;

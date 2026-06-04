@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, MapPin, BookOpen, Trophy, TrendingUp, Minus, ChevronDown, ChevronUp, ExternalLink, Star, Filter, X, Info, Coins, Lightbulb, GraduationCap, Building2, Globe, Languages } from 'lucide-react'
-import { ALL_UNIVERSITIES, REGIONS, STUDY_TYPES, LANGUAGES as DTM_LANGUAGES, UNIVERSITY_TYPES } from '../data/universities'
+import { ALL_UNIVERSITIES, REGIONS, STUDY_TYPES, LANGUAGES as DTM_LANGUAGES, UNIVERSITY_TYPES, DATA_YEAR } from '../data/universities'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
@@ -242,11 +242,38 @@ export default function DtmCalculatorPage() {
   }, [user])
 
   const handleScoreInput = (v) => {
-    setInputVal(v)
-    const n = parseFloat(v)
-    if (!isNaN(n) && n >= 0 && n <= MAX_SCORE) {
+    if (v === '') {
+      setInputVal('')
+      setScore(0)
+      setHasCalculated(false)
+      return
+    }
+    let n = parseFloat(v)
+    if (!isNaN(n)) {
+      if (n > MAX_SCORE) {
+        n = MAX_SCORE
+        setInputVal(MAX_SCORE.toString())
+      } else if (n < 0) {
+        n = 0
+        setInputVal('0')
+      } else {
+        setInputVal(v)
+      }
       setScore(n)
-      setHasCalculated(false) // require recalculation on score change
+      setHasCalculated(false)
+    }
+  }
+
+  const handleScoreFocus = () => {
+    if (inputVal === '0') {
+      setInputVal('')
+    }
+  }
+
+  const handleScoreBlur = () => {
+    if (inputVal === '') {
+      setInputVal('0')
+      setScore(0)
     }
   }
 
@@ -287,6 +314,11 @@ export default function DtmCalculatorPage() {
   const contractCount = results.filter(u=>u._best==='contract').length
 
   const handleCalculate = async () => {
+    if (score <= 0 || isNaN(score)) {
+      toast.warning("Iltimos, avval ballingizni kiriting!")
+      return
+    }
+
     const storageKey = `dtm_free_used_${user?.id || 'guest'}`
     const alreadyUsed = localStorage.getItem(storageKey) === 'true'
 
@@ -349,40 +381,111 @@ export default function DtmCalculatorPage() {
         .dtm-page { width:100%; padding-bottom:100px; }
         .dtm-hero {
           background: linear-gradient(145deg, #0F172A 0%, #1E293B 40%, #1a1040 70%, #0d1f4f 100%);
-          padding: 32px 0 90px; border-radius:0 0 24px 24px; margin-bottom:-50px;
+          padding: 32px 0 110px; border-radius:0 0 24px 24px; margin-bottom:-60px;
           position:relative; overflow:hidden; box-shadow:0 15px 30px rgba(15,23,42,0.12);
         }
-        @media(max-width:768px){ .dtm-hero{ padding:24px 0 80px; border-radius:0 0 16px 16px; margin-bottom:-40px; } }
+        @media(max-width:768px){ .dtm-hero{ padding:24px 0 100px; border-radius:0 0 16px 16px; margin-bottom:-50px; } }
         .dtm-container { max-width:1040px; margin:0 auto; position:relative; z-index:20; }
         .dtm-hero-content { max-width:1040px; margin:0 auto; padding:0 24px; position:relative; z-index:20; }
         @media(max-width:768px){ .dtm-hero-content{ padding:0 16px; } }
         .dtm-content { padding:0 24px; position:relative; z-index:2; }
         @media(max-width:768px){ .dtm-content{ padding:0 16px; } }
-        .dtm-score-card {
-          background:white; border-radius:32px; padding:20px 16px;
-          box-shadow:0 12px 40px rgba(15,23,42,0.08); position:relative; z-index:10;
-          border:1px solid rgba(255,255,255,0.6); max-width:680px; margin:0 auto;
+
+        /* ── New open input panel ── */
+        .dtm-input-panel {
+          background: white;
+          border-radius: 28px;
+          padding: 32px 32px 28px;
+          box-shadow: 0 20px 60px rgba(15,23,42,0.10);
+          border: 1px solid rgba(226,232,240,0.8);
+          max-width: 720px; margin: 0 auto;
           box-sizing: border-box; width: 100%;
         }
         @media(max-width:768px){
-          .dtm-score-card { padding:16px 14px; border-radius:24px; }
+          .dtm-input-panel { padding: 24px 20px 22px; border-radius: 22px; }
         }
-        .dtm-filter-chip {
-          padding:6px 14px; border-radius:100px; border:1.5px solid #E2E8F0;
-          background:white; font-size:0.75rem; font-weight:700; color:#64748B;
-          cursor:pointer; white-space:nowrap; transition:all 0.15s ease;
+
+        /* Score underline input */
+        .dtm-score-wrap {
+          display: flex; align-items: flex-end; gap: 6px;
+          border-bottom: 2.5px solid #E2E8F0;
+          padding-bottom: 8px; transition: border-color 0.2s;
+          width: fit-content; margin: 0 auto 32px;
         }
-        .dtm-filter-chip.active { border-color:#3461FF; background:#3461FF; color:white; }
+        .dtm-score-wrap:focus-within { border-color: #3461FF; }
+        .dtm-score-input {
+          width: 120px; border: none; background: transparent;
+          font-size: 3.5rem; font-weight: 900; color: #0F172A;
+          outline: none; font-family: 'Outfit','Outfit Fallback',sans-serif;
+          text-align: center; padding: 0; line-height: 1;
+          letter-spacing: -0.04em;
+        }
+        .dtm-score-max {
+          font-size: 1.1rem; color: #CBD5E1; font-weight: 700;
+          padding-bottom: 6px; white-space: nowrap;
+        }
+
+        /* Filter selects */
+        .dtm-selects-row {
+          display: grid; gap: 14px;
+          grid-template-columns: 1fr 1fr;
+        }
+        @media(max-width:520px){ .dtm-selects-row { grid-template-columns: 1fr; } }
+
+        .dtm-select-group label {
+          display: block; font-size: 0.65rem; font-weight: 800;
+          color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;
+        }
+        .dtm-select-wrap { position: relative; }
+        .dtm-select-wrap::after {
+          content: ''; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+          width: 0; height: 0;
+          border-left: 4px solid transparent; border-right: 4px solid transparent;
+          border-top: 5px solid #94A3B8; pointer-events: none;
+        }
+        .dtm-select {
+          width: 100%; padding: 11px 36px 11px 14px;
+          border-radius: 14px; border: 1.5px solid #E2E8F0;
+          background: #F8FAFC; font-size: 0.875rem; font-weight: 700;
+          color: #0F172A; outline: none; cursor: pointer;
+          appearance: none; -webkit-appearance: none;
+          font-family: inherit; transition: border-color 0.2s, background 0.2s;
+        }
+        .dtm-select:focus { border-color: #3461FF; background: white; }
+        .dtm-select:hover { border-color: #CBD5E1; }
+
+        /* Divider */
+        .dtm-divider { height: 1px; background: #F1F5F9; margin: 24px 0; }
+
+        /* Calculate button */
+        .dtm-calc-btn {
+          width: 100%; padding: 15px 24px;
+          border: none; border-radius: 16px; cursor: pointer;
+          font-size: 1rem; font-weight: 800; font-family: inherit;
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          transition: all 0.2s ease;
+        }
+        .dtm-calc-btn.active {
+          background: #3461FF;
+          color: white;
+          box-shadow: 0 4px 12px rgba(52, 97, 255, 0.15);
+        }
+        .dtm-calc-btn.active:hover {
+          background: #2552EA;
+          box-shadow: 0 6px 16px rgba(52, 97, 255, 0.25);
+        }
+        .dtm-calc-btn.active:active { transform: scale(0.98); }
+        .dtm-calc-btn.done {
+          background: #F1F5F9; color: #94A3B8; cursor: default;
+        }
+
+        /* Results grid */
         .results-grid {
           display: grid; gap: 16px;
           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
           width: 100%; box-sizing: border-box;
         }
-        .dtm-filters-grid {
-          display: grid; gap: 16px; margin-bottom: 24px;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          width: 100%; box-sizing: border-box;
-        }
+
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
         input[type=number] { -moz-appearance:textfield; }
@@ -418,7 +521,7 @@ export default function DtmCalculatorPage() {
                   border:'1px solid rgba(255,255,255,0.15)', display:'inline-flex', alignItems:'center', gap:6 }}>
                   <TrendingUp size={12} color="#34D399"/>
                   <span style={{ color:'#6EE7B7', fontSize:'0.65rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.1em' }}>
-                    DTM Kalkulator 2024
+                    DTM Kalkulator {DATA_YEAR}
                   </span>
                 </div>
               </div>
@@ -435,116 +538,105 @@ export default function DtmCalculatorPage() {
 
         <div className="dtm-container">
           <div className="dtm-content">
-          {/* Score Card */}
-          <div className="dtm-score-card">
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <p style={{ margin:'0 0 10px', fontSize:'0.65rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em' }}>
-                Umumiy ballingizni kiriting
-              </p>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:8, background: '#F8FAFC', padding: '8px 20px', borderRadius: 16, border: '2px solid #E2E8F0', transition: 'border-color 0.2s' }} className="input-glow-wrapper">
-                <input
-                  type="number"
-                  min={0}
-                  max={MAX_SCORE}
-                  step="0.1"
-                  value={inputVal}
-                  onChange={e => handleScoreInput(e.target.value)}
-                  className="input-glow"
-                  style={{
-                    width: 90,
-                    border: 'none',
-                    background: 'transparent',
-                    fontSize: '2rem',
-                    fontWeight: 900,
-                    color: '#0F172A',
-                    outline: 'none',
-                    fontFamily: 'inherit',
-                    textAlign: 'center',
-                    padding: 0
-                  }}
-                />
-                <span style={{ fontSize:'1rem', color:'#94A3B8', fontWeight:800 }}>/ {MAX_SCORE}</span>
-              </div>
+          {/* ── Input Panel ── */}
+          <div className="dtm-input-panel">
+
+            {/* Score label */}
+            <p style={{ margin:'0 0 16px', fontSize:'0.65rem', fontWeight:800, color:'#94A3B8',
+              textTransform:'uppercase', letterSpacing:'0.12em', textAlign:'center' }}>
+              Umumiy ballingizni kiriting
+            </p>
+
+            {/* Underline score input */}
+            <div className="dtm-score-wrap">
+              <input
+                type="number" min={0} max={MAX_SCORE} step="0.1"
+                value={inputVal}
+                onChange={e => handleScoreInput(e.target.value)}
+                onFocus={handleScoreFocus}
+                onBlur={handleScoreBlur}
+                className="dtm-score-input outfit-font"
+                placeholder="0"
+              />
+              <span className="dtm-score-max">/ {MAX_SCORE}</span>
             </div>
 
-            {/* Filters on Main Card */}
-            <div className="dtm-filters-grid">
-              {/* Region Selector */}
-              <div>
-                <p style={{ margin:'0 0 6px', fontSize:'0.65rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Hudud</p>
-                <div style={{ position: 'relative' }}>
-                  <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setHasCalculated(false) }}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1.5px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.85rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', transition: 'border-color 0.2s', textAlign: 'center' }}
-                    onFocus={e => e.target.style.borderColor = '#3461FF'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} >
+            {/* Filter selects */}
+            <div className="dtm-selects-row">
+              <div className="dtm-select-group">
+                <label>Hudud</label>
+                <div className="dtm-select-wrap">
+                  <select
+                    className="dtm-select"
+                    value={regionFilter}
+                    onChange={e => { setRegionFilter(e.target.value); setHasCalculated(false) }}
+                  >
                     {['Hammasi', ...REGIONS].map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
               </div>
-
-              {/* Specialty Selector */}
-              <div>
-                <p style={{ margin:'0 0 6px', fontSize:'0.65rem', fontWeight:800, color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', textAlign:'center' }}>Yo'nalish</p>
-                <div style={{ position: 'relative' }}>
-                  <select value={specialtyFilter} onChange={e => { setSpecialtyFilter(e.target.value); setHasCalculated(false) }}
-                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1.5px solid #E2E8F0', background: '#F8FAFC', fontSize: '0.85rem', fontWeight: 700, color: '#0F172A', outline: 'none', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748B\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', transition: 'border-color 0.2s', textAlign: 'center' }}
-                    onFocus={e => e.target.style.borderColor = '#3461FF'} onBlur={e => e.target.style.borderColor = '#E2E8F0'} >
+              <div className="dtm-select-group">
+                <label>Yo'nalish</label>
+                <div className="dtm-select-wrap">
+                  <select
+                    className="dtm-select"
+                    value={specialtyFilter}
+                    onChange={e => { setSpecialtyFilter(e.target.value); setHasCalculated(false) }}
+                  >
                     {ALL_SPECIALTIES.map(sp => <option key={sp} value={sp}>{sp}</option>)}
                   </select>
                 </div>
               </div>
             </div>
 
+            <div className="dtm-divider" />
+
+            {/* Calculate button */}
             <button
+              className={`dtm-calc-btn ${hasCalculated ? 'done' : 'active'}`}
               onClick={handleCalculate}
               disabled={isCalculating || hasCalculated}
-              style={{
-                width: '100%',
-                background: hasCalculated ? '#E2E8F0' : 'linear-gradient(135deg, #3461FF 0%, #8B5CF6 100%)',
-                color: hasCalculated ? '#94A3B8' : 'white',
-                border: 'none',
-                borderRadius: 14,
-                padding: '12px 16px',
-                fontSize: '0.95rem',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                cursor: hasCalculated ? 'default' : 'pointer',
-                boxShadow: hasCalculated ? 'none' : '0 6px 20px rgba(52, 97, 255, 0.25)',
-                transition: 'all 0.2s'
-              }}
             >
-              {isCalculating ? 'Hisoblanmoqda...' : hasCalculated ? 'Natijalar ko\'rsatilmoqda' : (
+              {isCalculating ? (
+                <>
+                  <motion.div animate={{ rotate: 360 }} transition={{ repeat:Infinity, duration:0.8, ease:'linear' }}>
+                    <Search size={18} />
+                  </motion.div>
+                  Hisoblanmoqda...
+                </>
+              ) : hasCalculated ? (
+                <>✓ Natijalar ko'rsatilmoqda</>
+              ) : (
                 <>
                   <Search size={18} />
-                  {hasUsedFree ? `Hisoblash (${UNLOCK_COST} Coin)` : 'Hisoblash (Tekin)'}
+                  {hasUsedFree ? `Hisoblash — ${UNLOCK_COST} Coin` : 'Bepul Hisoblash'}
                 </>
               )}
             </button>
 
             {!hasCalculated && hasUsedFree && userCoins < UNLOCK_COST && (
-              <div style={{ textAlign: 'center', marginTop: 16 }}>
-                <Link to="/shop" style={{ color:'#EF4444', textDecoration:'none', fontWeight:700, fontSize: '0.9rem' }}>
-                  Sizda coin yetarli emas. Sotib olish →
+              <div style={{ textAlign:'center', marginTop:14 }}>
+                <Link to="/shop" style={{ color:'#EF4444', textDecoration:'none', fontWeight:700, fontSize:'0.875rem' }}>
+                  Coinlar yetarli emas. Sotib olish →
                 </Link>
               </div>
             )}
 
-            {/* Premium Info Header after calculation */}
+            {/* Stats row after calculate */}
             {hasCalculated && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ display:'flex', gap:8, marginTop:20, flexWrap:'wrap', justifyContent: 'center' }}>
-                <div style={{ background:'#DCFCE7', borderRadius:100, padding:'6px 14px', display:'flex', alignItems:'center', gap:6 }}>
+              <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
+                style={{ display:'flex', gap:8, marginTop:20, flexWrap:'wrap', justifyContent:'center' }}>
+                <div style={{ background:'#DCFCE7', borderRadius:100, padding:'6px 16px', display:'flex', alignItems:'center', gap:6 }}>
                   <Trophy size={13} color="#10B981"/>
-                  <span style={{ fontSize:'0.75rem', fontWeight:800, color:'#15803D' }}>{grantCount} ta Grant</span>
+                  <span style={{ fontSize:'0.78rem', fontWeight:800, color:'#15803D' }}>{grantCount} ta Grant</span>
                 </div>
-                <div style={{ background:'#FEF3C7', borderRadius:100, padding:'6px 14px', display:'flex', alignItems:'center', gap:6 }}>
+                <div style={{ background:'#FEF3C7', borderRadius:100, padding:'6px 16px', display:'flex', alignItems:'center', gap:6 }}>
                   <Star size={13} color="#F59E0B"/>
-                  <span style={{ fontSize:'0.75rem', fontWeight:800, color:'#92400E' }}>{contractCount} ta Kontrakt</span>
+                  <span style={{ fontSize:'0.78rem', fontWeight:800, color:'#92400E' }}>{contractCount} ta Kontrakt</span>
                 </div>
-                <div style={{ background:'#F1F5F9', borderRadius:100, padding:'6px 14px', display:'flex', alignItems:'center', gap:6 }}>
+                <div style={{ background:'#F1F5F9', borderRadius:100, padding:'6px 16px', display:'flex', alignItems:'center', gap:6 }}>
                   <BookOpen size={13} color="#64748B"/>
-                  <span style={{ fontSize:'0.75rem', fontWeight:800, color:'#475569' }}>{results.length} ta OTM</span>
+                  <span style={{ fontSize:'0.78rem', fontWeight:800, color:'#475569' }}>{results.length} ta OTM</span>
                 </div>
               </motion.div>
             )}
