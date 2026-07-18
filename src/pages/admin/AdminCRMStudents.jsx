@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
+import { Send } from 'lucide-react'
 
 function formatUzbekPhone(value) {
   if (!value) return ''
@@ -314,9 +315,21 @@ export default function AdminCRMStudents() {
                             <CheckCircle2 size={14} /> Bot ulangan
                           </span>
                         ) : hasParent ? (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245,158,11,0.1)', color: '#F59E0B', padding: '6px 14px', borderRadius: 100, fontSize: '0.75rem', fontWeight: 700 }}>
-                            <Clock size={14} /> Kutilmoqda
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245,158,11,0.1)', color: '#F59E0B', padding: '6px 14px', borderRadius: 100, fontSize: '0.75rem', fontWeight: 700 }}>
+                              <Clock size={14} /> Kutilmoqda
+                            </span>
+                            <button 
+                              onClick={() => {
+                                const cleanPhone = parent.phone.replace(/[^0-9]/g, '')
+                                const text = encodeURIComponent(`Assalomu alaykum! Bobur Mentor Academy markazidan yozyapmiz. Farzandingiz davomatini kuzatib borish uchun ushbu botga kiring va raqamingizni tasdiqlang: @BoburMentorBot`)
+                                window.open(`https://t.me/+${cleanPhone}?text=${text}`, '_blank')
+                              }}
+                              title="Telegram orqali bot linkini yuborish"
+                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: 'rgba(52,97,255,0.1)', border: 'none', color: '#3461FF', cursor: 'pointer', transition: 'all 0.2s' }}>
+                              <Send size={14} />
+                            </button>
+                          </div>
                         ) : (
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', color: '#475569', padding: '6px 14px', borderRadius: 100, fontSize: '0.75rem', fontWeight: 600 }}>
                             <AlertCircle size={14} /> Raqam yo'q
