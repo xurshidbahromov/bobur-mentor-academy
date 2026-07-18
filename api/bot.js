@@ -254,7 +254,8 @@ if (bot) {
       const msg = `📊 <b>${p.student_name} — Davomat</b>\n\n` +
         `✅ Keldi: <b>${counts.present||0}</b> kun\n` +
         `❌ Kelmadi: <b>${counts.absent||0}</b> kun\n` +
-        `⏰ Kech keldi: <b>${counts.late||0}</b> kun\n\n` +
+        `⏰ Kech keldi: <b>${counts.late||0}</b> kun\n` +
+        `📝 Sababli (kelmadi): <b>${counts.excused||0}</b> kun\n\n` +
         `<b>So'nggi darslar:</b>\n${recent || "Ma'lumot yo'q"}`;
       await ctx.reply(msg, { parse_mode: 'HTML' });
     }
