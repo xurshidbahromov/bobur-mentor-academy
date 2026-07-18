@@ -189,27 +189,25 @@ if (bot) {
     const tgId = ctx.from.id;
     
     let p = contact.phone_number.replace(/\D/g, '');
-    if (p.startsWith('998')) p = '+' + p;
-    else if (p.startsWith('9') && p.length === 9) p = '+998' + p;
-    else if (!p.startsWith('+')) p = '+' + p;
+    if (p.startsWith('998')) { /* keep it */ } else if (p.startsWith('9') && p.length === 9) p = '998' + p;
 
-    // Build resilient search formats to catch any old DB records
     const phoneList = [p, contact.phone_number];
     if (!contact.phone_number.startsWith('+')) phoneList.push('+' + contact.phone_number);
     
     // Add formatted version: +998 (94) 101-26-80
-    if (p.length === 13 && p.startsWith('+998')) {
-      const formatted = `+998 (${p.substring(4, 6)}) ${p.substring(6, 9)}-${p.substring(9, 11)}-${p.substring(11, 13)}`;
+    if (p.length === 12 && p.startsWith('998')) {
+      const formatted = `+998 (${p.substring(3, 5)}) ${p.substring(5, 8)}-${p.substring(8, 10)}-${p.substring(10, 12)}`;
       phoneList.push(formatted);
       phoneList.push(formatted.replace(/\s+/g, '')); // +998(94)101-26-80
     }
 
-    const { data: parents, error } = await supabase
-      .from('crm_parents')
-      .select('*, crm_students(full_name)')
-      .in('phone', phoneList);
+    // Call RPC to securely bypass RLS (as Bot uses ANON key)
+    const { data: students, error } = await supabase.rpc('bot_verify_parent_phone', {
+      p_phones: phoneList,
+      p_tg_id: tgId
+    });
 
-    if (error || !parents || parents.length === 0) {
+    if (error || !students || students.length === 0) {
       const failKb = [
         ['👤 Profil', '🎁 Taklifnoma'],
         ['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish'],
@@ -222,26 +220,18 @@ if (bot) {
       );
     }
 
-    const { error: updateErr } = await supabase
-      .from('crm_parents')
-      .update({ telegram_chat_id: tgId, is_verified: true, verified_at: new Date().toISOString() })
-      .in('id', parents.map(pr => pr.id));
+    const studentNames = students.map(s => s.student_name).join(', ');
 
-    if (updateErr) {
-      return ctx.reply("⚠️ Xatolik yuz berdi. Qayta urinib ko'ring.");
-    }
-
-    const studentNames = parents.map(pr => `👦 ${pr.crm_students?.full_name}`).join('\n');
-    
-    const kb = [
+    const successKb = [
+      ['📅 Farzandim davomati'],
+      ['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish'],
       ['👤 Profil', '🎁 Taklifnoma'],
-      ['📊 Farzandim davomati', '📋 Guruh ma\'lumotlari'],
       ['ℹ️ Yordam']
     ];
-    if (ADMIN_TG_IDS.includes(String(tgId))) kb.push(['📊 Statistika']);
+    if (ADMIN_TG_IDS.includes(String(tgId))) successKb.push(['📊 Statistika']);
 
     ctx.reply(`🎉 Muvaffaqiyatli ro'yxatdan o'tdingiz!\n\nQuyidagi o'quvchilar profiliga ulandingiz:\n${studentNames}`, 
-      Markup.keyboard(kb).resize()
+      Markup.keyboard(successKb).resize()
     );
   });
 
