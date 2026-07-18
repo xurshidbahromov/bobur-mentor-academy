@@ -223,7 +223,7 @@ if (bot) {
     const studentNames = students.map(s => s.student_name).join(', ');
 
     const successKb = [
-      ['📅 Farzandim davomati'],
+      ['📊 Farzandim davomati'],
       ['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish'],
       ['👤 Profil', '🎁 Taklifnoma'],
       ['ℹ️ Yordam']
@@ -237,32 +237,37 @@ if (bot) {
 
   bot.hears('📊 Farzandim davomati', async (ctx) => {
     if (!supabase) return;
-    const tgId = ctx.from.id;
-    const { data: parents } = await supabase.from('crm_parents').select('student_id, crm_students(full_name)').eq('telegram_chat_id', tgId).eq('is_verified', true);
+    const tgId = String(ctx.from.id);
+
+    const { data: parents, error } = await supabase.rpc('bot_get_parent_students', { p_tg_id: Number(tgId) });
     
-    if (!parents || parents.length === 0) return ctx.reply("Siz ota-ona sifatida tasdiqlanmagansiz.");
+    if (error || !parents || parents.length === 0) {
+      return ctx.reply("Siz ota-ona sifatida tasdiqlanmagansiz yoki farzandlaringiz tizimda topilmadi.");
+    }
 
     for (let p of parents) {
-      const { data: records } = await supabase.from('crm_attendance').select('lesson_date, status, note').eq('student_id', p.student_id).order('lesson_date', { ascending: false }).limit(10);
+      const { data: records } = await supabase.rpc('bot_get_student_attendance', { p_student_id: p.student_id });
       const counts = (records||[]).reduce((acc, r) => { acc[r.status] = (acc[r.status]||0)+1; return acc }, {});
       const STATUS_EMOJI = { present: '✅', absent: '❌', late: '⏰', excused: '📝' };
       const recent = (records||[]).map(r => `${STATUS_EMOJI[r.status]} ${r.lesson_date}${r.note ? ` (${r.note})` : ''}`).join('\n');
       
-      let msg = `📊 <b>${p.crm_students?.full_name} — Davomat statistikasi</b>\n\n` +
-        `✅ Keldi: <b>${counts.present||0}</b> kun\n❌ Kelmadi: <b>${counts.absent||0}</b> kun\n\n<b>So'nggi darslar:</b>\n${recent || "Ma'lumot yo'q"}`;
+      const msg = `📊 <b>${p.student_name} — Davomat</b>\n\n` +
+        `✅ Keldi: <b>${counts.present||0}</b> kun\n` +
+        `❌ Kelmadi: <b>${counts.absent||0}</b> kun\n` +
+        `⏰ Kech keldi: <b>${counts.late||0}</b> kun\n\n` +
+        `<b>So'nggi darslar:</b>\n${recent || "Ma'lumot yo'q"}`;
       await ctx.reply(msg, { parse_mode: 'HTML' });
     }
   });
 
   bot.hears('📋 Guruh ma\'lumotlari', async (ctx) => {
     if (!supabase) return;
-    const tgId = ctx.from.id;
-    const { data: parents } = await supabase.from('crm_parents').select('crm_students(full_name, crm_groups(name, schedule_days, start_time))').eq('telegram_chat_id', tgId).eq('is_verified', true);
+    const tgId = Number(ctx.from.id);
+    const { data: parents } = await supabase.rpc('bot_get_parent_students', { p_tg_id: tgId });
     if (!parents || parents.length === 0) return ctx.reply("Topilmadi.");
 
     for (let p of parents) {
-      const g = p.crm_students?.crm_groups;
-      let msg = `📚 <b>Guruh ma'lumotlari</b>\n\n👦 O'quvchi: <b>${p.crm_students?.full_name}</b>\n🏫 Guruh: <b>${g?.name || '—'}</b>\n📅 Kunlar: ${g?.schedule_days?.join(', ') || '—'}\n🕐 Vaqt: ${g?.start_time || '—'}`;
+      const msg = `📚 <b>Guruh ma'lumotlari</b>\n\n👦 O'quvchi: <b>${p.student_name}</b>\n🏫 Guruh: <b>${p.group_name || '—'}</b>\n📅 Kunlar: ${p.schedule_days?.join(', ') || '—'}\n🕐 Vaqt: ${p.start_time || '—'}`;
       await ctx.reply(msg, { parse_mode: 'HTML' });
     }
   });
