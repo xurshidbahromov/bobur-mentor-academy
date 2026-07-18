@@ -15,12 +15,25 @@ if (bot) {
   // ── 1. /start ──
   bot.start(async (ctx) => {
     const isAdmin = ADMIN_TG_IDS.includes(String(ctx.from.id));
+    
+    let isParent = false;
+    if (supabase) {
+      const { data } = await supabase.from('crm_parents').select('id').eq('telegram_chat_id', ctx.from.id).eq('is_verified', true).limit(1).maybeSingle();
+      if (data) isParent = true;
+    }
+
     const keyboardButtons = [
-      ['👤 Profil', '🎁 Taklifnoma'],
-      ['ℹ️ Yordam']
+      ['👤 Profil', '🎁 Taklifnoma']
     ];
 
-    // Faqat adminlarga Statistika tugmasini qo'shamiz
+    if (isParent) {
+      keyboardButtons.push(['📊 Farzandim davomati', '📋 Guruh ma\'lumotlari']);
+    } else {
+      keyboardButtons.push(['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish']);
+    }
+
+    keyboardButtons.push(['ℹ️ Yordam']);
+
     if (isAdmin) {
       keyboardButtons.push(['📊 Statistika']);
     }
@@ -153,11 +166,98 @@ if (bot) {
       `Mavjud tugmalar va buyruqlar:\n` +
       `👤 Profil - Shaxsiy ma'lumotlar va tangalar\n` +
       `🎁 Taklifnoma - Do'stlarni taklif qilish\n` +
+      `👨‍👩‍👧 Ota-ona sifatida ro'yxatdan o'tish - Farzandingiz davomatini kuzatish\n` +
       `/stats - Platforma statistikasi (Faqat Adminlar uchun)`
     );
   };
   bot.help(handleHelp);
   bot.hears('ℹ️ Yordam', handleHelp);
+
+  // ── 5. Ota-ona ro'yxatdan o'tish va funksiyalar ──
+  bot.hears('👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish', async (ctx) => {
+    ctx.reply(
+      '📱 Iltimos, telefon raqamingizni tasdiqlash uchun pastdagi "Raqamni ulashish" tugmasini bosing:',
+      Markup.keyboard([
+        [Markup.button.contactRequest('📱 Raqamni ulashish')]
+      ]).resize().oneTime()
+    );
+  });
+
+  bot.on('contact', async (ctx) => {
+    if (!supabase) return ctx.reply("❌ Tizimda xatolik.");
+    const contact = ctx.message.contact;
+    const tgId = ctx.from.id;
+    
+    let p = contact.phone_number.replace(/\\D/g, '');
+    if (p.startsWith('998')) p = '+' + p;
+    else if (p.startsWith('9') && p.length === 9) p = '+998' + p;
+    else if (!p.startsWith('+')) p = '+' + p;
+
+    const { data: parents, error } = await supabase
+      .from('crm_parents')
+      .select('*, crm_students(full_name)')
+      .or(`phone.eq.${p},phone.eq.${contact.phone_number},phone.eq.+${contact.phone_number}`);
+
+    if (error || !parents || parents.length === 0) {
+      return ctx.reply("❌ Kechirasiz, bu raqam tizimda topilmadi.\nIltimos mentorga murojaat qiling va farzandingizga raqamingiz to'g'ri kiritilganiga ishonch hosil qiling.", 
+        Markup.keyboard([['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish'], ['👤 Profil', '🎁 Taklifnoma'], ['ℹ️ Yordam']]).resize()
+      );
+    }
+
+    const { error: updateErr } = await supabase
+      .from('crm_parents')
+      .update({ telegram_chat_id: tgId, is_verified: true, verified_at: new Date().toISOString() })
+      .in('id', parents.map(pr => pr.id));
+
+    if (updateErr) {
+      return ctx.reply("⚠️ Xatolik yuz berdi. Qayta urinib ko'ring.");
+    }
+
+    const studentNames = parents.map(pr => `👦 ${pr.crm_students?.full_name}`).join('\n');
+    
+    const kb = [
+      ['👤 Profil', '🎁 Taklifnoma'],
+      ['📊 Farzandim davomati', '📋 Guruh ma\'lumotlari'],
+      ['ℹ️ Yordam']
+    ];
+    if (ADMIN_TG_IDS.includes(String(tgId))) kb.push(['📊 Statistika']);
+
+    ctx.reply(`🎉 Muvaffaqiyatli ro'yxatdan o'tdingiz!\n\nQuyidagi o'quvchilar profiliga ulandingiz:\n${studentNames}`, 
+      Markup.keyboard(kb).resize()
+    );
+  });
+
+  bot.hears('📊 Farzandim davomati', async (ctx) => {
+    if (!supabase) return;
+    const tgId = ctx.from.id;
+    const { data: parents } = await supabase.from('crm_parents').select('student_id, crm_students(full_name)').eq('telegram_chat_id', tgId).eq('is_verified', true);
+    
+    if (!parents || parents.length === 0) return ctx.reply("Siz ota-ona sifatida tasdiqlanmagansiz.");
+
+    for (let p of parents) {
+      const { data: records } = await supabase.from('crm_attendance').select('lesson_date, status, note').eq('student_id', p.student_id).order('lesson_date', { ascending: false }).limit(10);
+      const counts = (records||[]).reduce((acc, r) => { acc[r.status] = (acc[r.status]||0)+1; return acc }, {});
+      const STATUS_EMOJI = { present: '✅', absent: '❌', late: '⏰', excused: '📝' };
+      const recent = (records||[]).map(r => `${STATUS_EMOJI[r.status]} ${r.lesson_date}${r.note ? ` (${r.note})` : ''}`).join('\n');
+      
+      let msg = `📊 <b>${p.crm_students?.full_name} — Davomat statistikasi</b>\n\n` +
+        `✅ Keldi: <b>${counts.present||0}</b> kun\n❌ Kelmadi: <b>${counts.absent||0}</b> kun\n\n<b>So'nggi darslar:</b>\n${recent || "Ma'lumot yo'q"}`;
+      await ctx.reply(msg, { parse_mode: 'HTML' });
+    }
+  });
+
+  bot.hears('📋 Guruh ma\'lumotlari', async (ctx) => {
+    if (!supabase) return;
+    const tgId = ctx.from.id;
+    const { data: parents } = await supabase.from('crm_parents').select('crm_students(full_name, crm_groups(name, schedule_days, start_time))').eq('telegram_chat_id', tgId).eq('is_verified', true);
+    if (!parents || parents.length === 0) return ctx.reply("Topilmadi.");
+
+    for (let p of parents) {
+      const g = p.crm_students?.crm_groups;
+      let msg = `📚 <b>Guruh ma'lumotlari</b>\n\n👦 O'quvchi: <b>${p.crm_students?.full_name}</b>\n🏫 Guruh: <b>${g?.name || '—'}</b>\n📅 Kunlar: ${g?.schedule_days?.join(', ') || '—'}\n🕐 Vaqt: ${g?.start_time || '—'}`;
+      await ctx.reply(msg, { parse_mode: 'HTML' });
+    }
+  });
 }
 
 export default async function handler(req, res) {
