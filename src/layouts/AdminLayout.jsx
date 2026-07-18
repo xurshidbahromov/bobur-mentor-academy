@@ -6,8 +6,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, BookOpen, HelpCircle, Users,
+  LayoutDashboard, BookOpen, Users, UsersRound,
   LogOut, ChevronRight, Menu, X, Target, Coins, Bell,
+  CalendarCheck, GraduationCap
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
@@ -20,6 +21,11 @@ const MENU = [
   { name: 'Foydalanuvchilar', path: '/admin/users', icon: Users },
   { name: 'To\'lovlar', path: '/admin/payments', icon: Coins },
   { name: 'Xabarnomalar', path: '/admin/notifications', icon: Bell },
+]
+
+const CRM_MENU = [
+  { name: 'Guruhlar', path: '/admin/crm/groups', icon: UsersRound },
+  { name: 'Davomat', path: '/admin/crm/attendance', icon: CalendarCheck },
 ]
 
 function useIsMobile() {
@@ -171,14 +177,35 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
     maxWidth: open ? 200 : 0,
     overflow: 'hidden',
     whiteSpace: 'nowrap',
-    transition: 'opacity 0.2s, max-width 0.3s cubic-bezier(0.23, 1, 0.32, 1)'
+    transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)'
+  }
+
+  const titleStyle = {
+    opacity: open ? 1 : 0,
+    maxHeight: open ? 40 : 0,
+    margin: open ? '16px 0 4px 12px' : '0 0 0 12px',
+    padding: '4px',
+    fontSize: '0.75rem',
+    fontWeight: 800,
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    overflow: open ? 'visible' : 'hidden',
+    transition: 'all 0.3s ease',
+    whiteSpace: 'nowrap',
+    lineHeight: 1.2
+  }
+
+  const crmTitleStyle = {
+    ...titleStyle,
+    color: '#3461FF',
   }
 
   return (
     <>
       {/* Logo + close (mobile) */}
-      <div style={{ padding: '20px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', minHeight: 64 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden' }}>
+      <div style={{ height: 64, boxSizing: 'border-box', padding: open ? '0 20px' : '0', display: 'flex', alignItems: 'center', justifyContent: open ? 'space-between' : 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', transition: 'padding 0.3s' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden', justifyContent: 'center' }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: '#3461FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <span style={{ color: 'white', fontWeight: 900, fontSize: '0.875rem' }}>BM</span>
           </div>
@@ -192,8 +219,8 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
       </div>
 
       {/* Nav links */}
-      <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto', overflowX: 'hidden' }}>
-        <p style={{ ...tStyle, margin: '0 0 8px 4px', fontSize: '0.7rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Menyu</p>
+      <nav style={{ flex: 1, padding: open ? '24px 12px' : '24px 8px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto', overflowX: 'hidden', transition: 'padding 0.3s' }}>
+        <div style={titleStyle}>Menyu</div>
 
         {MENU.map(item => {
           const isActive = location.pathname === item.path
@@ -203,28 +230,63 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
               to={item.path}
               title={!open ? item.name : undefined}
               style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 14px',
-                borderRadius: 12, textDecoration: 'none',
+                display: 'flex', alignItems: 'center', gap: open ? 14 : 0,
+                minHeight: 52,
+                padding: open ? '0 16px' : '0',
+                borderRadius: 14, textDecoration: 'none',
                 color: isActive ? 'white' : '#94A3B8',
                 background: isActive ? '#3461FF' : 'transparent',
                 fontWeight: isActive ? 700 : 500,
-                transition: 'background 0.2s, color 0.2s',
+                transition: 'all 0.2s',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
+                justifyContent: open ? 'flex-start' : 'center',
               }}
             >
-              <item.icon size={20} style={{ flexShrink: 0 }} />
-              <span style={{ ...tStyle, flex: 1 }}>{item.name}</span>
-              <ChevronRight size={16} style={{ flexShrink: 0, opacity: isActive && open ? 1 : 0, transition: 'opacity 0.2s' }} />
+              <item.icon size={22} style={{ flexShrink: 0 }} />
+              <span style={{ ...tStyle, flex: open ? 1 : 'none' }}>{item.name}</span>
+              {open && <ChevronRight size={16} style={{ flexShrink: 0, opacity: isActive ? 1 : 0, transition: 'opacity 0.2s' }} />}
+            </Link>
+          )
+        })}
+
+        {/* CRM Section */}
+        <div style={{ margin: '12px 0 8px', height: 1, background: 'rgba(255,255,255,0.06)' }} />
+        <div style={crmTitleStyle}>CRM</div>
+
+        {CRM_MENU.map(item => {
+          const isActive = location.pathname.startsWith(item.path)
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              title={!open ? item.name : undefined}
+              style={{
+                display: 'flex', alignItems: 'center', gap: open ? 14 : 0,
+                minHeight: 52,
+                padding: open ? '0 16px' : '0',
+                borderRadius: 14, textDecoration: 'none',
+                color: isActive ? 'white' : '#94A3B8',
+                background: isActive ? 'rgba(52,97,255,0.9)' : (open ? 'rgba(52,97,255,0.05)' : 'transparent'),
+                fontWeight: isActive ? 700 : 500,
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                border: open && !isActive ? '1px solid rgba(52,97,255,0.15)' : '1px solid transparent',
+                justifyContent: open ? 'flex-start' : 'center',
+              }}
+            >
+              <item.icon size={22} style={{ flexShrink: 0 }} />
+              <span style={{ ...tStyle, flex: open ? 1 : 'none' }}>{item.name}</span>
+              {open && <ChevronRight size={16} style={{ flexShrink: 0, opacity: isActive ? 1 : 0, transition: 'opacity 0.2s' }} />}
             </Link>
           )
         })}
       </nav>
 
       {/* Footer: user + signout */}
-      <div style={{ padding: '16px 12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, padding: '4px 4px', overflow: 'hidden', opacity: open ? 1 : 0, maxHeight: open ? 60 : 0, transition: 'opacity 0.2s, max-height 0.3s cubic-bezier(0.23, 1, 0.32, 1)' }}>
+      <div style={{ padding: open ? '16px 12px' : '16px 8px', borderTop: '1px solid rgba(255,255,255,0.06)', transition: 'padding 0.3s' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, padding: '4px', overflow: 'hidden', opacity: open ? 1 : 0, maxHeight: open ? 60 : 0, transition: 'opacity 0.2s, max-height 0.3s' }}>
           <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#334155', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {profile?.avatar_url
               ? <img src={profile.avatar_url} alt="admin" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -240,15 +302,16 @@ function SidebarContents({ open, location, profile, onSignOut, onClose }) {
           onClick={onSignOut}
           title={!open ? 'Chiqish' : undefined}
           style={{
-            width: '100%', padding: '10px 12px', borderRadius: 10,
+            width: '100%', padding: '12px', borderRadius: 10,
             border: '1px solid rgba(239,68,68,0.2)',
             background: 'rgba(239,68,68,0.05)',
             color: '#EF4444',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 10, cursor: 'pointer', fontWeight: 600, overflow: 'hidden',
+            display: 'flex', alignItems: 'center', justifyContent: open ? 'flex-start' : 'center',
+            gap: open ? 10 : 0, cursor: 'pointer', fontWeight: 600, overflow: 'hidden',
+            transition: 'all 0.3s'
           }}
         >
-          <LogOut size={18} style={{ flexShrink: 0 }} />
+          <LogOut size={20} style={{ flexShrink: 0 }} />
           <span style={{ ...tStyle, maxWidth: open ? 120 : 0 }}>Chiqish</span>
         </button>
       </div>

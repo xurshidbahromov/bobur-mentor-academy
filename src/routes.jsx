@@ -37,6 +37,11 @@ const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 const AdminPayments = lazy(() => import('./pages/admin/AdminPayments'))
 const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications'))
 
+// ── CRM pages ─────────────────────────────────────────
+const AdminCRMGroups = lazy(() => import('./pages/admin/AdminCRMGroups'))
+const AdminCRMStudents = lazy(() => import('./pages/admin/AdminCRMStudents'))
+const AdminAttendance = lazy(() => import('./pages/admin/AdminAttendance'))
+
 // ── Page transition ───────────────────────────────────
 const pageVariants = {
   initial: { opacity: 0, y: 14 },
@@ -87,6 +92,10 @@ export default function AppRoutes() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="payments" element={<AdminPayments />} />
             <Route path="notifications" element={<AdminNotifications />} />
+            {/* CRM */}
+            <Route path="crm/groups" element={<AdminCRMGroups />} />
+            <Route path="crm/groups/:groupId" element={<AdminCRMStudents />} />
+            <Route path="crm/attendance" element={<AdminAttendance />} />
           </Route>
 
           {/* ── 404 ── */}
