@@ -75,12 +75,15 @@ bot.onText(/\/start/, async (msg) => {
   bot.sendMessage(chatId,
     `👋 Assalomu alaykum, *${msg.from.first_name}*!\n\n` +
     `🏫 Bobur Mentor Academy CRM botiga xush kelibsiz.\n\n` +
-    `Bu yerda o'quv markazimiz haqida ma'lumot olishingiz yoki farzandingiz davomatini kuzatishingiz mumkin.`,
+    `Bu bot orqali farzandingizning davomat holatini kuzatib borishingiz mumkin.`,
     {
       parse_mode: 'Markdown',
       reply_markup: {
         keyboard: [
-          [{ text: '👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish' }],
+          [{ text: '👤 Profil' }, { text: '🎁 Taklifnoma' }],
+          [{ text: 'ℹ️ Yordam' }],
+          [{ text: '📊 Statistika' }],
+          [{ text: '👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish' }]
         ],
         resize_keyboard: true,
       }
@@ -117,6 +120,11 @@ bot.on('message', async (msg) => {
   // ── Group info ──
   if (text === "📋 Guruh ma'lumotlari") {
     return handleGroupInfo(chatId)
+  }
+
+  // ── Dummy buttons ──
+  if (['👤 Profil', '🎁 Taklifnoma', 'ℹ️ Yordam', '📊 Statistika'].includes(text)) {
+    return bot.sendMessage(chatId, "⏳ Bu bo'lim tez kunda ishga tushadi!")
   }
 })
 
