@@ -193,14 +193,24 @@ if (bot) {
     else if (p.startsWith('9') && p.length === 9) p = '+998' + p;
     else if (!p.startsWith('+')) p = '+' + p;
 
+    const phoneList = [p, contact.phone_number];
+    if (!contact.phone_number.startsWith('+')) phoneList.push('+' + contact.phone_number);
+
     const { data: parents, error } = await supabase
       .from('crm_parents')
       .select('*, crm_students(full_name)')
-      .or(`phone.eq.${p},phone.eq.${contact.phone_number},phone.eq.+${contact.phone_number}`);
+      .in('phone', phoneList);
 
     if (error || !parents || parents.length === 0) {
+      const failKb = [
+        ['👤 Profil', '🎁 Taklifnoma'],
+        ['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish'],
+        ['ℹ️ Yordam']
+      ];
+      if (ADMIN_TG_IDS.includes(String(tgId))) failKb.push(['📊 Statistika']);
+      
       return ctx.reply("❌ Kechirasiz, bu raqam tizimda topilmadi.\nIltimos mentorga murojaat qiling (bog'lanish uchun: @Bobur_mentor) va farzandingizga raqamingiz to'g'ri kiritilganiga ishonch hosil qiling.", 
-        Markup.keyboard([['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish'], ['👤 Profil', '🎁 Taklifnoma'], ['ℹ️ Yordam']]).resize()
+        Markup.keyboard(failKb).resize()
       );
     }
 
