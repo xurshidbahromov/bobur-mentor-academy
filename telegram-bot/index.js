@@ -52,7 +52,8 @@ bot.onText(/\/start/, async (msg) => {
     .select('*, crm_students(full_name, crm_groups(name))')
     .eq('telegram_chat_id', chatId)
     .eq('is_verified', true)
-    .single()
+    .limit(1)
+    .maybeSingle()
 
   if (existing) {
     return bot.sendMessage(chatId,
@@ -138,7 +139,9 @@ bot.on('contact', async (msg) => {
     .from('crm_parents')
     .select('*, crm_students(id, full_name, crm_groups(name, schedule_days, start_time))')
     .or(`phone.eq.${phone},phone.eq.${rawPhone},phone.eq.+${rawPhone}`)
-    .single()
+    .eq('is_verified', false)
+    .limit(1)
+    .maybeSingle()
 
   if (error || !parent) {
     userState[chatId] = null
@@ -185,11 +188,11 @@ bot.on('message', async (msg) => {
   if (!state || state.step !== 'awaiting_confirm') return
 
   if (text === '✅ Ha, mening farzandim') {
-    // Save telegram_chat_id and mark as verified
+    // Save telegram_chat_id and mark as verified for ALL children with this phone
     const { error } = await supabase
       .from('crm_parents')
       .update({ telegram_chat_id: chatId, is_verified: true, verified_at: new Date().toISOString() })
-      .eq('id', state.parentId)
+      .eq('phone', state.phone)
 
     userState[chatId] = null
 

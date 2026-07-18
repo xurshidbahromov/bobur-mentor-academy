@@ -130,9 +130,23 @@ export default function AdminCRMStudents() {
         if (cleanParentPhone) {
           const existing = editTarget.crm_parents
           if (existing) {
+            // if phone changed, maybe reset verification? For now just update phone.
             await supabase.from('crm_parents').update({ phone: cleanParentPhone }).eq('student_id', editTarget.id)
           } else {
-            await supabase.from('crm_parents').insert({ student_id: editTarget.id, phone: cleanParentPhone })
+            // Auto-link if phone already verified for another child
+            const { data: existingChat } = await supabase.from('crm_parents')
+              .select('telegram_chat_id')
+              .eq('phone', cleanParentPhone)
+              .not('telegram_chat_id', 'is', null)
+              .limit(1)
+              .maybeSingle()
+
+            await supabase.from('crm_parents').insert({ 
+              student_id: editTarget.id, 
+              phone: cleanParentPhone,
+              telegram_chat_id: existingChat?.telegram_chat_id || null,
+              is_verified: !!existingChat?.telegram_chat_id
+            })
           }
         }
         toast.success("O'quvchi yangilandi")
@@ -147,9 +161,22 @@ export default function AdminCRMStudents() {
 
         // Insert parent if phone given
         if (cleanParentPhone && student) {
-          await supabase.from('crm_parents').insert({ student_id: student.id, phone: cleanParentPhone })
+          // Auto-link if phone already verified for another child
+          const { data: existingChat } = await supabase.from('crm_parents')
+            .select('telegram_chat_id')
+            .eq('phone', cleanParentPhone)
+            .not('telegram_chat_id', 'is', null)
+            .limit(1)
+            .maybeSingle()
+
+          await supabase.from('crm_parents').insert({ 
+            student_id: student.id, 
+            phone: cleanParentPhone,
+            telegram_chat_id: existingChat?.telegram_chat_id || null,
+            is_verified: !!existingChat?.telegram_chat_id
+          })
         }
-        toast.success("O'quvchi qo'shildi!")
+        toast.success("O'quvchi qo'shildi! 🎉")
       }
 
       setModalOpen(false)
