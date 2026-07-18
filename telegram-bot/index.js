@@ -75,12 +75,12 @@ bot.onText(/\/start/, async (msg) => {
   bot.sendMessage(chatId,
     `👋 Assalomu alaykum, *${msg.from.first_name}*!\n\n` +
     `🏫 Bobur Mentor Academy CRM botiga xush kelibsiz.\n\n` +
-    `Bu bot orqali farzandingizning davomat holatini kuzatib borishingiz mumkin.`,
+    `Bu yerda o'quv markazimiz haqida ma'lumot olishingiz yoki farzandingiz davomatini kuzatishingiz mumkin.`,
     {
       parse_mode: 'Markdown',
       reply_markup: {
         keyboard: [
-          [{ text: '👨‍👩‍👧 Ota-ona sifatida bog\'lanish' }],
+          [{ text: '👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish' }],
         ],
         resize_keyboard: true,
       }
@@ -94,7 +94,7 @@ bot.on('message', async (msg) => {
   const text   = msg.text
 
   // ── Step 1: Start registration ──
-  if (text === "👨‍👩‍👧 Ota-ona sifatida bog'lanish") {
+  if (text === "👨‍👩‍👧 Ota-ona sifatida ro'yxatdan o'tish") {
     userState[chatId] = { step: 'awaiting_phone' }
     return bot.sendMessage(chatId,
       '📱 Iltimos, telefon raqamingizni yuboring.\n\n' +
@@ -150,7 +150,7 @@ bot.on('contact', async (msg) => {
       'Iltimos, mentorga murojaat qiling va raqamingiz qo\'shilganiga ishonch hosil qiling.',
       {
         parse_mode: 'Markdown',
-        reply_markup: { keyboard: [[{ text: "👨‍👩‍👧 Ota-ona sifatida bog'lanish" }]], resize_keyboard: true }
+        reply_markup: { keyboard: [[{ text: "👨‍👩‍👧 Ota-ona sifatida ro'yxatdan o'tish" }]], resize_keyboard: true }
       }
     )
   }
