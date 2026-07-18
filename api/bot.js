@@ -199,7 +199,7 @@ if (bot) {
       .or(`phone.eq.${p},phone.eq.${contact.phone_number},phone.eq.+${contact.phone_number}`);
 
     if (error || !parents || parents.length === 0) {
-      return ctx.reply("❌ Kechirasiz, bu raqam tizimda topilmadi.\nIltimos mentorga murojaat qiling va farzandingizga raqamingiz to'g'ri kiritilganiga ishonch hosil qiling.", 
+      return ctx.reply("❌ Kechirasiz, bu raqam tizimda topilmadi.\nIltimos mentorga murojaat qiling (bog'lanish uchun: @Bobur_mentor) va farzandingizga raqamingiz to'g'ri kiritilganiga ishonch hosil qiling.", 
         Markup.keyboard([['👨‍👩‍👧 Ota-ona sifatida ro\'yxatdan o\'tish'], ['👤 Profil', '🎁 Taklifnoma'], ['ℹ️ Yordam']]).resize()
       );
     }
