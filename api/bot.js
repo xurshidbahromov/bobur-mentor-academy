@@ -188,13 +188,21 @@ if (bot) {
     const contact = ctx.message.contact;
     const tgId = ctx.from.id;
     
-    let p = contact.phone_number.replace(/\\D/g, '');
+    let p = contact.phone_number.replace(/\D/g, '');
     if (p.startsWith('998')) p = '+' + p;
     else if (p.startsWith('9') && p.length === 9) p = '+998' + p;
     else if (!p.startsWith('+')) p = '+' + p;
 
+    // Build resilient search formats to catch any old DB records
     const phoneList = [p, contact.phone_number];
     if (!contact.phone_number.startsWith('+')) phoneList.push('+' + contact.phone_number);
+    
+    // Add formatted version: +998 (94) 101-26-80
+    if (p.length === 13 && p.startsWith('+998')) {
+      const formatted = `+998 (${p.substring(4, 6)}) ${p.substring(6, 9)}-${p.substring(9, 11)}-${p.substring(11, 13)}`;
+      phoneList.push(formatted);
+      phoneList.push(formatted.replace(/\s+/g, '')); // +998(94)101-26-80
+    }
 
     const { data: parents, error } = await supabase
       .from('crm_parents')
