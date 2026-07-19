@@ -246,16 +246,43 @@ if (bot) {
     }
 
     for (let p of parents) {
-      const { data: records } = await supabase.rpc('bot_get_student_attendance', { p_student_id: p.student_id });
+      const [{ data: records }, { data: hwRecords }] = await Promise.all([
+        supabase.rpc('bot_get_student_attendance', { p_student_id: p.student_id }),
+        supabase.rpc('bot_get_student_homework',   { p_student_id: p.student_id }),
+      ]);
+
+      // Build per-lesson lines
+      const ATT_LABELS = { present: '✅ Keldi', absent: '❌ Kelmadi', late: '⏰ Kech keldi', excused: '📝 Sababli' };
+      const hwMap = {};
+      (hwRecords||[]).forEach(h => { hwMap[h.lesson_date] = { done: h.done, note: h.note }; });
+      const hwDone    = (hwRecords||[]).filter(h => h.done === true).length;
+      const hwNotDone = (hwRecords||[]).filter(h => h.done === false).length;
+
+      // Format date: 2026-07-19 → 19-iyul
+      const MONTHS = ['yan','fev','mar','apr','may','iyn','iyl','avg','sen','okt','noy','dek'];
+      function fmtDate(d) {
+        const [,m,day] = d.split('-');
+        return `${parseInt(day)}-${MONTHS[parseInt(m)-1]}`;
+      }
+
+      const recent = (records||[]).map(r => {
+        const attLabel = ATT_LABELS[r.status] || r.status;
+        const attLine  = r.note ? `${attLabel} (${r.note})` : attLabel;
+        const hw = hwMap[r.lesson_date];
+        let hwLine = '';
+        if (hw !== undefined) {
+          hwLine = hw.done ? '📚 Dars bajargan' : '📚 Bajarmagan';
+          if (hw.note) hwLine += ` (${hw.note})`;
+        }
+        const parts = [attLine, hwLine].filter(Boolean).join(' · ');
+        return `<b>${fmtDate(r.lesson_date)}</b>: ${parts}`;
+      }).join('\n');
+
       const counts = (records||[]).reduce((acc, r) => { acc[r.status] = (acc[r.status]||0)+1; return acc }, {});
-      const STATUS_EMOJI = { present: '✅', absent: '❌', late: '⏰', excused: '📝' };
-      const recent = (records||[]).map(r => `${STATUS_EMOJI[r.status]} ${r.lesson_date}${r.note ? ` (${r.note})` : ''}`).join('\n');
-      
-      const msg = `📊 <b>${p.student_name} — Davomat</b>\n\n` +
-        `✅ Keldi: <b>${counts.present||0}</b> kun\n` +
-        `❌ Kelmadi: <b>${counts.absent||0}</b> kun\n` +
-        `⏰ Kech keldi: <b>${counts.late||0}</b> kun\n` +
-        `📝 Sababli (kelmadi): <b>${counts.excused||0}</b> kun\n\n` +
+
+      const msg = `📊 <b>${p.student_name} — Davomat va vazifalar</b>\n\n` +
+        `✅ Keldi: <b>${counts.present||0}</b>  ❌ Kelmadi: <b>${counts.absent||0}</b>  ⏰ Kech: <b>${counts.late||0}</b>  📝 Sababli: <b>${counts.excused||0}</b>\n` +
+        `📚 Dars qildi: <b>${hwDone}</b>  Qilmadi: <b>${hwNotDone}</b>\n\n` +
         `<b>So'nggi darslar:</b>\n${recent || "Ma'lumot yo'q"}`;
       await ctx.reply(msg, { parse_mode: 'HTML' });
     }
