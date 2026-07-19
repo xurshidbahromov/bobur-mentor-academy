@@ -271,7 +271,7 @@ if (bot) {
         const hw = hwMap[r.lesson_date];
         let hwLine = '';
         if (hw !== undefined) {
-          hwLine = hw.done ? '📚 Dars bajargan' : '📚 Bajarmagan';
+          hwLine = hw.done ? '📚 Vazifani bajargan' : '📚 Vazifani bajarmagan';
           if (hw.note) hwLine += ` (${hw.note})`;
         }
         const parts = [attLine, hwLine].filter(Boolean).join(' · ');
@@ -282,7 +282,7 @@ if (bot) {
 
       const msg = `📊 <b>${p.student_name} — Davomat va vazifalar</b>\n\n` +
         `✅ Keldi: <b>${counts.present||0}</b>  ❌ Kelmadi: <b>${counts.absent||0}</b>  ⏰ Kech: <b>${counts.late||0}</b>  📝 Sababli: <b>${counts.excused||0}</b>\n` +
-        `📚 Dars qildi: <b>${hwDone}</b>  Qilmadi: <b>${hwNotDone}</b>\n\n` +
+        `📚 Vazifa qildi: <b>${hwDone}</b> Vazifa qilmadi: <b>${hwNotDone}</b>\n\n` +
         `<b>So'nggi darslar:</b>\n${recent || "Ma'lumot yo'q"}`;
       await ctx.reply(msg, { parse_mode: 'HTML' });
     }

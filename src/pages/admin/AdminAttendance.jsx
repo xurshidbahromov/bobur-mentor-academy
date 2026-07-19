@@ -33,8 +33,8 @@ function MarkAllMenu({ onMarkAll, onMarkAllHw }) {
   const items = [
     { label: 'Hammasini keldi',         icon: CheckCircle2, color: '#10B981', action: () => { onMarkAll('present'); setOpen(false) } },
     { label: 'Hammasini kelmadi',       icon: XCircle,      color: '#EF4444', action: () => { onMarkAll('absent');  setOpen(false) } },
-    { label: 'Hammasini dars qildi',    icon: BookOpen,     color: '#10B981', action: () => { onMarkAllHw(true);   setOpen(false) } },
-    { label: 'Hammasini dars qilmadi',  icon: BookX,        color: '#EF4444', action: () => { onMarkAllHw(false);  setOpen(false) } },
+    { label: 'Hammasini vazifa qildi',    icon: BookOpen,     color: '#10B981', action: () => { onMarkAllHw(true);   setOpen(false) } },
+    { label: 'Hammasini vazifa qilmadi',  icon: BookX,        color: '#EF4444', action: () => { onMarkAllHw(false);  setOpen(false) } },
   ]
 
   return (
@@ -126,11 +126,11 @@ function StudentCard({ student, index, attStatus, attNote, hwStatus, hwNote, onA
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
           <button onClick={() => onHw(true)}
             style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 9, cursor: 'pointer', border: `1px solid ${hwStatus === true ? 'rgba(16,185,129,0.35)' : 'rgba(255,255,255,0.07)'}`, background: hwStatus === true ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)', color: hwStatus === true ? '#10B981' : '#64748B', fontWeight: hwStatus === true ? 700 : 500, fontSize: '0.825rem', transition: 'all 0.15s' }}>
-            <BookOpen size={13} /> Dars qildi
+            <BookOpen size={13} /> Bajargan
           </button>
           <button onClick={() => onHw(false)}
             style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 9, cursor: 'pointer', border: `1px solid ${hwStatus === false ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.07)'}`, background: hwStatus === false ? 'rgba(239,68,68,0.14)' : 'rgba(255,255,255,0.03)', color: hwStatus === false ? '#EF4444' : '#64748B', fontWeight: hwStatus === false ? 700 : 500, fontSize: '0.825rem', transition: 'all 0.15s' }}>
-            <BookX size={13} /> Qilmadi
+            <BookX size={13} /> Bajarmagan
           </button>
           {hwToggled && (
             <button onClick={() => onHw(null)}
