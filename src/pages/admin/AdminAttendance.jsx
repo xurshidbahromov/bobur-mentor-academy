@@ -33,8 +33,8 @@ function MarkAllMenu({ onMarkAll, onMarkAllHw }) {
   const items = [
     { label: 'Hammasini keldi',         icon: CheckCircle2, color: '#10B981', action: () => { onMarkAll('present'); setOpen(false) } },
     { label: 'Hammasini kelmadi',       icon: XCircle,      color: '#EF4444', action: () => { onMarkAll('absent');  setOpen(false) } },
-    { label: 'Hammasini vazifa qildi',    icon: BookOpen,     color: '#10B981', action: () => { onMarkAllHw(true);   setOpen(false) } },
-    { label: 'Hammasini vazifa qilmadi',  icon: BookX,        color: '#EF4444', action: () => { onMarkAllHw(false);  setOpen(false) } },
+    { label: 'Hammasini vazifa bajargan',    icon: BookOpen,     color: '#10B981', action: () => { onMarkAllHw(true);   setOpen(false) } },
+    { label: 'Hammasini vazifa bajarmagan',  icon: BookX,        color: '#EF4444', action: () => { onMarkAllHw(false);  setOpen(false) } },
   ]
 
   return (
