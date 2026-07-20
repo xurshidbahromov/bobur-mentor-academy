@@ -31,6 +31,7 @@ const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminContent = lazy(() => import('./pages/admin/AdminContent'))
 const AdminGeneralQuizzes = lazy(() => import('./pages/admin/AdminGeneralQuizzes'))
+const AdminTopicQuizzes = lazy(() => import('./pages/admin/AdminTopicQuizzes'))
 const AdminDailyQuizzes = lazy(() => import('./pages/admin/AdminDailyQuizzes'))
 const AdminDailyQuizQuestions = lazy(() => import('./pages/admin/AdminDailyQuizQuestions'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
@@ -62,7 +63,7 @@ export default function AppRoutes() {
     <LazyMotion features={domAnimation} strict>
       <AnimatePresence mode="wait">
         <Suspense fallback={<PageSkeleton />}>
-          <Routes location={location} key={location.pathname}>
+          <Routes location={location} key={location.pathname.startsWith('/admin') ? 'admin' : location.pathname}>
 
           {/* ── Public ── */}
           <Route path="/" element={<PW><LandingPage /></PW>} />
@@ -87,6 +88,7 @@ export default function AppRoutes() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="content" element={<AdminContent />} />
             <Route path="general-quizzes" element={<AdminGeneralQuizzes />} />
+            <Route path="topic-quizzes" element={<AdminTopicQuizzes />} />
             <Route path="daily-quizzes" element={<AdminDailyQuizzes />} />
             <Route path="daily-quizzes/:quizId" element={<AdminDailyQuizQuestions />} />
             <Route path="users" element={<AdminUsers />} />

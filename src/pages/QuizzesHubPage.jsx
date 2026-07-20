@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'sonner'
+import { TopicIcon } from '../utils/topicIcons'
 
 // ── Tab definitions ──────────────────────────────────────────
 const TABS = [
@@ -28,12 +29,13 @@ export default function QuizzesHubPage() {
     queryFn: async () => {
       const d = new Date()
       const today = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-      const [cRes, lRes, qRes, aRes, dailyRes] = await Promise.all([
+        const [cRes, lRes, qRes, aRes, dailyRes, topicRes] = await Promise.all([
         supabase.from('courses').select('id,title').eq('is_published',true).order('created_at',{ascending:false}),
         supabase.from('lessons').select('id,course_id,title,is_free').eq('is_published',true).order('order_index',{ascending:true}),
         supabase.from('quizzes').select('id,lesson_id').not('lesson_id','is',null),
         user ? supabase.from('user_access').select('lesson_id').eq('user_id',user.id) : {data:[]},
         supabase.from('daily_quizzes').select('*').eq('is_active', true).order('quiz_date', { ascending: false }),
+        supabase.from('topic_quiz_sets').select('id,title,description,icon_emoji,order_index').eq('is_published',true).order('order_index').order('created_at',{ascending:false}),
       ])
       const dailyQuizzes = dailyRes.data || []
 
@@ -49,6 +51,17 @@ export default function QuizzesHubPage() {
         atts?.forEach(a => { attemptsMap[a.daily_quiz_id] = a })
       }
 
+      // topic_quiz_sets — question counts
+      const topicSets = topicRes.data || []
+      let topicSetCounts = {}
+      if (topicSets.length > 0) {
+        const { data: tqCounts } = await supabase
+          .from('topic_quiz_questions')
+          .select('set_id')
+          .in('set_id', topicSets.map(s => s.id))
+        tqCounts?.forEach(r => { topicSetCounts[r.set_id] = (topicSetCounts[r.set_id] || 0) + 1 })
+      }
+
       const map = {}
       lRes.data?.forEach(l => {
         const count = qRes.data?.filter(q => q.lesson_id === l.id).length || 0
@@ -59,13 +72,13 @@ export default function QuizzesHubPage() {
       })
       const courses = (cRes.data||[]).filter(c => map[c.id]?.length > 0)
       const unlockedSet = new Set((aRes.data||[]).map(a => a.lesson_id))
-      return { courses, map, unlockedSet, dailyQuizzes, attemptsMap }
+      return { courses, map, unlockedSet, dailyQuizzes, attemptsMap, topicSets, topicSetCounts }
     },
     staleTime: 0,
     refetchOnWindowFocus: true,
   })
 
-  const { courses=[], map:lessonsMap={}, unlockedSet=new Set(), dailyQuizzes=[], attemptsMap={} } = data || {}
+  const { courses=[], map:lessonsMap={}, unlockedSet=new Set(), dailyQuizzes=[], attemptsMap={}, topicSets=[], topicSetCounts={} } = data || {}
 
   return (
     <>
@@ -466,6 +479,52 @@ export default function QuizzesHubPage() {
                         })}
                       </div>
                     ) : (
+                      <div style={{ padding: '60px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', background: '#F8FAFC', borderRadius: 24, border: '1px dashed rgba(52,97,255,0.15)' }}>
+                        <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(52,97,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                          <BookOpen size={32} color="#3461FF" style={{ opacity: 0.5 }} />
+                        </div>
+                        <p style={{ margin: 0, fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>Hozircha mavzulashtirilgan testlar mavjud emas.</p>
+                      </div>
+                    )}
+
+                    {/* ── Standalone topic quiz sets ── */}
+                    {topicSets.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: courses.length > 0 ? 24 : 0 }}>
+                        {courses.length > 0 && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0' }}>
+                            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.06)' }} />
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Qo'shimcha to'plamlar</span>
+                            <div style={{ flex: 1, height: 1, background: 'rgba(15,23,42,0.06)' }} />
+                          </div>
+                        )}
+                        {topicSets.map((ts, ti) => {
+                          const qCount = topicSetCounts[ts.id] || 0
+                          const accent = `hsl(${ti * 67 + 170}, 65%, 45%)`
+                          const accentBg = `hsl(${ti * 67 + 170}, 80%, 95%)`
+                          return (
+                            <div key={ts.id} className="glass-card-premium card-glow-hover"
+                              style={{ padding: '12px 16px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }}
+                              onClick={() => navigate(`/quiz/topic-${ts.id}`)}>
+                              <div style={{ width: 46, height: 46, borderRadius: 14, background: accentBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 6px 16px ${accent}33` }}>
+                                <TopicIcon name={ts.icon_emoji} size={24} color={accent} />
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <h3 className="outfit-font" style={{ margin: '0 0 3px', fontSize: '1rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ts.title}</h3>
+                                {ts.description && <p style={{ margin: 0, fontSize: '0.8125rem', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ts.description}</p>}
+                                <span style={{ fontSize: '0.8125rem', color: accent, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                                  <HelpCircle size={13} /> {qCount} ta savol
+                                </span>
+                              </div>
+                              <div style={{ width: 36, height: 36, borderRadius: '50%', background: accent, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <ChevronRight size={18} strokeWidth={3} />
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+
+                    {courses.length === 0 && topicSets.length === 0 && (
                       <div style={{ padding: '60px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', background: '#F8FAFC', borderRadius: 24, border: '1px dashed rgba(52,97,255,0.15)' }}>
                         <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(52,97,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                           <BookOpen size={32} color="#3461FF" style={{ opacity: 0.5 }} />

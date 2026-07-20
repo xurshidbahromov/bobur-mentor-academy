@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext'
 import { toast } from 'sonner'
 import confetti from 'canvas-confetti'
 import MathRenderer from '../components/ui/MathRenderer'
+import { TopicIcon } from '../utils/topicIcons'
 
 // ── Constants ────────────────────────────────────────────────
 const SECONDS_PER_QUESTION = 60
@@ -210,9 +211,10 @@ export default function QuizPage() {
   const { lessonId } = useParams()
   const queryClient = useQueryClient()
   
-  const isDaily = lessonId?.startsWith('daily-')
-  const actualId = isDaily ? lessonId.replace('daily-', '') : lessonId
-  const isGeneral = lessonId === 'general'
+  const isDaily     = lessonId?.startsWith('daily-')
+  const isTopicSet  = lessonId?.startsWith('topic-')
+  const actualId    = isDaily ? lessonId.replace('daily-', '') : isTopicSet ? lessonId.replace('topic-', '') : lessonId
+  const isGeneral   = lessonId === 'general'
 
   const { data: quizData, isLoading: loading } = useQuery({
     queryKey: ['quiz', lessonId, actualId, isDaily],
@@ -227,6 +229,16 @@ export default function QuizPage() {
         const { data, error } = await supabase.from('quizzes').select('*').eq('is_general', true)
         if (error) throw error
         return { lesson: { title: 'Umumiy Test' }, allQuizzes: (data || []).sort(() => Math.random() - 0.5) }
+      } else if (isTopicSet) {
+        const [{ data: s, error: sErr }, { data: q, error: qErr }] = await Promise.all([
+          supabase.from('topic_quiz_sets').select('id,title,description,icon_emoji').eq('id', actualId).single(),
+          supabase.from('topic_quiz_questions').select('*').eq('set_id', actualId).order('order_index').order('created_at'),
+        ])
+        if (sErr) throw sErr
+        if (qErr) throw qErr
+        // Normalize to quizzes schema (same fields, just different source)
+        const normalized = (q || []).map(r => ({ ...r, lesson_id: null, is_general: false }))
+        return { lesson: { title: s.title, icon_name: s.icon_emoji }, quizzes: normalized, isTopicSet: true }
       } else {
         const [{ data: l, error: lErr }, { data: q, error: qErr }] = await Promise.all([
           supabase.from('lessons').select('id, title').eq('id', lessonId).single(),
@@ -367,8 +379,13 @@ export default function QuizPage() {
       <header style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, position: 'sticky', top: 0, background: 'rgba(248,250,252,0.98)', zIndex: 10, borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
         <button onClick={() => navigate('/quizzes')} style={{ background: 'rgba(15,23,42,0.05)', border: 'none', color: '#1E293B', width: 40, height: 40, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><ArrowLeft size={20} /></button>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Quiz Session</p>
-          <h1 className="outfit-font" style={{ margin: 0, fontSize: '1.125rem', fontWeight: 900, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lesson?.title}</h1>
+          <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {isDaily ? 'Kunlik Test' : isGeneral ? 'Umumiy Test' : isTopicSet ? 'Mavzulashtirilgan Test' : 'Dars Testi'}
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+            {lesson?.icon_name && <TopicIcon name={lesson.icon_name} size={18} color="#3461FF" />}
+            <h1 className="outfit-font" style={{ margin: 0, fontSize: '1.125rem', fontWeight: 900, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lesson?.title}</h1>
+          </div>
         </div>
         {phase === 'quiz' && <MinimalTimer seconds={timeLeft} />}
       </header>

@@ -8,7 +8,7 @@ import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, BookOpen, Users, UsersRound,
   LogOut, ChevronRight, Menu, X, Target, Coins, Bell,
-  CalendarCheck, GraduationCap
+  CalendarCheck, GraduationCap, BookMarked, Flame, Shuffle
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
@@ -16,9 +16,10 @@ import { useAuth } from '../context/AuthContext'
 const MENU = [
   { name: 'Statistika', path: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Dars Boshqaruvi', path: '/admin/content', icon: BookOpen },
-  { name: 'Kunlik Testlar', path: '/admin/daily-quizzes', icon: Target },
-  { name: 'Umumiy Testlar', path: '/admin/general-quizzes', icon: Target },
-  { name: 'Foydalanuvchilar', path: '/admin/users', icon: Users },
+  { name: 'Kunlik Testlar',      path: '/admin/daily-quizzes',   icon: Flame },
+  { name: 'Umumiy Testlar',       path: '/admin/general-quizzes', icon: Shuffle },
+  { name: 'Mavzu Testlar',        path: '/admin/topic-quizzes',   icon: BookMarked },
+  { name: 'Foydalanuvchilar',     path: '/admin/users',           icon: Users },
   { name: 'To\'lovlar', path: '/admin/payments', icon: Coins },
   { name: 'Xabarnomalar', path: '/admin/notifications', icon: Bell },
 ]
