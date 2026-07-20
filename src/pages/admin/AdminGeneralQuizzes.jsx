@@ -193,8 +193,8 @@ export default function AdminGeneralQuizzes() {
       {/* MODAL */}
       <AnimatePresence>
         {isModalOpen && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} style={{ background: '#1E293B', width: '100%', maxWidth: 600, borderRadius: 24, padding: 32, border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div className="admin-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+            <motion.div className="admin-modal-content" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} style={{ background: '#1E293B', width: '100%', maxWidth: 600, padding: 'clamp(20px, 5vw, 32px)', border: '1px solid rgba(255,255,255,0.1)' }}>
               <h2 style={{ margin: '0 0 24px', fontSize: '1.5rem', fontWeight: 800 }}>
                 {editingItem ? "Umumiy Savolni Tahrirlash" : "Yangi Umumiy Savol Qo'shish"}
               </h2>

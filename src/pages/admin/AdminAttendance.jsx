@@ -358,7 +358,7 @@ export default function AdminAttendance() {
           )}
 
           {/* Student cards grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: 12, marginBottom: 20 }}>
             {students.map((s, i) => (
               <StudentCard key={s.id} student={s} index={i}
                 attStatus={attendance[s.id]}   attNote={attNotes[s.id]}

@@ -49,9 +49,9 @@ function SetModal({ item, onClose, onSave }) {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-        style={{ background: '#1E293B', width: '100%', maxWidth: 500, borderRadius: 24, padding: 32, border: '1px solid rgba(255,255,255,0.09)' }}>
+    <div className="admin-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <motion.div className="admin-modal-content" initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+        style={{ background: '#1E293B', width: '100%', maxWidth: 500, padding: 'clamp(20px, 5vw, 32px)', border: '1px solid rgba(255,255,255,0.09)' }}>
 
         {/* Header with live icon preview */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
@@ -199,9 +199,9 @@ function QuestionModal({ setId, item, onClose, onSave }) {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-        style={{ background: '#1E293B', width: '100%', maxWidth: 640, borderRadius: 24, padding: 32, border: '1px solid rgba(255,255,255,0.09)', maxHeight: '92vh', overflowY: 'auto' }}>
+    <div className="admin-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <motion.div className="admin-modal-content" initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+        style={{ background: '#1E293B', width: '100%', maxWidth: 640, padding: 'clamp(20px, 5vw, 32px)', border: '1px solid rgba(255,255,255,0.09)' }}>
         <h2 style={{ margin: '0 0 24px', fontSize: '1.375rem', fontWeight: 800 }}>
           {item ? "Savolni tahrirlash" : "Yangi savol qo'shish"}
         </h2>
@@ -368,7 +368,7 @@ export default function AdminTopicQuizzes() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {filtered.map(set => (
               <motion.div key={set.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-                style={{ background: '#1E293B', borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)', padding: '15px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+                style={{ background: '#1E293B', borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)', padding: '15px 18px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
                 {/* Icon */}
                 <div style={{ width: 46, height: 46, borderRadius: 13, background: 'rgba(52,97,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <TopicIcon name={set.icon_emoji} size={22} color="#60A5FA" />
@@ -384,7 +384,7 @@ export default function AdminTopicQuizzes() {
                   {set.description && <p style={{ margin: '3px 0 0', fontSize: '0.8rem', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{set.description}</p>}
                 </div>
                 {/* Actions */}
-                <div style={{ display: 'flex', gap: 7, flexShrink: 0 }}>
+                <div style={{ display: 'flex', gap: 7, flexShrink: 0, flexWrap: 'wrap' }}>
                   <button onClick={() => { setSelectedSet(set); setView('questions') }}
                     style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '8px 13px', borderRadius: 9, background: 'rgba(52,97,255,0.1)', border: '1px solid rgba(52,97,255,0.2)', color: '#60A5FA', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}>
                     <HelpCircle size={14} /> Savollar

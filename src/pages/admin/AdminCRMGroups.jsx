@@ -24,19 +24,21 @@ function Modal({ open, onClose, children }) {
   return (
     <AnimatePresence>
       <motion.div
+        className="admin-modal-overlay"
         key="backdrop"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
         style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
       >
         <motion.div
+          className="admin-modal-content"
           key="modal"
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           onClick={e => e.stopPropagation()}
-          style={{ background: '#1E293B', borderRadius: 28, padding: 36, width: '100%', maxWidth: 520, border: '1px solid rgba(255,255,255,0.08)', maxHeight: '90vh', overflowY: 'auto' }}
+          style={{ background: '#1E293B', padding: 'clamp(20px, 5vw, 36px)', width: '100%', maxWidth: 520, border: '1px solid rgba(255,255,255,0.08)' }}
         >
           {children}
         </motion.div>

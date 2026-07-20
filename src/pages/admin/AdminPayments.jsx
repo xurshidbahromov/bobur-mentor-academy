@@ -102,8 +102,8 @@ export default function AdminPayments() {
             <p style={{ color: '#94A3B8', fontWeight: 500 }}>Hozircha to'lov so'rovlari yo'q</p>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <div className="admin-table-container">
+            <table style={{ width: '100%', minWidth: '700px', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94A3B8', fontSize: '0.75rem', textTransform: 'uppercase' }}>
                   <th style={{ padding: '16px 12px', fontWeight: 600 }}>Mijoz</th>

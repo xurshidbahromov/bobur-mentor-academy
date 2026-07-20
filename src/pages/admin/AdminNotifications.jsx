@@ -117,7 +117,7 @@ export default function AdminNotifications() {
             exit={{ opacity: 0, x: 20 }}
             style={{ 
                 background: '#1E293B', 
-                padding: 40, 
+                padding: 'clamp(20px, 5vw, 40px)', 
                 borderRadius: 32, 
                 border: '1px solid rgba(255,255,255,0.05)',
                 maxWidth: 700
@@ -201,7 +201,9 @@ export default function AdminNotifications() {
                        border: '1px solid rgba(255,255,255,0.05)',
                        display: 'flex',
                        justifyContent: 'space-between',
-                       alignItems: 'center'
+                       alignItems: 'center',
+                       flexWrap: 'wrap',
+                       gap: '12px'
                     }}
                   >
                     <div>
@@ -213,7 +215,7 @@ export default function AdminNotifications() {
                         </div>
                         <p style={{ margin: 0, fontSize: '0.875rem', color: '#94A3B8' }}>{n.message}</p>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
+                    <div style={{ textAlign: 'left', minWidth: '120px' }}>
                         <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569' }}>{new Date(n.created_at).toLocaleDateString()}</p>
                         <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', fontWeight: 600 }}>ID: {n.user_id?.split('-')[0]}...</p>
                     </div>

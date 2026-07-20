@@ -388,13 +388,14 @@ export default function AdminContent() {
       {/* ── MODAL ── */}
       <AnimatePresence>
         {modalType && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div className="admin-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
             <motion.div
+              className="admin-modal-content"
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.22 }}
-              style={{ background: '#1E293B', width: '100%', maxWidth: modalType === 'quiz' ? 600 : 500, borderRadius: 24, padding: 32, border: '1px solid rgba(255,255,255,0.1)', maxHeight: '90vh', overflowY: 'auto' }}
+              style={{ background: '#1E293B', width: '100%', maxWidth: modalType === 'quiz' ? 600 : 500, padding: 'clamp(20px, 5vw, 32px)', border: '1px solid rgba(255,255,255,0.1)' }}
             >
               <h2 style={{ margin: '0 0 24px', fontSize: '1.375rem', fontWeight: 800 }}>
                 {modalType === 'course' ? (editingItem ? 'Mavzuni Tahrirlash' : "Yangi Mavzu Qo'shish") :
@@ -425,7 +426,7 @@ export default function AdminContent() {
                   <input placeholder="YouTube Link yoki ID (masalan: dQw4w9WgXcQ)" value={lessonForm.youtube_video_id} onChange={e => setLessonForm({ ...lessonForm, youtube_video_id: e.target.value })} style={inp} />
                   <textarea placeholder="Dars ta'rifi" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })} rows={3} style={inp} />
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div className="admin-flex-row-to-col" style={{ gap: 16 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                       <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.9rem', color: '#CBD5E1' }}>
                         <input type="checkbox" checked={lessonForm.is_free} onChange={e => setLessonForm({ ...lessonForm, is_free: e.target.checked })} style={{ width: 18, height: 18 }} />
