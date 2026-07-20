@@ -96,7 +96,7 @@ export default function AdminDashboard() {
 
       {/* Revenue Section */}
       <div className="admin-grid-2-1" style={{ marginBottom: '48px' }}>
-        <div className="admin-card" style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
+        <div className="admin-card" style={{ background: '#1E293B', padding: '32px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', position: 'relative', minWidth: 0 }}>
           <div className="admin-header-row" style={{ marginBottom: '32px' }}>
             <div>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0 0 4px' }}>Daromad Dinamikasi</h2>
@@ -121,17 +121,34 @@ export default function AdminDashboard() {
           </div>
 
           {/* Simple SVG Chart */}
-          <div className="admin-chart-container" style={{ height: '240px', width: '100%', position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
-            {(stats?.[`revenue_${timeframe}`] || []).map((val, i, arr) => {
-              const max = Math.max(...arr, 1000)
-              const height = (val / max) * 100
+          <div className="admin-chart-container" style={{ height: '240px', width: '100%', position: 'relative', display: 'flex', alignItems: 'flex-end', gap: '8px', overflowX: 'auto', paddingBottom: '10px' }}>
+            {(() => {
+              const data = stats?.[`revenue_${timeframe}`] || [];
+              const max = Math.max(...data.map(d => d.amount), 1000);
+              const totalInPeriod = data.reduce((sum, d) => sum + d.amount, 0);
+              
               return (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '100%', height: `${height}%`, background: 'linear-gradient(to top, #3461FF, #8B5CF6)', borderRadius: '6px 6px 2px 2px', minHeight: '4px', opacity: 0.8 + (height / 500) }} />
-                  <span style={{ fontSize: '10px', color: '#475569', fontWeight: 600 }}>{i + 1}</span>
-                </div>
+                <>
+                  {totalInPeriod === 0 && (
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', fontSize: '0.875rem', fontWeight: 600, zIndex: 10 }}>
+                      Ushbu davrda daromad mavjud emas
+                    </div>
+                  )}
+                  {data.map((item, i) => {
+                    const height = (item.amount / max) * 100;
+                    return (
+                      <div key={i} style={{ flex: 1, minWidth: timeframe === 'monthly' ? '24px' : '0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', zIndex: 1 }}>
+                        <div 
+                          title={`${item.amount.toLocaleString()} UZS`}
+                          style={{ width: '100%', height: `${height}%`, background: 'linear-gradient(to top, #3461FF, #8B5CF6)', borderRadius: '6px 6px 2px 2px', minHeight: '4px', opacity: totalInPeriod === 0 ? 0.2 : (0.8 + (height / 500)) }} 
+                        />
+                        <span style={{ fontSize: '10px', color: '#475569', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.label}</span>
+                      </div>
+                    )
+                  })}
+                </>
               )
-            })}
+            })()}
           </div>
         </div>
 
